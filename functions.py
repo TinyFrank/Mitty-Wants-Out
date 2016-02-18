@@ -11,6 +11,7 @@ import math
 
 def place_loot(settings, screen, stats, loots):
 	#instantiate one loot
+	rand_shape = choice(('Rod','I-Beam','Mesh','Sheet','Bar','Chunk'))
 	loot_inst = Loot(settings, screen, stats.loot_val) 
 	placed = False
 	timeout=0
@@ -42,7 +43,7 @@ def place_loot(settings, screen, stats, loots):
 
 def place_part(settings, screen, stats, loots):
 	#instantiate one loot
-	rand_shape = choice(('rod','beam','mesh','sheet','bar'))
+	rand_shape = choice(('Rod','I-Beam','Mesh','Sheet','Bar','Chunk'))
 	loot_inst = Part(settings, screen, value = stats.loot_val, shape = rand_shape) 
 	loot_inst.construct_part()
 	placed = False
@@ -95,7 +96,16 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 	if event.key == pygame.K_q:
 		sys.exit()
 	elif event.key == pygame.K_c:
-		place_part(settings, screen, stats, loots)
+		place_loot(settings, screen, stats, loots)
+	elif event.key == pygame.K_f:
+		for i in range(0,101):
+			place_loot(settings, screen, stats, loots)
+	elif event.key == pygame.K_g:
+		for i in range(0,10):
+			stats.inv.append(loots.pop(i))
+			print(len(loots))
+			#stats.inv.append(loots[i])
+			#loots.remove(loots[i])
 	#D is my debug key - click for terminal infos
 	elif event.key == pygame.K_d:
 		for i in loots:
@@ -109,16 +119,18 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 			inv_pip(settings,screen,stats,ip_buttons)
 	elif stats.inv_pip:
 		if event.key == pygame.K_ESCAPE: 
-			close_inv_pip(stats,ip_buttons)
+			close_inv_pip(stats,settings,screen, ip_buttons)
 		elif event.key == pygame.K_i:
-			close_inv_pip(stats,ip_buttons)
+			close_inv_pip(stats,settings,screen,ip_buttons)
 		elif event.key == pygame.K_UP or event.key == pygame.K_w:
 			stats.scroll_inv_up()
 			close_loot_pip(stats,lp_buttons)
+			close_inv_pip(stats,settings,screen,ip_buttons)
 			inv_pip(settings,screen,stats,ip_buttons)
 		elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
 			stats.scroll_inv_down()
 			close_loot_pip(stats,lp_buttons)
+			close_inv_pip(stats,settings,screen,ip_buttons)
 			inv_pip(settings,screen,stats,ip_buttons)
 	elif stats.loot_pip:
 		if event.key == pygame.K_ESCAPE:
@@ -145,17 +157,30 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 				take_loot(stats,loots,lp_buttons)
 		elif stats.inv_pip:
 			if not ip_buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
-				close_inv_pip(stats,ip_buttons)
+				close_inv_pip(stats,settings,screen,ip_buttons)
 				
 def loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i):	
-	loot_inst = Loot(	settings, screen, stats.loot_val,
-						loot.color,loot.condition, loot.q_num,loot.mat,
-						i,loot.l_type,loot.parts,loot.trim)								
+	loot_inst = Loot(	settings, 
+						screen, 
+						value = loot.value,
+						color = loot.color,
+						condition = loot.condition, 
+						quality = loot.q_num,
+						material = loot.material,
+						ref = i,
+						l_type = loot.l_type,
+						shape = loot.shape,
+						parts =loot.parts,
+						trim = loot.trim,
+						den = loot.den,
+						num = loot.num,
+						raw = loot.raw,
+						weight = loot.weight)								
 	lp_buttons.append(loot_inst)
 	lp_buttons[1] = Button(	settings, screen, loot.name, scx-275, 
 							scy-200, 550,50,(0,0,0),None,18)
 							
-	for x in range(0,7):
+	for x in range(0,len(loot.desc)):
 		text_line = Button(settings, screen, loot.desc[x],
 		scx+10, scy-55+x*25, 230,30,(0,0,0),None,14)
 		lp_buttons.append(text_line)
@@ -169,20 +194,26 @@ def inv_pip(settings,screen,stats,ip_buttons):
 	scx = settings.screen_width/2
 	scy = settings.screen_height/2
 	if stats.inv:
-		inv_inst = Loot(	settings, screen,  
-							stats.loot_val,
-							stats.inv[stats.inv_scroll].color,
-							stats.inv[stats.inv_scroll].condition, 
-							stats.inv[stats.inv_scroll].q_num,
-							stats.inv[stats.inv_scroll].mat,
-							None,
-							stats.inv[stats.inv_scroll].l_type,
-							stats.inv[stats.inv_scroll].parts,
-							stats.inv[stats.inv_scroll].trim)
-		inv_inst.weight = stats.inv[stats.inv_scroll].weight
-		inv_inst.value = stats.inv[stats.inv_scroll].value
-		inv_inst.trim = stats.inv[stats.inv_scroll].trim
-		inv_inst.parts = stats.inv[stats.inv_scroll].parts	
+		inv_inst = Loot(settings, 
+						screen, 
+						value = stats.loot_val,
+						color = stats.inv[stats.inv_scroll].color,
+						condition = stats.inv[stats.inv_scroll].condition, 
+						quality = stats.inv[stats.inv_scroll].q_num,
+						material = stats.inv[stats.inv_scroll].material,
+						ref = stats.inv[stats.inv_scroll].ref,
+						l_type = stats.inv[stats.inv_scroll].l_type,
+						shape = stats.inv[stats.inv_scroll].shape,
+						parts =stats.inv[stats.inv_scroll].parts,
+						trim = stats.inv[stats.inv_scroll].trim,
+						den = stats.inv[stats.inv_scroll].den,
+						num = stats.inv[stats.inv_scroll].num,
+						raw = stats.inv[stats.inv_scroll].raw,
+						weight = stats.inv[stats.inv_scroll].weight)	
+		#inv_inst.weight = stats.inv[stats.inv_scroll].weight
+		#inv_inst.value = stats.inv[stats.inv_scroll].value
+		#inv_inst.trim = stats.inv[stats.inv_scroll].trim
+		#inv_inst.parts = stats.inv[stats.inv_scroll].parts	
 	first6 = len(stats.inv)
 	
 	if first6 > 11:
@@ -205,18 +236,22 @@ def inv_pip(settings,screen,stats,ip_buttons):
 	
 	#calculate the height of the above series of buttons
 		ip_dheight = len(inv_inst.desc)*25
-		for x in range(0,len(inv_inst.parts_desc)):	
-			text_line = Button(settings, screen, inv_inst.parts_desc[x],
-			scx+225, scy-150+ip_dheight+x*25, 250,30,(50,50,50),None,13)
-			ip_buttons.append(text_line)
-		ip_buttons.append(inv_inst)
-		ip_buttons[-1].rect.center = ip_buttons[13].rect.center 
+		try:
+			for x in range(0,len(inv_inst.parts_desc)):	
+				text_line = Button(settings, screen, inv_inst.parts_desc[x],
+				scx+225, scy-150+ip_dheight+x*25, 250,30,(50,50,50),None,13)
+				ip_buttons.append(text_line)
+			ip_buttons.append(inv_inst)
+			ip_buttons[-1].rect.center = ip_buttons[13].rect.center 
+		except:
+			pass
 	stats.inv_pip = True
 
-def close_inv_pip(stats,ip_buttons):
+def close_inv_pip(stats,settings,screen,ip_buttons):
 	if stats.inv:
 		del ip_buttons[14:]
 	stats.inv_pip = False
+	screen.fill(settings.bg_colour)
 			
 def check_events(	settings, screen, stats, buttons, ig_buttons, 
 					lp_buttons, ip_buttons, loots):
