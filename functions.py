@@ -42,7 +42,9 @@ def place_loot(settings, screen, stats, loots):
 
 def place_part(settings, screen, stats, loots):
 	#instantiate one loot
-	loot_inst = Part(settings, screen, value = stats.loot_val, shape = 'rod') 
+	rand_shape = choice(('rod','beam','mesh','sheet','bar'))
+	loot_inst = Part(settings, screen, value = stats.loot_val, shape = rand_shape) 
+	loot_inst.construct_part()
 	placed = False
 	timeout=0
 	while not placed:

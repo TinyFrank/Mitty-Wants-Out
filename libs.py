@@ -3,7 +3,8 @@ import pygame
 from pygame.sprite import Sprite
 	
 class Part(object):
-	def __init__(	self,settings, screen, shape=None,material=None,weight=None,name=None,
+	def __init__(	self,settings, screen, shape=None,material=None,
+					weight=None,name=None,
 					value=1,color=None):
 							
 		#list of possible loot qualities
@@ -199,7 +200,11 @@ class Part(object):
 						'mineral':('chunk')}
 									
 		#dictionary of image sets for parts
-		self.part_sprites = {'rod':('L_rod.png','M_rod.png')}
+		self.part_sprites = {'rod':('L_rod.png','M_rod.png'),
+							'bar':('L_bar.png','M_bar.png'),
+							'beam':('L_beam.png','M_beam.png'),
+							'mesh':('L_mesh.png','M_mesh.png'),
+							'sheet':('L_sheet.png','M_sheet.png'),}
 		
 									
 		#list of materials which can be dyed
@@ -213,7 +218,7 @@ class Part(object):
 		self.name = name
 		self.value = value
 		self.color = color
-		self.construct_part()
+		#self.construct_part()
 		
 	def construct_part(self):
 		self.roll_weight()
@@ -270,31 +275,34 @@ class Part(object):
 	def roll_image(self):
 		self.image_line = pygame.image.load(self.sprite[0])
 		self.image_line.convert_alpha()
+		#self.image_line.set_colorkey((255,255,255))
 		self.image_mat = pygame.image.load(self.sprite[1])
 		self.image_mat.convert_alpha()	
+		#self.image_mat.set_colorkey((255,255,255))
 		self.layers = (len(self.image_mat.get_palette()))
-		alphas = []
-		self.hi = [		self.material[2][0]+30,
-						self.material[2][1]+30,
-						self.material[2][2]+30,255]
+		"""
+		#create highlight/shadow colours
+		self.hi = [		self.material[2][0]+50,
+						self.material[2][1]+50,
+						self.material[2][2]+50,0]
 		self.mid = [	self.material[2][0],
 						self.material[2][1],
-						self.material[2][2],255]
-		self.low = [	self.material[2][0]-30,
-						self.material[2][1]-30,
-						self.material[2][2]-30,255]
-		for i in self.hi:
-			if i > 255:
-				i=255
-		for i in self.low:
-			if i < 0:
-				i=0						
-		print(self.hi)
-		print(self.mid)
-		print(self.low)
+						self.material[2][2],0]
+		self.low = [	self.material[2][0]-50,
+						self.material[2][1]-50,
+						self.material[2][2]-50,0]
+		#check all colours between 0 and 255				
+		for i in range(0,3):
+			if self.hi[i] > 255:
+				self.hi[i]=255
+		for i in range(0,3):
+			if self.low[i] < 0:
+				self.low[i]=0	
+		
+		#convert colours in given ranges to hi,mid,lo		
 		for i in range(0,self.layers-1):
 			self.x_color = self.image_mat.get_palette_at(i)
-			if self.x_color[0] == 255:
+			if self.x_color[0] > 230:
 				self.image_mat.set_palette_at(i,(255,255,255,0))
 			elif 255 > self.x_color[0] > 125:
 				self.image_mat.set_palette_at(i,self.hi)
@@ -302,6 +310,10 @@ class Part(object):
 				self.image_mat.set_palette_at(i,self.mid)
 			elif 71 > self.x_color[0] > 0:
 				self.image_mat.set_palette_at(i,self.low)
+		for i in range(0,len(self.image_line.get_palette())):
+			if self.image_line.get_palette_at(i)[0] > 200:
+				self.image_line.set_palette_at(i,(255,255,255,0))
+		"""
 	def create_rects(self):
 		#create rects
 		self.rect = self.image_line.get_rect()
@@ -315,13 +327,14 @@ class Part(object):
 	def blitme(self):
 		"""Draw the loot at it's current location."""
 		self.screen.blit(self.image_mat,self.rect) #Color (Paintjob)
-		self.screen.blit(self.image_line,self.rect) #Line art			
+		self.screen.blit(self.image_line,self.rect) #Line art	
+			
 class Loot(Part):
 	def __init__(	self,settings,screen,value=None,color=None,
 					condition=None,quality=None,material=None,
 					ref=None,l_type=None,parts=None,trim=None,
 					den=1,num=10):	
-		super(Loot, self).__init__()
+		super(Loot, self).__init__( settings, screen)
 		
 		self.l_type = l_type
 		self.settings = settings
