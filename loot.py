@@ -139,5 +139,17 @@ class Loot(object):
 			#assign second part material as trim material	
 			self.trim = self.parts[1][6]
 			self.t_color = self.trim[2]	
+			
+	def roll_short_name(self):
+		if not self.short_name:
+			self.short_name =  str(self.material[0])
+			self.short_name += str(self.l_type[0])
 	
-	def
+	def roll_name(self):
+		if not self.name:
+			self.name = ''
+			self.name = str(self.color)
+			self.name +=
+			self.name +=
+			
+			
