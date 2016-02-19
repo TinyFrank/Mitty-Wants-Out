@@ -44,3 +44,6 @@ class Stats():
 		self.inv_scroll+=1
 		if self.inv_scroll >= len(self.inv):
 			self.inv_scroll = 0
+	
+	def sort_inv_name(self):
+		self.inv.sort(key=lambda loot: loot.short_name)

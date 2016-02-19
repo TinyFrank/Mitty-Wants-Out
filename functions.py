@@ -11,7 +11,6 @@ import math
 
 def place_loot(settings, screen, stats, loots):
 	#instantiate one loot
-	rand_shape = choice(('Rod','I-Beam','Mesh','Sheet','Bar','Chunk'))
 	loot_inst = Loot(settings, screen, stats.loot_val) 
 	loot_inst.construct()
 	placed = False
@@ -64,7 +63,8 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 	if event.key == pygame.K_q:
 		sys.exit()
 	elif event.key == pygame.K_c:
-		place_loot(settings, screen, stats, loots)
+		#place_loot(settings, screen, stats, loots)
+		stats.sort_inv_name()
 	elif event.key == pygame.K_f:
 		for i in range(0,101):
 			place_loot(settings, screen, stats, loots)
@@ -147,9 +147,11 @@ def loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i):
 						den = loot.den,
 						num = loot.num,
 						raw = loot.raw,
+						val_x = loot.val_x,
+						val_normal = loot.val_normal,
 						weight = loot.weight,
-						q_num = loot.q_num)
-	print(loot_inst.desc)							
+						q_num = loot.q_num,
+						alt_color = loot.alt_color)	
 	lp_buttons.append(loot_inst)
 	lp_buttons[1] = Button(	settings, screen, loot.name, scx-275, 
 							scy-200, 550,50,(0,0,0),None,18)
@@ -185,24 +187,27 @@ def inv_pip(settings,screen,stats,ip_buttons):
 						num = stats.inv[stats.inv_scroll].num,
 						raw = stats.inv[stats.inv_scroll].raw,
 						weight = stats.inv[stats.inv_scroll].weight,
-						q_num = stats.inv[stats.inv_scroll].weight)	
-		
-	first6 = len(stats.inv)
+						val_x = stats.inv[stats.inv_scroll].val_x,
+						val_normal = stats.inv[stats.inv_scroll].val_normal,
+						q_num = stats.inv[stats.inv_scroll].weight,
+						alt_color = stats.inv[stats.inv_scroll].alt_color)	
 	
-	if first6 > 11:
-		first6 = 11
+		first6 = len(stats.inv)
 		
-	for i in range(0,first6):
-		index = i + stats.inv_scroll
-		if index >= len(stats.inv):
-			index -= len(stats.inv)
-		#print(str(first6) +  ' ' + str(i) + ' ' + str(stats.inv_scroll) + ' ' + str(index))
-		ip_buttons[1+i].msg = stats.inv[0+index].name
-		ip_buttons[1+i].prep_msg()
-	if stats.inv:	
+		if first6 > 11:
+			first6 = 11
+			
+		for i in range(0,first6):
+			index = i + stats.inv_scroll
+			if index >= len(stats.inv):
+				index -= len(stats.inv)
+			#print(str(first6) +  ' ' + str(i) + ' ' + str(stats.inv_scroll) + ' ' + str(index))
+			ip_buttons[1+i].msg = stats.inv[0+index].name
+			ip_buttons[1+i].prep_msg()
+	#if stats.inv:	
 		for x in range(0,len(inv_inst.desc)):
 			text_line = Button(settings, screen, inv_inst.desc[x],
-			scx+225, scy-160+x*25, 250,30,(0,0,0),None,15)
+			scx+190, scy-160+x*25, 300,30,(0,0,0),None,15)
 			ip_buttons.append(text_line)
 		ip_buttons.append(inv_inst)
 		ip_buttons[-1].rect.center = ip_buttons[13].rect.center 
@@ -212,7 +217,7 @@ def inv_pip(settings,screen,stats,ip_buttons):
 		try:
 			for x in range(0,len(inv_inst.parts_desc)):	
 				text_line = Button(settings, screen, inv_inst.parts_desc[x],
-				scx+225, scy-150+ip_dheight+x*25, 250,30,(50,50,50),None,13)
+				scx+190, scy-150+ip_dheight+x*25, 300,30,(50,50,50),None,13)
 				ip_buttons.append(text_line)
 			ip_buttons.append(inv_inst)
 			ip_buttons[-1].rect.center = ip_buttons[13].rect.center 
@@ -222,7 +227,7 @@ def inv_pip(settings,screen,stats,ip_buttons):
 
 def close_inv_pip(stats,settings,screen,ip_buttons):
 	if stats.inv:
-		del ip_buttons[14:]
+		del ip_buttons[15:]
 	stats.inv_pip = False
 	screen.fill(settings.bg_colour)
 			
