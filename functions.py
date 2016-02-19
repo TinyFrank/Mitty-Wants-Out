@@ -13,39 +13,7 @@ def place_loot(settings, screen, stats, loots):
 	#instantiate one loot
 	rand_shape = choice(('Rod','I-Beam','Mesh','Sheet','Bar','Chunk'))
 	loot_inst = Loot(settings, screen, stats.loot_val) 
-	placed = False
-	timeout=0
-	while not placed:
-		x = randint(50,screen.get_width()-50)
-		y = randint(150,screen.get_height()-50)
-		loot_inst.rect.x = x - (loot_inst.rect.width/2)
-		loot_inst.rect.y = y - (loot_inst.rect.height/2)
-		hits = 0
-		if loots:
-			for i in loots:
-				if 	i.rect.colliderect(loot_inst.rect):
-					hits=1
-		if not hits and loots:
-			loot_inst.rect.x = x - (loot_inst.rect.width/2)
-			loot_inst.rect.y = y - (loot_inst.rect.height/2)
-			loots.append(loot_inst)
-			loots.sort(key = lambda x: x.rect.y)
-			placed = True
-		if not hits and not loots:
-			loot_inst.rect.x = x - (loot_inst.rect.width/2)
-			loot_inst.rect.y = y - (loot_inst.rect.height/2)
-			loots.append(loot_inst)
-			loots.sort(key = lambda x: x.rect.y)
-			placed = True
-		timeout+=1
-		if timeout > 50:
-			placed = True	
-
-def place_part(settings, screen, stats, loots):
-	#instantiate one loot
-	rand_shape = choice(('Rod','I-Beam','Mesh','Sheet','Bar','Chunk'))
-	loot_inst = Part(settings, screen, value = stats.loot_val, shape = rand_shape) 
-	loot_inst.construct_part()
+	loot_inst.construct()
 	placed = False
 	timeout=0
 	while not placed:
@@ -101,9 +69,12 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 		for i in range(0,101):
 			place_loot(settings, screen, stats, loots)
 	elif event.key == pygame.K_g:
-		for i in range(0,10):
-			stats.inv.append(loots.pop(i))
-			print(len(loots))
+		print(len(loots))
+		while True:
+			try:
+				stats.inv.append(loots.pop(-1))
+			except:
+				break
 			#stats.inv.append(loots[i])
 			#loots.remove(loots[i])
 	#D is my debug key - click for terminal infos
@@ -163,9 +134,10 @@ def loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i):
 	loot_inst = Loot(	settings, 
 						screen, 
 						value = loot.value,
+						level = stats.loot_val,
 						color = loot.color,
 						condition = loot.condition, 
-						quality = loot.q_num,
+						quality = loot.quality,
 						material = loot.material,
 						ref = i,
 						l_type = loot.l_type,
@@ -175,7 +147,9 @@ def loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i):
 						den = loot.den,
 						num = loot.num,
 						raw = loot.raw,
-						weight = loot.weight)								
+						weight = loot.weight,
+						q_num = loot.q_num)
+	print(loot_inst.desc)							
 	lp_buttons.append(loot_inst)
 	lp_buttons[1] = Button(	settings, screen, loot.name, scx-275, 
 							scy-200, 550,50,(0,0,0),None,18)
@@ -196,10 +170,11 @@ def inv_pip(settings,screen,stats,ip_buttons):
 	if stats.inv:
 		inv_inst = Loot(settings, 
 						screen, 
-						value = stats.loot_val,
+						level = stats.loot_val,
+						value = stats.inv[stats.inv_scroll].value,
 						color = stats.inv[stats.inv_scroll].color,
 						condition = stats.inv[stats.inv_scroll].condition, 
-						quality = stats.inv[stats.inv_scroll].q_num,
+						quality = stats.inv[stats.inv_scroll].quality,
 						material = stats.inv[stats.inv_scroll].material,
 						ref = stats.inv[stats.inv_scroll].ref,
 						l_type = stats.inv[stats.inv_scroll].l_type,
@@ -209,11 +184,9 @@ def inv_pip(settings,screen,stats,ip_buttons):
 						den = stats.inv[stats.inv_scroll].den,
 						num = stats.inv[stats.inv_scroll].num,
 						raw = stats.inv[stats.inv_scroll].raw,
-						weight = stats.inv[stats.inv_scroll].weight)	
-		#inv_inst.weight = stats.inv[stats.inv_scroll].weight
-		#inv_inst.value = stats.inv[stats.inv_scroll].value
-		#inv_inst.trim = stats.inv[stats.inv_scroll].trim
-		#inv_inst.parts = stats.inv[stats.inv_scroll].parts	
+						weight = stats.inv[stats.inv_scroll].weight,
+						q_num = stats.inv[stats.inv_scroll].weight)	
+		
 	first6 = len(stats.inv)
 	
 	if first6 > 11:

@@ -148,6 +148,9 @@ def run():
 	hour = 6
 	minute = 0
 	
+	pygame.mixer.music.load('drunkman2 4.ogg')
+	pygame.mixer.music.play(-1)
+	
 	while True:
 		clock.tick(100)
 		gf.check_events(	settings, screen, stats, buttons, 

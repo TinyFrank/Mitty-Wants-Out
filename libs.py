@@ -3,11 +3,11 @@ import pygame
 from pygame.sprite import Sprite
 			
 class Loot(object):
-	def __init__(	self,settings,screen,value=None,color=None,
+	def __init__(	self,settings,screen,level=None,value=None,color=None,
 					condition=None,quality=None,material=None,
 					ref=None,l_type=None,shape=None,parts=None,trim=None,
-					den=1,num=10,raw=None,weight=None):			
-							
+					den=1,num=10,raw=None,weight=None,q_num=None):	
+			
 		#list of possible loot qualities
 		self.qualities = (	('shoddy ',0.2), 
 							('cheapo ',0.4),
@@ -95,8 +95,8 @@ class Loot(object):
 							['Porcelain ',1.5,(238,236,211),2.4], 
 							['Cement ',0.1,(164,164,164),2.9],	
 							['Fire Clay ',1.0,(163,135,130),2],
-							['Red Brick ',0.3,(194,98,79),1.7],	
-							['Terracotta ',0.8,(255,255,255),1.8])
+							['Red Clay ',0.3,(194,98,79),1.7],	
+							['Terracotta ',0.8,(214,90,71),1.8])
 									
 		self.fibres = (		['Silk ',2.5,(255,255,255),1.3], 
 							['Cotton ',1,(255,255,255),1.5], 
@@ -152,9 +152,9 @@ class Loot(object):
 							('yellow ',(255,255,0)) )
 							
 		#array of available loot types
-		self.loot_types ={	0:[
+		self.loot_types ={	14:[
 							'Charcoal Barbecue ',
-							('D_bbq.png','L_bbq.png','M_bbq.png'),
+							'bbq',
 							[["legs ","rod ",3,2,'metal'],
 							["grill ","mesh ",1,3,'metal'],
 							["lid ","sheet ",1,4,'metal'],
@@ -163,7 +163,7 @@ class Loot(object):
 							15],
 							1:[
 							'Propane Barbecue ',
-							('D_pbbq.png','L_pbbq.png','M_pbbq.png'),
+							'pbbq',
 							[["legs ","rod ",4,3,'metal'],
 							["grill ","mesh ",1,5,'metal'],
 							["lid ","sheet ",1,5,'metal'],
@@ -173,7 +173,7 @@ class Loot(object):
 							30],
 							2:[
 							'Stereo ',
-							('D_stereo.png','L_stereo.png','M_stereo.png'),
+							'stereo',
 							[["drive motor ","chunk ",1,3,'metal'],
 							["grill ","mesh ",2,2,'plastic'],
 							["handle ","rod ",1,2,'plastic'],
@@ -183,47 +183,47 @@ class Loot(object):
 							4],
 							3:[
 							'Coffee Mug ',
-							('D_cmug.png','L_cmug.png','M_cmug.png'),
+							'cmug',
 							[["body ","chunk ",1,1,'ceramic']],
 							0.5],
 							1:[
 							'T-Shirt ',
-							('D_tshirt.png','L_tshirt.png','M_tshirt.png'),
+							'tshirt',
 							[["body ","roll ",1,1,'fibre']],
 							.3],
 							4:[
 							'CD Case ',
-							('D_cdcase.png','L_cdcase.png','M_cdcase.png'),
+							'cdcase',
 							[["front ","sheet ",1,1,'plastic'],
 							["back ","sheet ",1,1,'plastic']],
 							.1],
 							5:[
 							'Detergent Jug ',
-							('D_detergent.png','L_detergent.png','M_detergent.png'),
+							'detergent',
 							[["cap ","chunk ",1,1,'plastic'],
 							["body ","sheet ",1,5,'plastic']],
 							.8],
 							6:[
 							'Kids Shovel ',
-							('D_kshovel.png','L_kshovel.png','M_kshovel.png'),
+							'kshovel',
 							[["handle ","rod ",1,1,'plastic'],
 							["scoop ","sheet ",1,2,'plastic']],
 							.4],
 							7:[
 							'Soap Bar ',
-							('D_soap.png','L_soap.png','M_soap.png'),
+							'soap',
 							[["body ","chunk ",1,1,'natural']],
 							.5],
 							8:[
 							'Baseball Cap ',
-							('D_baseballcap.png','L_baseballcap.png','M_baseballcap.png'),
+							'baseballcap',
 							[["cap ","sheet ",1,4,'fibre'],
 							["brim ","sheet ",1,3,'plastic'],
 							["strap ","strip ",1,1,'plastic']],
 							.4],
 							9:[
 							'Propane Tank ',
-							('D_ptank.png','L_ptank.png','M_ptank.png'),
+							'ptank',
 							[["body ","sheet ",1,5,'metal'],
 							["rim ","strip ",1,2,'metal'],
 							["valve ","chunk ",1,2,'metal'],
@@ -232,15 +232,15 @@ class Loot(object):
 							8],
 							10:[
 							'Purse ',
-							('D_purse.png','L_purse.png','M_purse.png'),
-							[["body ","roll ",1,20,'metal'],
-							["flap ","sheet ",1,8,'metal'],
-							["strap ","strap ",1,3,'metal'],
+							'purse',
+							[["body ","roll ",1,20,'fibre'],
+							["flap ","sheet ",1,8,'fibre'],
+							["strap ","strap ",1,3,'fibre'],
 							["latch ","chunk ",2,1,'metal']],
 							2],
 							11:[
 							'Valve ',
-							('D_valve.png','L_valve.png','M_valve.png'),
+							'valve',
 							[["body ","chunk ",1,10,'metal'],
 							["nozzle ","tube ",1,3,'metal'],
 							["handle ","rod ",1,5,'metal'],
@@ -248,12 +248,12 @@ class Loot(object):
 							1.5],
 							12:[
 							'Screws ',
-							('D_valve.png','L_valve.png','M_valve.png'),
+							'screw',
 							[["body ","chunk ",10,10,'metal']],
 							.1],
 							13:[
 							'2L Pop Bottle ',
-							('D_2lpop.png','L_2lpop.png','M_2lpop.png'),
+							'2lpop',
 							[["body ","sheet ",1,4,'plastic'],
 							["cap ","chunk ",1,1,'plastic'],
 							["contents ","fluid ",1,10,'fluid']],
@@ -295,54 +295,55 @@ class Loot(object):
 						'mineral':('Chunk','Powder','Pebble')}
 									
 		#dictionary of image sets for parts
-		self.part_sprites = {'Rod':('L_rod.png','M_rod.png'),
-							'Bar':('L_bar.png','M_bar.png'),
-							'I-Beam':('L_ibeam.png','M_ibeam.png'),
-							'Mesh':('L_mesh.png','M_mesh.png'),
-							'Sheet':('L_sheet.png','M_sheet.png'),
-							'Chunk':('L_chunk.png','M_chunk.png'),
-							'Threaded Rod':('L_rod.png','M_rod.png'),
-							'Tube':('L_rod.png','M_rod.png'),
-							'Wire':('L_wire.png','M_wire.png'),
-							'Square Tube':('L_bar.png','M_bar.png'),
-							'T-Slot Extrusion':('L_bar.png','M_bar.png'),
-							'Pin':('L_rod.png','M_rod.png'),
-							'Expanded Sheet':('L_sheet.png','M_sheet.png'),
-							'Angle Bar':('L_bar.png','M_bar.png'),
-							'Beam':('L_ibeam.png','M_ibeam.png'),
-							'Strip':('L_strip.png','M_strip.png'),
-							'Peg':('L_mesh.png','M_mesh.png'),
-							'Dowel':('L_sheet.png','M_sheet.png'),
-							'Plank':('L_board.png','M_board.png'),
-							'Board':('L_board.png','M_board.png'),
-							'Trim':('L_bar.png','M_bar.png'),
-							'Scrap':('L_ibeam.png','M_ibeam.png'),
-							'Sawdust':('L_mesh.png','M_mesh.png'),
-							'Log':('L_sheet.png','M_sheet.png'),
-							'Branch':('L_chunk.png','M_chunk.png'),
-							'Pellets':('L_rod.png','M_rod.png'),
-							'Tile':('L_tile.png','M_tile.png'),
-							'Brick':('L_brick.png','M_brick.png'),
-							'Powder':('L_mesh.png','M_mesh.png'),
-							'Plate':('L_sheet.png','M_sheet.png'),
-							'Shard':('L_chunk.png','M_chunk.png'),
-							'Fragment':('L_rod.png','M_rod.png'),
-							'Thread':('L_spool.png','M_spool.png'),
-							'Roll':('L_roll.png','M_roll.png'),
-							'Yarn':('L_spool.png','M_spool.png'),
-							'Rope':('L_mesh.png','M_mesh.png'),
-							'Strap':('L_sheet.png','M_sheet.png'),
-							'Confetti':('L_chunk.png','M_chunk.png'),
-							'Pebble':('L_sheet.png','M_sheet.png'),
-							'Gasket':('L_gasket.png','M_gasket.png'),
-							'Hose':('L_hose.png','M_hose.png')
+		self.part_sprites = {'Rod':'rod',
+							'Bar':'bar',
+							'I-Beam':'ibeam',
+							'Mesh':'mesh',
+							'Sheet':'sheet',
+							'Chunk':'chunk',
+							'Threaded Rod':'rod',
+							'Tube':'rod',
+							'Wire':'wire',
+							'Square Tube':'bar',
+							'T-Slot Extrusion':'bar',
+							'Pin':'rod',
+							'Expanded Sheet':'sheet',
+							'Angle Bar':'bar',
+							'Beam':'ibeam',
+							'Strip':'strip',
+							'Peg':'rod',
+							'Dowel':'rod',
+							'Plank':'board',
+							'Board':'board',
+							'Trim':'bar',
+							'Scrap':'chunk',
+							'Sawdust':'chunk',
+							'Log':'mesh',
+							'Branch':'mesh',
+							'Pellets':'chunk',
+							'Tile':'tile',
+							'Brick':'brick',
+							'Powder':'chunk',
+							'Plate':'tile',
+							'Shard':'chunk',
+							'Fragment':'chunk',
+							'Thread':'spool',
+							'Roll':'roll',
+							'Yarn':'roll',
+							'Rope':'spool',
+							'Strap':'strip',
+							'Confetti':'chunk',
+							'Pebble':'chunk',
+							'Gasket':'gasket',
+							'Hose':'hose'
 							}
 		
 									
 		#list of materials which can be dyed
 		self.dyed = ['plastic','rubber','fibre','paper']
-		
+		self.spritepath = "images/"
 		self.raw = raw
+		self.level = level
 		self.l_type = l_type
 		self.settings = settings
 		self.screen = screen
@@ -365,10 +366,9 @@ class Loot(object):
 		self.con_forbid = []
 		self.typ_forbid = []		
 		self.val_x = 0
-		self.weight = 0
+		self.weight = weight
 		self.val_normal = 0
 		self.construct()
-		
 	def construct(self):
 		if not self.raw:
 			self.raw = choice(['part','loot'])	
@@ -379,28 +379,28 @@ class Loot(object):
 			
 	def construct_loot(self):
 		#pick a loot type if none was given
-		if self.l_type == None:	
+		if not self.l_type:	
 			self.specify_l_type()
 		self.specify_short_name()
 		self.specify_sprite()
 		self.specify_quality()
 		self.specify_condition()
-		self.specify_mat()
 		self.specify_color()
-		self.specify_trim()
+		self.specify_mat()
 		self.include_parts()
+		self.specify_trim()
 		self.specify_value()
 		self.compose_name()	
 		self.compose_desc()
-		self.set_images()
+		self.roll_image()
 		self.create_rects()	
 		
 	def specify_l_type(self):
-		"""pick random loot type when none was given"""
-		while True:
-			self.l_type = randint(0,len(self.loot_types)-1)	
-			if self.l_type not in self.typ_forbid:
-				break
+		if not self.l_type:
+			while True:
+				self.l_type = randint(1,len(self.loot_types))	
+				if self.l_type not in self.typ_forbid:
+					break
 		
 	def set_images(self):
 		#compose image from source and alter based on qual/mat/color
@@ -414,11 +414,11 @@ class Loot(object):
 		paint, some of the fragments are made transparent to reveal
 		the material layer below.
 		"""
-		self.image_dirt = pygame.image.load(self.sprite[0])
+		self.image_dirt = pygame.image.load('images/' + self.sprite[0])
 		self.image_dirt.convert_alpha()
-		self.image_line = pygame.image.load(self.sprite[1])
+		self.image_line = pygame.image.load('images/' + self.sprite[1])
 		self.image_line.convert_alpha()
-		self.image_mat = pygame.image.load(self.sprite[2])
+		self.image_mat = pygame.image.load('images/' + self.sprite[2])
 		self.image_mat.convert_alpha()
 		
 		#num of colour layers in 'M' palette
@@ -472,33 +472,25 @@ class Loot(object):
 		"""Draw the loot at it's current location."""
 		self.screen.blit(self.image_mat,self.rect) #Color (Paintjob)
 		self.screen.blit(self.image_line,self.rect) #Line art
-		try:
-			self.blit_alpha(self.screen,self.image_dirt,self.rect,self.alpha)
-		except:
-			pass
+		#try:
+			#self.blit_alpha(self.screen,self.image_dirt,self.rect,self.alpha)
+		#except:
+			#pass
 	
 	def specify_quality(self):
 		"""if no quality was specified, select one randomly"""
-		if self.quality == None:
+		if not self.quality:
 			while True:
 				self.q_num = randint(0,len(self.qualities)-1)
 				if self.q_num not in self.qua_forbid:
 					self.quality = self.qualities[self.q_num]
 					break
-					
-		#otherwise, save quality to q_num and reload quality from list			
-		else:
-			self.q_num = self.quality
-			self.quality = self.qualities[self.q_num]
-			
+	
 	def specify_mat(self):
 		"""specify a primary material if none was given"""
 		if not self.material:
-			while True:
-				mt = randint(0,len(self.metals)-1)
-				if mt not in self.mat_forbid:
-					self.material = self.metals[mt]
-					break
+			self.mat_cat=self.loot_types[self.l_type][2][0][4]
+			self.material = choice(self.std_w[self.mat_cat][1])
 	
 	def specify_condition(self):
 		"""define a state-of-repair or 'conditon' if none was given"""
@@ -521,9 +513,8 @@ class Loot(object):
 	def specify_trim(self):
 		"""specify trim if none was given"""
 		if not self.trim:
-			self.trim = self.material
-			while self.trim == self.material:
-				self.trim = self.metals[randint(0,len(self.metals)-1)]
+			if len(self.parts)>1:
+				self.trim = self.parts[1][-1]
 		
 	def include_parts(self):
 		""""
@@ -554,20 +545,24 @@ class Loot(object):
 		self.trial_w = 0
 		for part in self.parts:
 			self.trial_w += part[2]*part[3]*self.std_w[part[4]][0]
-			print(str(self.weight)+'kgs of '+self.short_name+'worth $'+str(self.value)+'\n')
 		self.w_x = self.weight / self.trial_w
 		#calculate a weigth factor based on the quotient above
 		for part in self.parts:
 			part[3] *= self.w_x		
 		#for each part...
 		if len(self.parts[0])<6:
-			for i in self.parts:
-				#20% chance to change the material to different material
+			for num,i in enumerate(self.parts):
+				#chance to change the material to different material
+				if num == 0:
+					i.append(self.material)
+					print('part 1 now has mat '+str(self.material))
 				if randint(0,self.num) > self.den:
 					while True:
 						sel = randint(0,len(self.std_w[i[4]][1])-1)
 						if sel not in self.mat_forbid:
-							i.append(self.metals[sel])
+							self.mat_cat=self.std_w[i[4]][1]
+							print(self.mat_cat[sel])
+							i.append(self.mat_cat[sel])
 							break
 				else:
 					i.append(self.material)
@@ -583,26 +578,23 @@ class Loot(object):
 			#val_x is the part contribtuion(i[3]) * material value
 			self.val_x += i[3]*i[-1][1]
 			self.val_normal += i[3]
-			"""print('\t'+str(i[2])+' '+str(i[-1][0])+' '+str(i[0])+' weight = ' + str(round(i[2]*i[3]*i[4][3],2)))"""
 			self.weight+=i[2]*i[3]*i[-1][3]
 			self.parts_desc.append(str(i[2]))
 			self.parts_desc[n]+=' '+str(i[-1][0])
 			self.parts_desc[n]+=' '+str(i[0])
 		self.weight = round(self.weight-self.loot_types[self.l_type][3],2)
 		
-		"""print('sum of part weights = ' + str(self.weight) + '\n\n')"""
 	def breakdown(self,inv):
 		pass
 	
 	def specify_value(self):
-		#set value
-		self.value *= 20 #cost of a 'new, steel' bbq IRL, for balancing
+		self.value = self.level * 20 #cost of a 'new, steel' bbq IRL, for balancing
 		self.value *= round(self.quality[1]*self.material[1],2)
 		self.value *= round(self.val_x,2)
 		self.value = round(self.condition[1]*self.value,2)
 	def compose_name(self):
 		#compose name
-		self.name = self.quality[0].title() + self.material[0].title() + self.short_name
+		self.name = self.quality[0].title() + self.material[0] + self.short_name
 			
 	def compose_desc(self):
 		#compose descriptive string for Loot PIP
@@ -664,11 +656,10 @@ class Loot(object):
 		self.roll_sprite()
 		self.roll_image()
 		self.create_rects()
-		print(str(self.weight)+'kgs of '+self.name+'worth $'+str(self.value)+'\n')
 
 	def roll_weight(self):
 		if not self.weight:
-			self.weight	= (self.value**2)*(randint(0,400)/100)
+			self.weight	= round((self.level**2)*(randint(0,400)/100),2)
 		
 	def roll_material(self):
 		if not self.material:
@@ -689,24 +680,25 @@ class Loot(object):
 	def roll_name(self):
 		if not self.name:
 			if self.color:
-				self.name = self.color[0].title()
+				if self.color != 'N\A':
+					self.name = self.color[0].title()
 			else:
 				self.name = ''
-		self.name += self.material[0].title()			
+		self.name += self.material[0]			
 		self.name += self.shape + ' '
 	
 	def roll_value(self):
-		#print(str(self.weight)+' '+str(self.material[1]))
-		self.value = round(self.value*self.weight*self.material[1],2)	
+		if not self.value:
+			self.value = round(self.level*self.weight*self.material[1],2)	
 
 	def roll_sprite(self):
 		self.sprite = self.part_sprites[self.shape]
 						
 	def roll_image(self):
-		self.image_line = pygame.image.load(self.sprite[0])
+		self.image_line = pygame.image.load("images/L_" + str(self.sprite)+'.png')
 		self.image_line.convert_alpha()
 		#self.image_line.set_colorkey((255,255,255))
-		self.image_mat = pygame.image.load(self.sprite[1])
+		self.image_mat = pygame.image.load('images/M_' + str(self.sprite)+'.png')
 		self.image_mat.convert_alpha()	
 		#self.image_mat.set_colorkey((255,255,255))
 		self.layers = (len(self.image_mat.get_palette()))
@@ -747,9 +739,12 @@ class Loot(object):
 		
 		for i in range(0,self.layers-1):
 			self.x_color = self.image_mat.get_palette_at(i)
-			self.n_color = ((self.material[2][0]+self.x_color[0])/2,
-							(self.material[2][1]+self.x_color[1])/2,
-							(self.material[2][2]+self.x_color[2])/2,255)
+			if not self.color:
+				self.color = ['N/A',[0,0,0,0]]
+				self.color[1] = self.material[2]
+			self.n_color = ((self.color[1][0]+self.x_color[0])/2,
+							(self.color[1][1]+self.x_color[1])/2,
+							(self.color[1][2]+self.x_color[2])/2,255)
 			self.image_mat.set_palette_at(i,self.n_color)
 	def roll_rects(self):
 		#create rects
