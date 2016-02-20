@@ -10,7 +10,15 @@ from button import Button
 import math
 
 def place_loot(settings, screen, stats, loots):
+	debug_init = gen_init
+	debug_init[0]='loot'
+	#debug_init[2]= 'Bar'
+	debug_init[3]=16
+	#debug_init[7]= 1.0
+	#debug_init[9]=['Gold ',80,(255,210,48),19.32]
+	#debug_init[10]=['Gold ',80,(255,210,48),19.32]
 	#instantiate one loot
+	#loot_inst = Loot(settings, screen, stats.loot_val,debug_init) 
 	loot_inst = Loot(settings, screen, stats.loot_val) 
 	loot_inst.construct()
 	placed = False
@@ -23,7 +31,15 @@ def place_loot(settings, screen, stats, loots):
 		hits = 0
 		if loots:
 			for i in loots:
-				if 	i.rect.colliderect(loot_inst.rect):
+				xhits = 0
+				yhits = 0
+				if i.rect.colliderect(loot_inst.rect):
+					#xhits=1
+				#w_avg = (i.rect.width + loot_inst.rect.width)/2
+				#if ((abs(i.rect.x-loot_inst.rect.x)*0.5) > w_avg):
+					#print(str(abs(i.rect.x-loot_inst.rect.x)) + ' is less than ' +str(w_avg))
+					#yhits=1
+				#if xhits and yhits:
 					hits=1
 		if not hits and loots:
 			loot_inst.rect.x = x - (loot_inst.rect.width/2)
@@ -64,10 +80,9 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 		#place_loot(settings, screen, stats, loots)
 		stats.sort_inv_name()
 	elif event.key == pygame.K_f:
-		for i in range(0,101):
+		for i in range(0,200):
 			place_loot(settings, screen, stats, loots)
 	elif event.key == pygame.K_g:
-		print(len(loots))
 		while True:
 			try:
 				stats.inv.append(loots.pop(-1))
@@ -134,7 +149,7 @@ def loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i):
 						loot_val = stats.loot_val,
 						init_array = loot.init_array,
 						ref = i)
-							
+	loot_inst.rebuild()					
 	lp_buttons.append(loot_inst)
 	lp_buttons[1] = Button(	settings, screen, loot.name, scx-275, 
 							scy-200, 550,50,(0,0,0),None,18)
@@ -156,7 +171,7 @@ def inv_pip(settings,screen,stats,ip_buttons):
 						loot_val = stats.loot_val,
 						init_array = stats.inv[stats.inv_scroll].init_array,)
 						
-	
+		inv_inst.rebuild()
 		first6 = len(stats.inv)
 		
 		if first6 > 11:

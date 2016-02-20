@@ -1,16 +1,21 @@
 from random import randint,choice
+import random
 import pygame
 from pygame.sprite import Sprite
 import libs
+import copy
 
+gen_init = 	[choice(('loot','part')),None,None,None,[],[],[],None,
+			None,[],[],[],'','',[],[],[],None,[],[],[],[]]
+"""can be initialized with a presets for 0,2,3,7,9,10"""
 class Loot(object):
 	def __init__(	self,settings,screen,loot_val,init_array=None,ref=None):
 		
 		#initialization array for creating sprite copies
-		self.init_array = init_array
+		#self.init_array = init_array
 		
 		#initialize attributes
-		if self.init_array:
+		if init_array:
 			self.raw = init_array[0] #string - part or loot
 			self.l_type = init_array[1]#array - describes type of loot
 			self.shape = init_array[2]#array - describes type of part
@@ -29,8 +34,10 @@ class Loot(object):
 			self.parts_desc = init_array[15]#list - table description of parts
 			self.condition = init_array[16]#tuple - name and number
 			self.mat_cat = init_array[17]#string - material category
-			self.ref = ref
-			self.color = init_array[19]
+			self.color = init_array[18]
+			self.m_color = init_array[19]
+			self.t_color = init_array[20]
+			self.c_palette = init_array[21]
 		else:
 			self.raw = choice(('loot','part'))
 			self.l_type = None
@@ -50,7 +57,17 @@ class Loot(object):
 			self.parts_desc = []
 			self.condition = []
 			self.mat_cat = None
+			self.color = []
+			self.m_color = []
+			self.t_color = []
+			self.c_palette = []
+		if ref:
 			self.ref = ref
+		if self.shape:
+			self.raw = 'part'	
+			self.condition = None
+			self.parts = [None]
+		
 		#temp attributes for calculation
 		self.val_x = 0 #float - multiplier of part values
 		self.val_normal = 0#int - sum of part contributions
@@ -58,6 +75,7 @@ class Loot(object):
 		self.settings = settings
 		self.screen = screen
 		self.spritepath = 'images/'
+		sys_r = random.SystemRandom()
 		
 		#initialize external lists
 		self.qualities = libs.qualities
@@ -80,8 +98,6 @@ class Loot(object):
 		self.std_w = libs.std_w
 		self.part_sprites = libs.part_sprites
 
-		self.construct()
-		
 	def construct(self):
 		if self.raw == 'loot':
 			self.roll_l_type()
@@ -90,6 +106,7 @@ class Loot(object):
 			self.roll_parts()
 			self.roll_condition()
 		self.roll_material()
+		self.roll_color()
 		if self.raw == 'part':
 			self.roll_shape() 
 		self.roll_quality()
@@ -98,64 +115,83 @@ class Loot(object):
 		self.roll_short_name()
 		self.roll_name()
 		self.roll_desc()
-		self.roll_parts_desc()
+		if self.raw == 'loot':
+			self.roll_parts_desc()
 		self.roll_image()
 		self.roll_rects()
-		#reuild results into init_array for creating copies
+		#rebuild results into init_array for creating copies
 		self.init_array=[	self.raw,self.l_type,self.shape,
 			self.l_type_num,self.typ_forbid,self.parts,self.largest,
 			self.weight,self.value,self.material, self.trim,
 			self.quality,self.short_name,self.name,self.desc,
-			self.parts_desc,self.condition,self.mat_cat,self.ref,
-			self.color]
+			self.parts_desc,self.condition,self.mat_cat,self.color,
+			self.m_color,self.t_color,self.c_palette]
+			
+	def rebuild(self):
+		self.roll_image()
+		self.roll_rects()
+		self.init_array=[	self.raw,self.l_type,self.shape,
+			self.l_type_num,self.typ_forbid,self.parts,self.largest,
+			self.weight,self.value,self.material, self.trim,
+			self.quality,self.short_name,self.name,self.desc,
+			self.parts_desc,self.condition,self.mat_cat,self.color,
+			self.m_color,self.t_color]
 			
 	def roll_l_type(self):
-		if not self.l_type:
+		if not self.l_type_num:
 			while True:
 				#roll a randow number within the range of loot types
 				self.l_type_num = randint(1,len(self.loot_types))
-				#assign that index's array to l_type
-				self.l_type = self.loot_types[self.l_type_num]
 				#only continue loop if this l_type_num is forbidden
 				if self.l_type_num not in self.typ_forbid:
 					break
 			
+		if not self.l_type: 
+			#assign that index's array to l_type
+			self.l_type = self.loot_types[self.l_type_num]
+				
 	def roll_weight(self):
 		if not self.weight:
 			if self.raw == 'loot':
 				#assign setpoint weight from l_type
 				setpoint = self.l_type[3]
-				offset = randint(0,101)
-				offset -= 50.5
-				offset /= 100
-				offset =+ 1
-				offset *= self.level
-				self.weight = setpoint * offset
+				offset = float(randint(0,201))
+				offset = offset - 50.5 * self.level
+				offset = offset / 1000.0
+				offset = offset + 1.0
+				self.weight = round(setpoint * offset,2)
 			elif self.raw == 'part':
 				#pick random weight based on level
 				self.weight = randint(1,101)/100
 				#mutiply 0>1 range by level squared and round to 2 digits
 				self.weight = round(self.weight*self.level**2,2)
+		elif self.weight:
+			if self.raw == 'loot':
+				setpoint = self.l_type[3]
+				self.weight *= setpoint
+			
 				
 	def roll_parts(self):
 		#check redundancy
 		if not self.parts:
 			#assign l_type parts array to self.parts
-			self.parts = self.l_type[2]	
+			self.parts = copy.copy(self.l_type[2])	
 			#assign materials to each part and sum v_normal
+			score = 0
 			for i,part in enumerate(self.parts):
 				#store address of mat_cat info list for this part
-				part_mat_cat = part[4]
+				part_mat_cat = choice(part[4])
 				#append rolled material array to this part
-				part.append(choice(self.std_w[part_mat_cat][1]))
+				part.append(None)
+				part[6]=choice(self.std_w[part_mat_cat][1])
 				#add part contribution to v_normal
 				self.val_normal += part[3]
 				#find largest part
-				score = 0
 				if part[3] > score:
 					leader = i #largest part index so far
 					score = part[3] # largest contribution so far
-				
+				if i == 1:
+					self.trim_cat = part_mat_cat
 			#assign largest part
 			self.largest = leader
 					
@@ -163,7 +199,17 @@ class Loot(object):
 			for part in self.parts:
 				part[3] /= self.val_normal #part contrib is now >0 and <1
 				#append part weight 
-				part.append(part[3]*self.weight)
+				part.append(None)
+				part[7]= part[3]*self.weight
+			if self.material:
+				#assign largest part material as main material
+				if self.parts[self.largest][0] != 'contents ':
+					self.parts[self.largest][6] = self.material
+				elif self.parts[self.largest][0] == 'contents ':
+					self.parts[0][6] = self.material
+			if self.trim and len(self.parts)>1:
+				if self.trim in self.std_w[self.trim_cat][1]:
+					self.parts[1][6] = self.trim
 	
 	def roll_condition(self):
 		if not self.condition:
@@ -174,15 +220,23 @@ class Loot(object):
 		if not self.material:
 			if self.raw == 'loot':
 				#assign largest part material as main material
-				self.material = self.parts[self.largest][6]
+				if self.parts[self.largest][0] != 'contents ':
+					self.material = self.parts[self.largest][6]
+				elif self.parts[self.largest][0] == 'contents ':
+					self.material = self.parts[0][6]
 				self.m_color = self.material[2]
 				self.color = choice(self.colors)
 			if self.raw == 'part':
 				self.mat_cat = 'fluid'
+				if self.shape:
+					#with predefined shape, find suitable category
+					while self.shape not in self.shapes[self.mat_cat]:
+						self.mat_cat = self.mat_cats[randint(0,len(self.mat_cats)-1)]
 				#pick and mat cat but fluid
-				while self.mat_cat == 'fluid':
-					self.mat_cat = self.mat_cats[randint(0,len(self.mat_cats)-1)]
-				#material becomes any mat array from chosen category
+				elif not self.shape:
+					while self.mat_cat == 'fluid':
+						self.mat_cat = self.mat_cats[randint(0,len(self.mat_cats)-1)]
+					#material becomes any mat array from chosen category
 				self.material = choice(self.std_w[self.mat_cat][1])
 				self.color = ['N/A',[0,0,0,0]]
 				#main color becomes mat color
@@ -192,8 +246,20 @@ class Loot(object):
 				if self.mat_cat in self.dyed:
 					self.ct = randint(0,len(self.colors)-1)
 					self.color =  self.colors[self.ct]
-					self.material[2] = self.colors[self.ct][1]
-			
+					
+	def roll_color(self):
+		if not self.color:
+			self.color = ['N/A',[0,0,0]]
+			if self.raw == 'loot':
+				self.m_color = self.material[2]
+				self.color = choice(self.colors)
+			if self.raw == 'part':
+				self.color[1] = self.material[2]
+				self.color[0] = self.material[0]
+				if self.mat_cat in self.dyed:
+					self.ct = randint(0,len(self.colors)-1)
+					self.color =  self.colors[self.ct]
+					
 	def roll_shape(self):
 		if not self.shape:
 			self.shape = choice(self.shapes[self.mat_cat])	
@@ -211,15 +277,24 @@ class Loot(object):
 					#incrememnt value by part weight * part mat. value
 					self.value += part[7]*part[6][1]
 			elif self.raw == 'part':
-				self.value = self.weight*self.material[1]
+				self.value = self.weight*self.material[1]*(self.quality[1]**self.level)
 		self.value = round(self.value,2)
 	
 	def roll_trim(self):
-		if not self.trim:
-			if len(self.parts) > 1:
-				#assign second part material as trim material	
-				self.trim = self.parts[1][6]
-				self.t_color = self.trim[2]
+		if self.trim:
+			if self.raw == "loot" and len(self.parts) > 1:
+				if self.parts[1][6] == self.trim: 
+					self.t_color = self.trim[2]
+					self.t_color_name = ''
+				else:
+					#for parts and single part loots, pick randomly
+					self.trimx = choice(self.colors)
+					self.trim = []
+					for col in self.trimx:
+						self.trim.append(col)
+					self.trim.append(self.trim[1])
+					self.t_color = self.trim[1]
+					self.t_color_name = self.trim[0]
 			else:
 				#for parts and single part loots, pick randomly
 				self.trimx = choice(self.colors)
@@ -227,8 +302,31 @@ class Loot(object):
 				for col in self.trimx:
 					self.trim.append(col)
 				self.trim.append(self.trim[1])
-			self.t_color = self.trim[1]
-			
+				self.t_color = self.trim[1]
+				self.t_color_name = self.trim[0]
+				print(self.name+' now has '+str(self.t_color_name))
+		elif not self.trim:
+			if len(self.parts) > 1:
+				#assign second part material as trim material	
+				self.trim = self.parts[1][6]
+				self.t_color = self.trim[2]
+				self.t_color_name = ' '
+				#if the material is dyed, select a dye color 
+				self.trim_cat = self.parts[1][4][0]
+				if self.trim_cat in self.dyed:
+					self.ct = randint(0,len(self.colors)-1)
+					self.t_color =  self.colors[self.ct][1]					
+					self.t_color_name =  self.colors[self.ct][0]
+			else:
+				#for parts and single part loots, pick randomly
+				self.trimx = choice(self.colors)
+				self.trim = []
+				for col in self.trimx:
+					self.trim.append(col)
+				self.trim.append(self.trim[1])
+				self.t_color = self.trim[1]
+				self.t_color_name = self.trim[0]
+				
 	def roll_short_name(self):
 		if not self.short_name:
 			#assign shape name for parts
@@ -254,7 +352,12 @@ class Loot(object):
 			self.desc = []
 			self.desc.append("Material: " + self.material[0].upper())
 			try:
-				self.desc.append("Trim: " + self.trim[0].upper())
+				if self.t_color_name:
+					self.desc.append("Trim: "+self.t_color_name.upper()+' ')
+					if self.t_color_name != self.trim[0]:
+						self.desc[1] += self.trim[0].upper()
+				elif not self.t_color_name:
+					self.desc.append("Trim: "+ self.trim[0].upper())
 			except:
 				self.desc.append("Trim: N/A")
 			self.desc.append("Quality: " + self.quality[0].upper())
@@ -284,10 +387,11 @@ class Loot(object):
 						
 	def roll_image(self):
 		#set sprite by shape or loot type
-		if self.shape:
-			self.sprite = self.part_sprites[self.shape]
-		elif self.l_type:
-			self.sprite = self.l_type[1]	
+		print(self.name)
+		if self.raw == 'part':
+			self.sprite = choice(self.part_sprites[self.shape])
+		elif self.raw == 'loot':
+			self.sprite = choice(self.l_type[1])	
 		
 		#always load LINE layer, convert 
 		self.image_line = pygame.image.load(self.spritepath+"L_" + str(self.sprite)+'.png')
@@ -305,7 +409,7 @@ class Loot(object):
 			#assign working color to x_color
 			self.x_color = self.image_mat.get_palette_at(i)
 			#determine working color offset from middle grey
-			self.grey_offset = -(self.x_color[0]-127)
+			self.grey_offset = (self.x_color[0]-127)
 			#add offset to self.color to make new color
 			self.n_color = [self.color[1][0]+self.grey_offset,
 							self.color[1][1]+self.grey_offset,
@@ -320,7 +424,7 @@ class Loot(object):
 				elif 0<rgbint<256:
 					self.n_color2[num]=rgbint
 			#wrap new color back into tuple and assign back to palette		
-			self.n_color=(self.n_color2[0],self.n_color2[1],self.n_color2[2])
+			self.n_color=[self.n_color2[0],self.n_color2[1],self.n_color2[2]]
 			self.image_mat.set_palette_at(i,self.n_color2)
 		
 		try:
@@ -328,27 +432,31 @@ class Loot(object):
 			self.image_trim = pygame.image.load('images/M2_' + str(self.sprite)+'.png')
 			self.image_trim.convert_alpha()	
 			self.layers = len(self.image_trim.get_palette())
+			if self.c_palette:
+				for i in range(0,self.layers-1):
+					self.image_trim.set_palette_at(i,self.c_palette[i])
+			else:
+				for i in range(0,self.layers-1):
+					self.x_color = self.image_trim.get_palette_at(i)
+					#grey offset, same as above
+					self.grey_offset = (self.x_color[0]-127)
+					#by now t_color should be an rgb tuple
+					self.n_color = [self.t_color[0]+self.grey_offset,
+									self.t_color[1]+self.grey_offset,
+									self.t_color[2]+self.grey_offset]
+					self.n_color2=[0,0,0]
+					for num,rgbint in enumerate(self.n_color):
+						if rgbint>255:
+							self.n_color2[num]=255
+						elif rgbint<0:
+							self.n_color2[num]=0
+						elif 0<rgbint<256:
+							self.n_color2[num]=rgbint
+							
+					self.n_color=(self.n_color2[0],self.n_color2[1],self.n_color2[2])
+					self.image_trim.set_palette_at(i,self.n_color)
+					self.c_palette.append(self.n_color)
 			
-			for i in range(0,self.layers-1):
-				self.x_color = self.image_trim.get_palette_at(i)
-				#grey offset, same as above
-				self.grey_offset = -(self.x_color[0]-127)
-				#by now t_color should be an rgb tuple
-				self.n_color = [self.t_color[0]+self.grey_offset,
-								self.t_color[1][1]+self.grey_offset,
-								self.t_color[1][2]+self.grey_offset]
-				self.n_color2=[0,0,0]
-				for num,rgbint in enumerate(self.n_color):
-					if rgbint>255:
-						self.n_color2[num]=255
-					elif rgbint<0:
-						self.n_color2[num]=0
-					elif 0<rgbint<256:
-						self.n_color2[num]=rgbint
-						
-				self.n_color=(self.n_color2[0],self.n_color2[1],self.n_color2[2])
-				self.image_trim.set_palette_at(i,self.n_color)
-				
 		except:
 			pass
 		
@@ -356,6 +464,7 @@ class Loot(object):
 			#if there is a COLOR layer, load and convert it
 			self.image_col = pygame.image.load('images/C_' + str(self.sprite)+'.png')
 			self.image_col.convert_alpha()	
+			
 			
 			self.layers = len(self.image_col.get_palette())
 			
