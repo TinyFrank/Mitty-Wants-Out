@@ -83,7 +83,7 @@ def run():
 	
 	#Make Inventory PIP menu
 	ip_buttons = []
-	#font used by inventory list buttons asdasd
+	#font used by inventory list buttons 
 	ip_font = 12
 	ip_window = Button(settings, screen, "",
 		scx-500, scy-145, 1000,290,(100,100,100),None,20)

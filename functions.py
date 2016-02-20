@@ -3,7 +3,7 @@ from time import sleep
 from random import randint
 import json
 from player import Player
-from libs import *
+from loot import *
 import pygame
 import copy
 from button import Button
@@ -45,8 +45,6 @@ def take_loot(stats,loots,lp_buttons):
 	#delete original loot from the loot pile
 	#add coppied loot to inventory
 	stats.inv.append(lp_buttons[6])
-	stats.inv[-1].weight = lp_buttons[6].weight
-	stats.inv[-1].value = lp_buttons[6].value
 	del loots[lp_buttons[6].ref]	
 	
 	close_loot_pip(stats,lp_buttons)
@@ -133,25 +131,10 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 def loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i):	
 	loot_inst = Loot(	settings, 
 						screen, 
-						value = loot.value,
-						level = stats.loot_val,
-						color = loot.color,
-						condition = loot.condition, 
-						quality = loot.quality,
-						material = loot.material,
-						ref = i,
-						l_type = loot.l_type,
-						shape = loot.shape,
-						parts =loot.parts,
-						trim = loot.trim,
-						den = loot.den,
-						num = loot.num,
-						raw = loot.raw,
-						val_x = loot.val_x,
-						val_normal = loot.val_normal,
-						weight = loot.weight,
-						q_num = loot.q_num,
-						alt_color = loot.alt_color)	
+						loot_val = stats.loot_val,
+						init_array = loot.init_array,
+						ref = i)
+							
 	lp_buttons.append(loot_inst)
 	lp_buttons[1] = Button(	settings, screen, loot.name, scx-275, 
 							scy-200, 550,50,(0,0,0),None,18)
@@ -162,35 +145,17 @@ def loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i):
 		lp_buttons.append(text_line)
 		
 	lp_buttons[6].rect.center = lp_buttons[4].rect.center 
-	#lp_buttons[6].weight = loot.weight
-	#lp_buttons[6].value = loot.value	
 	stats.loot_pip = True	
 
 def inv_pip(settings,screen,stats,ip_buttons):
 	scx = settings.screen_width/2
 	scy = settings.screen_height/2
 	if stats.inv:
-		inv_inst = Loot(settings, 
+		inv_inst = Loot(	settings, 
 						screen, 
-						level = stats.loot_val,
-						value = stats.inv[stats.inv_scroll].value,
-						color = stats.inv[stats.inv_scroll].color,
-						condition = stats.inv[stats.inv_scroll].condition, 
-						quality = stats.inv[stats.inv_scroll].quality,
-						material = stats.inv[stats.inv_scroll].material,
-						ref = stats.inv[stats.inv_scroll].ref,
-						l_type = stats.inv[stats.inv_scroll].l_type,
-						shape = stats.inv[stats.inv_scroll].shape,
-						parts =stats.inv[stats.inv_scroll].parts,
-						trim = stats.inv[stats.inv_scroll].trim,
-						den = stats.inv[stats.inv_scroll].den,
-						num = stats.inv[stats.inv_scroll].num,
-						raw = stats.inv[stats.inv_scroll].raw,
-						weight = stats.inv[stats.inv_scroll].weight,
-						val_x = stats.inv[stats.inv_scroll].val_x,
-						val_normal = stats.inv[stats.inv_scroll].val_normal,
-						q_num = stats.inv[stats.inv_scroll].weight,
-						alt_color = stats.inv[stats.inv_scroll].alt_color)	
+						loot_val = stats.loot_val,
+						init_array = stats.inv[stats.inv_scroll].init_array,)
+						
 	
 		first6 = len(stats.inv)
 		
