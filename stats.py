@@ -33,6 +33,7 @@ class Stats():
 		self.stock = []
 		self.loot_pip = False
 		self.inv_pip = False
+		self.map_pip = False
 		self.inv_scroll = 0
 
 	def scroll_inv_up(self):

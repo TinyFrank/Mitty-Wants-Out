@@ -444,9 +444,9 @@ loot_types ={				1:[
 							.9],
 							37:[
 							'Wine Bottle ',
-							['wine1','wine2'],
+							['mittyanimate','wine2'],
 							[["body ","chunk ",1,1,['plastic','ceramic'],None,None],
-							["stopper ","chunk ",1,1,['plastic','rubber','natural'],None,None],
+							["stopper ","chunk ",1,1,['plastic','rubber'],None,None],
 							["contents ","fluid",1,80,['fluid'],None,None]],
 							1.5]
 							}

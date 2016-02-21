@@ -138,6 +138,7 @@ def run():
 	#Create item groups
 	player = Player(settings, screen)
 	loots = []
+	hoods = []
 	
 	
 	#Create clock to stabilize framerate
@@ -154,8 +155,8 @@ def run():
 	while True:
 		clock.tick(100)
 		gf.check_events(	settings, screen, stats, buttons, 
-							ig_buttons, lp_buttons, ip_buttons, loots)
+							ig_buttons, lp_buttons, ip_buttons, loots, hoods)
 		gf.update_screen(	settings,screen, stats, buttons, ig_buttons, 
-							lp_buttons, ip_buttons, player, loots)
+							lp_buttons, ip_buttons, player, loots, hoods)
 run()
 	

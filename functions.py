@@ -8,18 +8,19 @@ import pygame
 import copy
 from button import Button
 import math
+from maps import Hood
 
 def place_loot(settings, screen, stats, loots):
 	debug_init = gen_init
 	debug_init[0]='loot'
 	#debug_init[2]= 'Bar'
-	debug_init[3]=16
+	debug_init[3]=37
 	#debug_init[7]= 1.0
 	#debug_init[9]=['Gold ',80,(255,210,48),19.32]
 	#debug_init[10]=['Gold ',80,(255,210,48),19.32]
 	#instantiate one loot
-	#loot_inst = Loot(settings, screen, stats.loot_val,debug_init) 
-	loot_inst = Loot(settings, screen, stats.loot_val) 
+	loot_inst = Loot(settings, screen, stats.loot_val,debug_init) 
+	#loot_inst = Loot(settings, screen, stats.loot_val) 
 	loot_inst.construct()
 	placed = False
 	timeout=0
@@ -72,13 +73,36 @@ def close_loot_pip(stats,lp_buttons):
 	stats.loot_pip = False
 	
 def check_keydown_events(	event, settings, screen, stats, loots, 
-							lp_buttons, ip_buttons):
+							lp_buttons, ip_buttons,hoods):
 	"""Respond to keypresses"""
 	if event.key == pygame.K_q:
 		sys.exit()
 	elif event.key == pygame.K_c:
 		#place_loot(settings, screen, stats, loots)
 		stats.sort_inv_name()
+	elif event.key == pygame.K_m:
+		#toggle map pip
+		if stats.map_pip == True:
+			stats.map_pip = False
+		if stats.map_pip == False and len(hoods)> 0:
+			stats.map_pip = True
+	#elif event.key == pygame.K_k:
+		##place_loot(settings, screen, stats, loots)
+		#hoods[0].grow_hood(100)
+		#hoods[0].tiles = []
+		#hoods[0].roll_rects()
+	elif event.key == pygame.K_i:
+		inv_pip(settings,screen,stats,ip_buttons)
+		#create/destrpy debug hood
+		#if stats.map_pip == True:
+			#stats.map_pip = False
+			#del hoods[0]
+		#if stats.map_pip == False:
+			#d_hood = Hood(settings,screen,stats)
+			#d_hood.grow_hood(1)
+			#d_hood.roll_rects()
+			#hoods.append(d_hood)
+			#stats.map_pip = True
 	elif event.key == pygame.K_f:
 		for i in range(0,200):
 			place_loot(settings, screen, stats, loots)
@@ -88,9 +112,6 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 				stats.inv.append(loots.pop(-1))
 			except:
 				break
-			#stats.inv.append(loots[i])
-			#loots.remove(loots[i])
-	#D is my debug key - click for terminal infos
 	elif event.key == pygame.K_d:
 		for i in loots:
 			print(i.desc)
@@ -125,12 +146,14 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 def check_buttons(	settings, screen, stats, buttons, ig_buttons, 
 					lp_buttons, ip_buttons, loots, mouse_pos):
 	"""Start new game when player clicks Play"""
+	scx = settings.screen_width/2
+	scy = settings.screen_height/2
 	if not stats.game_active:
 		if buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 			stats.game_active=True
 		elif  buttons[1].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 			sys.exit()
-		
+	
 	if stats.game_active:
 		if ig_buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 			inv_pip(settings,screen,stats,ip_buttons)
@@ -139,9 +162,17 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 		elif stats.loot_pip:
 			if lp_buttons[2].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 				take_loot(stats,loots,lp_buttons)
-		elif stats.inv_pip:
+		elif stats.inv_pip and not stats.loot_pip:
 			if not ip_buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 				close_inv_pip(stats,settings,screen,ip_buttons)
+		elif stats.loot_pip and not stats.inv_pip:
+			if not lp_buttons[0].rect.collidepoint(mouse_pos):
+				close_loot_pip(stats,lp_buttons)
+		elif not stats.loot_pip or stats.inv_pip:
+			for i,loot in enumerate(loots):
+				if loot.rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+					loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i)
+					break	
 				
 def loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i):	
 	loot_inst = Loot(	settings, 
@@ -212,7 +243,7 @@ def close_inv_pip(stats,settings,screen,ip_buttons):
 	screen.fill(settings.bg_colour)
 			
 def check_events(	settings, screen, stats, buttons, ig_buttons, 
-					lp_buttons, ip_buttons, loots):
+					lp_buttons, ip_buttons, loots, hoods):
 	"""Respond to keyboard and mouse events"""
 	
 	#create variables for screen center
@@ -224,24 +255,17 @@ def check_events(	settings, screen, stats, buttons, ig_buttons,
 			sys.exit()
 		elif event.type == pygame.KEYDOWN:
 			check_keydown_events(	event, settings, screen, stats, 
-									loots, lp_buttons, ip_buttons)		
+									loots, lp_buttons, ip_buttons, hoods)		
 		#elif event.type == pygame.KEYUP:
 			#check_keyup_events(event, settings, screen, stats)	
 		elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 			mouse_pos = pygame.mouse.get_pos()
 			check_buttons(	settings, screen, stats, buttons, 
 							ig_buttons, lp_buttons, ip_buttons, loots, mouse_pos)
-			if not stats.loot_pip or stats.inv_pip:
-				for i,loot in enumerate(loots):
-					if loot.rect.collidepoint(mouse_pos[0], mouse_pos[1]):
-						loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i)
-						break
-			elif stats.loot_pip and not stats.inv_pip:
-				if not lp_buttons[0].rect.collidepoint(mouse_pos):
-					close_loot_pip(stats,lp_buttons)
+
 				
 def update_screen(	settings, screen, stats, buttons, ig_buttons, 
-					lp_buttons, ip_buttons, player, loots):
+					lp_buttons, ip_buttons, player, loots, hoods):
 	"""Update images on the screen and flip to the new screen"""
 
 	#Redraw the screen during each pass through the loop
@@ -264,7 +288,7 @@ def update_screen(	settings, screen, stats, buttons, ig_buttons,
 					i.draw_button()
 				except:	
 					i.blitme()
-		elif stats.inv_pip:
+		if stats.inv_pip:
 			if len(stats.inv)>11:
 				len_inv = 11
 			else:
@@ -276,6 +300,10 @@ def update_screen(	settings, screen, stats, buttons, ig_buttons,
 					i.draw_button()
 				except:	
 					i.blitme()
+		if stats.map_pip == True:
+			if hoods:
+				print('blittin map')
+				hoods[0].draw_hood()
 				
 					
 	#Make the most recently drawn screen visible

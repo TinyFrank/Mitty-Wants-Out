@@ -4,6 +4,7 @@ class Button():
 	
 	def __init__(self, settings, screen, msg,x,y,w,h,colour,image,fontsize=32):
 		"""Initialize button attributes"""
+		self.im = image
 		self.msg = msg
 		self.screen = screen
 		self.screen_rect = screen.get_rect()
@@ -19,6 +20,15 @@ class Button():
 		#Build the button's rect object and position it
 		self.rect = pygame.Rect(x,y,self.width,self.height)
 		
+		#load image and get rect
+		if self.im:
+			try:
+				self.image = pygame.image.load('images/'+self.im+'.png')
+				self.image_line.convert_alpha()
+				self.image_rect = self.image.get_rect()
+			except:
+				print('button could not find image file')
+		
 		#The button message needs to be prepped only once
 		self.prep_msg()
 	
@@ -32,5 +42,9 @@ class Button():
 	def draw_button(self):
 		#Draw blank button and then draw message
 		self.screen.fill(self.button_colour, self.rect)
+		try:
+			self.screen.blit(self.image, self.image_rect)
+		except:
+			pass
 		self.screen.blit(self.msg_image, self.msg_image_rect)
 
