@@ -153,10 +153,12 @@ def run():
 	pygame.mixer.music.play(-1)
 	
 	while True:
-		clock.tick(100)
+		clock.tick(50)
 		gf.check_events(	settings, screen, stats, buttons, 
-							ig_buttons, lp_buttons, ip_buttons, loots, hoods)
+							ig_buttons, lp_buttons, ip_buttons, loots, 
+							hoods, player)
 		gf.update_screen(	settings,screen, stats, buttons, ig_buttons, 
-							lp_buttons, ip_buttons, player, loots, hoods)
+							lp_buttons, ip_buttons, player, loots, 
+							hoods)
 run()
 	

@@ -64,6 +64,7 @@ class Hood(object):
 			if self.roadmap[0+x_L][self.exits[2][1]-1][0] == 'R':
 				break
 			x_L += 1
+			
 		x_L = 1
 		while True:
 			if self.roadmap[19-x_L][self.exits[3][1]][0] == 'F':

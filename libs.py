@@ -137,9 +137,9 @@ minerals = (				['Charcoal ',0.2,(20,20,20),2.0],
 soft_solids = (				['Cork ',3,(105,83,57),0.23],
 							['Wax ',1.8,(255,255,255),0.96])
 
-pills = (					['Pain Killers ',50,(105,83,57),1.2],
-							['Flu Pills ',30,(255,255,255),1.2],
-							['Antidepressants ',30,(255,255,255),1.2],
+pills = (					['Pain Killer ',50,(105,83,57),1.2],
+							['Flu ',30,(255,255,255),1.2],
+							['Antidepressant ',30,(255,255,255),1.2],
 							['Stimulant ',30,(255,255,255),1.2],
 							['Lessphine ',150,(255,255,255),1.2])
 							
@@ -444,7 +444,7 @@ loot_types ={				1:[
 							.9],
 							37:[
 							'Wine Bottle ',
-							['mittyanimate','wine2'],
+							['wine1','wine2'],
 							[["body ","chunk ",1,1,['plastic','ceramic'],None,None],
 							["stopper ","chunk ",1,1,['plastic','rubber'],None,None],
 							["contents ","fluid",1,80,['fluid'],None,None]],
@@ -490,7 +490,7 @@ shapes = {				'metal':(	'Threaded Rod','Bar','Tube','Wire',
 						'natural':(	'Scrap','Chunk'),
 						'mineral':(	'Chunk','Powder','Pebble','Slab'),
 						'soft solid':(	'Scrap','Chunk'),
-						'pills':	(	'Pellets','Chunk'),
+						'pills':	(	'Capsules','Tablets'),
 						}
 									
 		#dictionary of image sets for parts
@@ -535,7 +535,9 @@ part_sprites = {			'Rod':['rod'],
 							'Confetti':['confetti'],
 							'Pebble':['pebble'],
 							'Gasket':['gasket'],
-							'Hose':['hose']
+							'Hose':['hose'],
+							'Tablets':['pellet'],
+							'Capsules':['confetti']
 							}
 		
 									

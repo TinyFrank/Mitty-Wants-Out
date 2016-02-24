@@ -7,4 +7,4 @@ class Settings():
 		self.screen_width = 1200
 		self.screen_height = 800
 		self.bg_colour = (140,140,140)
-		self.FPS = 200
+		self.FPS = 30

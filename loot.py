@@ -143,7 +143,7 @@ class Loot(object):
 			self.weight,self.value,self.material, self.trim,
 			self.quality,self.short_name,self.name,self.desc,
 			self.parts_desc,self.condition,self.mat_cat,self.color,
-			self.m_color,self.t_color]
+			self.m_color,self.t_color,self.sprite,self.label]
 			
 	def roll_l_type(self):
 		if not self.l_type_num:
