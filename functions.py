@@ -175,14 +175,13 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 					player.dest = mouse_pos
 					player.dest_ref = i
 					break	
+			if player.dest_ref == None:
+				player.dest = mouse_pos
 		elif ig_buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 			inv_pip(settings,screen,stats,ip_buttons)
 		elif ig_buttons[4].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 			stats.game_active=False
-		else:
-			player.dest = mouse_pos
 			
-				
 def loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i):	
 	stats.inv_pip = False
 	stats.map_pip = False
