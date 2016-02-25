@@ -32,10 +32,12 @@ class Player(Sprite):
 		self.cell_position = 0
 		self.rect = self.cells[0].get_rect()
 		self.dest = [0,0]
+		self.dest = [self.rect.x,self.rect.y]
 		self.dest_ref = None
 		self.screen_rect = self.screen.get_rect()
-		self.delta = [0,0]
+		self.delta = [0,0,0]
 		self.rect.center = self.screen_rect.center		
+		self.speed = 5 #pixel ditance moved per update
 		"""
 		Initialize sprite state
 		0 - Still
@@ -48,9 +50,19 @@ class Player(Sprite):
 		
 	def update(self):
 		"""Update the player's sprite"""
+		print(self.dest)
 		self.center = [self.rect.x,self.rect.y]
+		print(self.center)
 		if self.dest != self.center:
-			self.dest[0] - self.center[0] = dx
+			self.dx = self.dest[0] - self.center[0]
+			self.dy = self.dest[1] - self.center[1]
+			self.delta = [self.dx,self.dy,int((self.dx**2+self.dy**2)**(1/2))]
+			print(self.delta)
+			self.delta[0] = int((self.delta[0]/self.delta[2])*self.speed)
+			self.delta[1] = int((self.delta[1]/self.delta[2])*self.speed)
+			self.rect.x += self.delta[0]
+			self.rect.y += self.delta[1]
+			
 		
 	def blitme(self):
 		"""Draw Mitty at his current location."""
