@@ -1,5 +1,6 @@
 from random import choice, randint
 from button import Button
+from household import Household, Prole
 
 class Hood(object):
 	def __init__(self,settings,screen,stats):
