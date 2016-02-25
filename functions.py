@@ -80,11 +80,11 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 			stats.map_pip = False
 		elif stats.map_pip == False and len(hoods)> 0:
 			stats.map_pip = True
-	#elif event.key == pygame.K_k:
-		##place_loot(settings, screen, stats, loots)
-		#hoods[0].grow_hood(100)
-		#hoods[0].tiles = []
-		#hoods[0].roll_rects()
+	elif event.key == pygame.K_k:
+		#debug - grow hood
+		hoods[0].grow_hood(100)
+		hoods[0].tiles = []
+		hoods[0].roll_rects()
 	elif event.key == pygame.K_i:
 		if not stats.inv_pip:
 			inv_pip(settings,screen,stats,ip_buttons)
@@ -97,7 +97,8 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 			del hoods[0]
 		if stats.map_pip == False:
 			d_hood = Hood(settings,screen,stats)
-			d_hood.grow_hood(1)
+			d_hood.grow_hood(10)
+			d_hood.seed_hq()
 			d_hood.roll_rects()
 			hoods.append(d_hood)
 			stats.map_pip = True
@@ -175,10 +176,10 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 					player.dest = mouse_pos
 					player.dest_ref = i
 					break	
-			if player.dest_ref == None:
+			if ig_buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+				inv_pip(settings,screen,stats,ip_buttons)
+			elif player.dest_ref == None:
 				player.dest = mouse_pos
-		elif ig_buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
-			inv_pip(settings,screen,stats,ip_buttons)
 		elif ig_buttons[4].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 			stats.game_active=False
 			

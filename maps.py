@@ -10,6 +10,7 @@ class Hood(object):
 		self.tiles = []
 		self.scx = settings.screen_width/2
 		self.scy = settings.screen_height/2
+		#create 20x20 grid of empty fields
 		self.roadmap = [[['F',1,None]for y in range(20)]for x in range(20)]
 		
 		#tile color dictionary
@@ -87,7 +88,11 @@ class Hood(object):
 					self.roads.append([i,j])
 				if y[0] == 'L':
 					self.lots.append([i,j])
-					
+	
+	def seed_hq(self):
+		#place mitty's hq on the map
+		self.hq_coord = choice(self.lots)
+		self.roadmap[self.hq_coord[0]][self.hq_coord[1]][0] = 'M'		
 					
 	def grow_hood(self,turns):
 		#pick a road tile at random
@@ -101,12 +106,12 @@ class Hood(object):
 					del x
 			self.x_tile = choice(self.roads)
 			self.doable = False
+			#make sure selected road is inside the 2 tile margin
 			if self.x_tile[1]>1:
 				if self.x_tile[1]<18:
 					if self.x_tile[0]>1:
 						if self.x_tile[0]<18:
 							self.doable = True
-			print(self.x_tile)
 			if self.doable:
 				if self.roadmap[self.x_tile[0]][self.x_tile[1]-1][0] != 'R':
 					if self.x_tile[1]-1 > 1:
@@ -123,8 +128,8 @@ class Hood(object):
 				if len(self.roll) > 1:
 					self.offset = choice(self.roll)
 					if self.offset[0] == 0:
-						if self.roadmap[self.x_tile[0]+1][self.x_tile[1]+self.offset[1]][0] != 'R':
-							if self.roadmap[self.x_tile[0]-1][self.x_tile[1]+self.offset[1]][0] != 'R':
+						if self.roadmap[self.x_tile[0]+1][self.x_tile[1]+self.offset[1]][0] not in ['R','M']:
+							if self.roadmap[self.x_tile[0]-1][self.x_tile[1]+self.offset[1]][0] not in ['R','M']:
 								self.roadmap[self.x_tile[0]+1][self.x_tile[1]+self.offset[1]][0] = 'L'
 								self.roadmap[self.x_tile[0]-1][self.x_tile[1]+self.offset[1]][0] = 'L'
 								self.lots.append([self.x_tile[0]+1,self.x_tile[1]+self.offset[1]])
@@ -133,8 +138,8 @@ class Hood(object):
 								self.roads.append([self.x_tile[0],self.x_tile[1]+self.offset[1]])
 								turns -= 1
 					else:
-						if self.roadmap[self.x_tile[0]+self.offset[0]][self.x_tile[1]+1][0] != 'R':
-							if self.roadmap[self.x_tile[0]+self.offset[0]][self.x_tile[1]-1][0] != 'R':
+						if self.roadmap[self.x_tile[0]+self.offset[0]][self.x_tile[1]+1][0] not in ['R','M']:
+							if self.roadmap[self.x_tile[0]+self.offset[0]][self.x_tile[1]-1][0] not in ['R','M']:
 								self.roadmap[self.x_tile[0]+self.offset[0]][self.x_tile[1]+1][0] = 'L'
 								self.roadmap[self.x_tile[0]+self.offset[0]][self.x_tile[1]-1][0] = 'L'
 								self.lots.append([self.x_tile[0]+self.offset[0],self.x_tile[1]+1])
@@ -143,6 +148,7 @@ class Hood(object):
 								self.roads.append([self.x_tile[0]+self.offset[0],self.x_tile[1]])
 								turns -= 1
 				if self.lots:
+					#level up a random lot
 					self.x_lot = choice(self.lots)
 					if self.roadmap[self.x_lot[0]][self.x_lot[1]][1]<154:
 						self.roadmap[self.x_lot[0]][self.x_lot[1]][1]+=1
@@ -154,10 +160,11 @@ class Hood(object):
 		for i,x in enumerate(self.roadmap):
 			for j,y in enumerate(x):
 				if y[0] == 'L':
-					hood_tile = Button(self.settings, self.screen,'',
+					#Lots change colour based on wealth
+					hood_tile = Button(self.settings, self.screen,str(y[1]),
 								self.scx-(10*self.tile)+(i*self.tile), 
 								self.scy-(10*self.tile)+(j*self.tile),
-								self.tile,self.tile,(	self.tile_dict[y[0]][0][0]+y[1],
+								self.tile,self.tile,(	self.tile_dict[y[0]][0][0]+y[1]-1,
 														self.tile_dict[y[0]][0][1],
 														self.tile_dict[y[0]][0][2]),None,10)
 				else:
