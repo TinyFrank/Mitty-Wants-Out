@@ -51,7 +51,8 @@ class Player(Sprite):
 	def update(self):
 		"""Update the player's sprite"""
 		print(self.dest)
-		self.center = [self.rect.x,self.rect.y]
+		self.center = [	self.rect.x+int(self.rect.width/2),
+						self.rect.y+int(self.rect.height/2)]
 		print(self.center)
 		if self.dest != self.center:
 			self.dx = self.dest[0] - self.center[0]

@@ -174,12 +174,14 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 				if loot.rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 					player.dest = mouse_pos
 					player.dest_ref = i
-					#loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i)
 					break	
 		elif ig_buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 			inv_pip(settings,screen,stats,ip_buttons)
 		elif ig_buttons[4].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 			stats.game_active=False
+		else:
+			player.dest = mouse_pos
+			
 				
 def loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i):	
 	stats.inv_pip = False
@@ -315,8 +317,8 @@ def update_screen(	settings, screen, stats, buttons, ig_buttons,
 			if loot.rect.colliderect(player.rect):
 				if i == player.dest_ref:
 					player_dest = [0,0]
-					player_dest[0] = player.rect.x
-					player_dest[1] = player.rect.y
+					player_dest[0] = player.rect.x+int(player.rect.width/2)
+					player_dest[1] = player.rect.y+int(player.rect.height/2)
 					player.dest = player_dest
 					loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i)
 					player.dest_ref = None
