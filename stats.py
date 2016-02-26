@@ -23,7 +23,17 @@ class Stats():
 		
 		#holds items in stock in the shop
 		self.stock = []
-	
+		
+		#initiate Nanny State
+		self.min_wage = 15
+		self.work_age = 18
+		self.work_day = 8
+		self.work_week = 5
+		self.poverty = self.work_day * self.work_week * 52 * self.min_wage
+		
+	def roll_nstate(self):
+		self.poverty = self.work_day * self.work_week * 52 * self.min_wage
+		
 	def reset_stats(self):
 		"""Initialize statistics that can change during the game"""
 		self.score = 0

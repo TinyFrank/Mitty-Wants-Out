@@ -133,6 +133,10 @@ class Hood(object):
 							if self.roadmap[self.x_tile[0]-1][self.x_tile[1]+self.offset[1]][0] not in ['R','M']:
 								self.roadmap[self.x_tile[0]+1][self.x_tile[1]+self.offset[1]][0] = 'L'
 								self.roadmap[self.x_tile[0]-1][self.x_tile[1]+self.offset[1]][0] = 'L'
+								self.roadmap[self.x_tile[0]+1][self.x_tile[1]+self.offset[1]][2] = Household(self.settings,self.screen,self.stats,1)
+								self.roadmap[self.x_tile[0]-1][self.x_tile[1]+self.offset[1]][2] = Household(self.settings,self.screen,self.stats,1)
+								self.roadmap[self.x_tile[0]+1][self.x_tile[1]+self.offset[1]][2].construct()
+								self.roadmap[self.x_tile[0]-1][self.x_tile[1]+self.offset[1]][2].construct()
 								self.lots.append([self.x_tile[0]+1,self.x_tile[1]+self.offset[1]])
 								self.lots.append([self.x_tile[0]-1,self.x_tile[1]+self.offset[1]])
 								self.roadmap[self.x_tile[0]][self.x_tile[1]+self.offset[1]][0] = 'R'
@@ -143,6 +147,10 @@ class Hood(object):
 							if self.roadmap[self.x_tile[0]+self.offset[0]][self.x_tile[1]-1][0] not in ['R','M']:
 								self.roadmap[self.x_tile[0]+self.offset[0]][self.x_tile[1]+1][0] = 'L'
 								self.roadmap[self.x_tile[0]+self.offset[0]][self.x_tile[1]-1][0] = 'L'
+								self.roadmap[self.x_tile[0]+self.offset[0]][self.x_tile[1]+1][2] = Household(self.settings,self.screen,self.stats,1)
+								self.roadmap[self.x_tile[0]+self.offset[0]][self.x_tile[1]-1][2] = Household(self.settings,self.screen,self.stats,1)
+								self.roadmap[self.x_tile[0]+self.offset[0]][self.x_tile[1]+1][2].construct()
+								self.roadmap[self.x_tile[0]+self.offset[0]][self.x_tile[1]-1][2].construct()
 								self.lots.append([self.x_tile[0]+self.offset[0],self.x_tile[1]+1])
 								self.lots.append([self.x_tile[0]+self.offset[0],self.x_tile[1]+1])
 								self.roadmap[self.x_tile[0]+self.offset[0]][self.x_tile[1]][0] = 'R'
