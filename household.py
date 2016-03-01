@@ -7,7 +7,8 @@ lnames = [ 	'Manning','Tsang','MacLeod','Flood','Elston','Rayner',
 			'Flaherty','Harper','Trudeau']
 
 mnames = [	'Josh','Nick','Pete','Caleb','Phil','Garth','Matt','Micah',
-			'Don','Al','Paul','Dan','John','Steve','Chris','Ken']
+			'Don','Al','Paul','Dan','John','Steve','Chris','Ken','Frank',
+			'Berg']
 
 fnames = [	'Cherry','Tessa','Carron','Sharon','Mel','Hannah','Lila',
 			'Meghan','Becca','Sarah','Kate','Ali','Pat']
@@ -47,7 +48,7 @@ class Household(object):
 			if self.num_proles > 1:
 				self.num_kids = self.num_proles + 1
 				while self.num_kids >= self.num_proles:
-					self.num_kids = choice([0,0,0,0,0,0,1,1,1,1,2,2,3,4,5,6,7])
+					self.num_kids = choice([0,0,1,1,1,1,2,2,3,4,5,6,7])
 				self.num_adults = self.num_proles - self.num_kids
 			elif self.num_proles == 1:
 				self.num_adults = 1
@@ -58,7 +59,7 @@ class Household(object):
 		self.wages = []
 		self.wages_n = 0
 		for i in range(self.num_adults):
-			self.x_wages.append(randint(0,101)**2)	
+			self.x_wages.append(randint(1,101)**2)	
 			self.wages_n += self.x_wages[i]
 		for i in self.x_wages:
 			self.wages.append(i/self.wages_n)
@@ -93,8 +94,8 @@ class Household(object):
 			
 		for prole in self.proles:
 			print(prole.fname+prole.lname+' '+str(prole.salary))
-		print(self.hh_value)
-		print('\n\n')		
+		print('Yearly Household Income: ' + str(self.hh_value))
+		print('\n')		
 				
 		
 class Prole(object):

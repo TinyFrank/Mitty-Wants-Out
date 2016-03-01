@@ -1,23 +1,43 @@
 from random import choice, randint
 from button import Button
-from household import Household, Prole
+from household import Household, Prole, lnames
+
+prefixes = ['San ','Old ','Great ','East ','West ','North ','South '
+			'Central ','Upper ','Lower ','Little ']
+
+suffixes = ['ton','town','ville','burg','ito','ino','etta','s']
+
+locs = [' Hills',' City',' Hill',' Plateau',' Forest',' Pines',' River',
+			' Delta',' Valley',' Oaks',' Mews',' Shores']
 
 class Hood(object):
 	def __init__(self,settings,screen,stats):
 		self.settings = settings
 		self.screen = screen
 		self.stats = stats
-		self.tile = 40
+		self.tile = self.settings.map_size/20
 		self.tiles = []
 		self.scx = settings.screen_width/2
 		self.scy = settings.screen_height/2
+		self.ms = self.settings.map_size
+		
+		#roll a name format
+		self.pe,self.su,self.lo = '', '', ''
+		if randint(0,3)>1:
+			self.pe = choice(prefixes)
+		if randint(0,3)>1:
+			self.su = choice(suffixes)
+		if randint(0,3)>1:
+			self.lo = choice(locs)
+		self.name = self.pe + choice(lnames) + self.su + self.lo
+		
 		#create 20x20 grid of empty fields
 		self.roadmap = [[['F',1,None]for y in range(20)]for x in range(20)]
 		
 		#tile color dictionary
 		self.tile_dict = {	'R':((0,0,0),'Road'),
-							'L':((100,0,0),'Lot'),
-							'F':((0,180,0),'Field'),
+							'L':((0,100,0),'Lot'),
+							'F':((110,150,100),'Field'),
 							'M':((0,0,255),"Mitty's Place")}
 					
 		#pick a random exit on each edge
@@ -152,7 +172,7 @@ class Hood(object):
 								self.roadmap[self.x_tile[0]+self.offset[0]][self.x_tile[1]+1][2].construct()
 								self.roadmap[self.x_tile[0]+self.offset[0]][self.x_tile[1]-1][2].construct()
 								self.lots.append([self.x_tile[0]+self.offset[0],self.x_tile[1]+1])
-								self.lots.append([self.x_tile[0]+self.offset[0],self.x_tile[1]+1])
+								self.lots.append([self.x_tile[0]+self.offset[0],self.x_tile[1]-1])
 								self.roadmap[self.x_tile[0]+self.offset[0]][self.x_tile[1]][0] = 'R'
 								self.roads.append([self.x_tile[0]+self.offset[0],self.x_tile[1]])
 								turns -= 1
@@ -169,18 +189,26 @@ class Hood(object):
 		for i,x in enumerate(self.roadmap):
 			for j,y in enumerate(x):
 				if y[0] == 'L':
+					if 100 > y[1] > 50:
+						self.yhouse = 'h_mid'
+					elif y[1] > 100:
+						self.yhouse = 'h_hi'
+					else:
+						self.yhouse = 'h_lo'
 					#Lots change colour based on wealth
-					hood_tile = Button(self.settings, self.screen,str(y[1]),
-								self.scx-(10*self.tile)+(i*self.tile), 
+					hood_tile = Button(self.settings, self.screen,'',
+								self.scx-(10*self.tile)+(i*self.tile)-(self.ms/4), 
 								self.scy-(10*self.tile)+(j*self.tile),
-								self.tile,self.tile,(	self.tile_dict[y[0]][0][0]+y[1]-1,
-														self.tile_dict[y[0]][0][1],
-														self.tile_dict[y[0]][0][2]),None,10)
+								self.tile,self.tile,(	self.tile_dict[y[0]][0][0],
+														self.tile_dict[y[0]][0][1]+y[1]-1,
+														self.tile_dict[y[0]][0][2]),
+								self.yhouse,10,i,j)
 				else:
 					hood_tile = Button(self.settings, self.screen,'',
-							self.scx-(10*self.tile)+(i*self.tile), 
+							self.scx-(10*self.tile)+(i*self.tile)-(self.ms/4), 
 							self.scy-(10*self.tile)+(j*self.tile),
-							self.tile,self.tile,(	self.tile_dict[y[0]][0]),None,10)								
+							self.tile,self.tile,(	self.tile_dict[y[0]][0]),
+							None,10,i,j)								
 				self.tiles.append(hood_tile)
 		
 	def draw_hood(self):

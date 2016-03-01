@@ -67,7 +67,7 @@ def take_loot(stats,loots,lp_buttons):
 	close_loot_pip(stats,lp_buttons)
 	
 def check_keydown_events(	event, settings, screen, stats, loots, 
-							lp_buttons, ip_buttons,hoods):
+							lp_buttons, ip_buttons,mp_buttons,hoods):
 	"""Respond to keypresses"""
 	if event.key == pygame.K_q:
 		if not stats.loot_pip:
@@ -79,6 +79,8 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 		if stats.map_pip == True:
 			stats.map_pip = False
 		elif stats.map_pip == False and len(hoods)> 0:
+			close_inv_pip(stats,settings,screen,ip_buttons)
+			close_loot_pip(stats,lp_buttons)
 			stats.map_pip = True
 	elif event.key == pygame.K_k:
 		#debug - grow hood
@@ -97,6 +99,8 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 			del hoods[0]
 		if stats.map_pip == False:
 			d_hood = Hood(settings,screen,stats)
+			mp_buttons[1].msg = d_hood.name
+			mp_buttons[1].prep_msg()
 			d_hood.grow_hood(10)
 			d_hood.seed_hq()
 			d_hood.roll_rects()
@@ -151,7 +155,8 @@ def check_keyup_events(	event,settings, screen, stats,loots,
 			stats.sd_timer = stats.s_time
 
 def check_buttons(	settings, screen, stats, buttons, ig_buttons, 
-					lp_buttons, ip_buttons, loots, mouse_pos, player):
+					lp_buttons, ip_buttons, mp_buttons, loots, 
+					mouse_pos, player,hoods):
 	"""Start new game when player clicks Play"""
 	scx = settings.screen_width/2
 	scy = settings.screen_height/2
@@ -170,6 +175,12 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 		elif stats.inv_pip and not stats.loot_pip:
 			if not ip_buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 				close_inv_pip(stats,settings,screen,ip_buttons)
+		elif stats.map_pip:
+			for i in hoods[0].tiles:
+				if i.rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+					if hoods[0].roadmap[i.refx][i.refy][0] == 'L':
+						mp_buttons[2].msg = str(hoods[0].roadmap[i.refx][i.refy][2].lname) + ' Household'
+						mp_buttons[2].prep_msg()
 		elif not stats.loot_pip and not stats.inv_pip:
 			for i,loot in enumerate(loots):
 				if loot.rect.collidepoint(mouse_pos[0], mouse_pos[1]):
@@ -260,7 +271,8 @@ def close_inv_pip(stats,settings,screen,ip_buttons):
 	screen.fill(settings.bg_colour)
 			
 def check_events(	settings, screen, stats, buttons, ig_buttons, 
-					lp_buttons, ip_buttons, loots, hoods, player):
+					lp_buttons, ip_buttons, mp_buttons, loots, hoods, 
+					player):
 	"""Respond to keyboard and mouse events"""
 	
 	#create variables for screen center
@@ -272,18 +284,21 @@ def check_events(	settings, screen, stats, buttons, ig_buttons,
 			sys.exit()
 		elif event.type == pygame.KEYDOWN:
 			check_keydown_events(	event, settings, screen, stats, 
-									loots, lp_buttons, ip_buttons, hoods)		
+									loots, lp_buttons, ip_buttons, 
+									mp_buttons, hoods)		
 		elif event.type == pygame.KEYUP:
 			check_keyup_events(		event, settings, screen, stats,
 									loots, lp_buttons, ip_buttons, hoods)	
 		elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
 			mouse_pos = pygame.mouse.get_pos()
 			check_buttons(	settings, screen, stats, buttons, 
-							ig_buttons, lp_buttons, ip_buttons, loots, 
-							mouse_pos, player)
+							ig_buttons, lp_buttons, ip_buttons, 
+							mp_buttons, loots, 
+							mouse_pos, player, hoods)
 				
 def update_screen(	settings, screen, stats, buttons, ig_buttons, 
-					lp_buttons, ip_buttons, player, loots, hoods):
+					lp_buttons, ip_buttons, mp_buttons, 
+					player, loots, hoods):
 	"""Update images on the screen and flip to the new screen"""
 	scx = settings.screen_width/2
 	scy = settings.screen_height/2
@@ -348,6 +363,8 @@ def update_screen(	settings, screen, stats, buttons, ig_buttons,
 					i.blitme()
 				
 		if stats.map_pip == True:
+			for i in mp_buttons:
+				i.draw_button()
 			if hoods:
 				hoods[0].draw_hood()
 				

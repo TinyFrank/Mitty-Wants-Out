@@ -2,7 +2,8 @@ import pygame.font
 
 class Button():
 	
-	def __init__(self, settings, screen, msg,x,y,w,h,colour,image,fontsize=32):
+	def __init__(self, settings, screen, msg,x,y,w,h,colour,image,
+				fontsize=32,refx=None,refy=None):
 		"""Initialize button attributes"""
 		self.im = image
 		self.msg = msg
@@ -10,6 +11,8 @@ class Button():
 		self.screen_rect = screen.get_rect()
 		self.settings = settings
 		self.fontsize = fontsize
+		self.refx = refx
+		self.refy = refy
 		
 		#set the dimensions and properties of the button
 		self.width, self.height = w, h
@@ -22,12 +25,13 @@ class Button():
 		
 		#load image and get rect
 		if self.im:
-			try:
-				self.image = pygame.image.load('images/'+self.im+'.png')
-				self.image_line.convert_alpha()
-				self.image_rect = self.image.get_rect()
-			except:
-				print('button could not find image file')
+			#try:
+			self.image = pygame.image.load('images/'+self.im+'.png')
+			self.image.convert_alpha()
+			self.image_rect = self.image.get_rect()
+			self.image_rect.center = self.rect.center
+			#except:
+				#print('button could not find image file')
 		
 		#The button message needs to be prepped only once
 		self.prep_msg()

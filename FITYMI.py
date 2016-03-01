@@ -60,6 +60,26 @@ def run():
 	ig_buttons.append(character_button)
 	ig_buttons.append(menu_button)
 	
+	#Make Map PIP menu
+	ms = settings.map_size
+	mp_buttons = []
+	mp_bg = Button(settings, screen, "",
+		scx-(ms/2)-(ms/4)-10, scy-(ms/2)-10, 
+		ms+(ms/2)+20,ms+20,(0,0,0),None,20)
+	mp_title = Button(settings, screen, "",
+		scx+(ms/4)+10, scy-(ms/2), 
+		ms/2-10,100,(100,100,100),None,20)
+	mp_hh = Button(settings, screen, "",
+		scx+(ms/4)+10, scy-(ms/2)+110, 
+		ms/2-10,60,(100,100,100),None,20)
+	mp_hhinc = Button(settings, screen, "",
+		scx+(ms/4)+10, scy-(ms/2)+170, 
+		ms/2-10,60,(100,100,100),None,20)
+	mp_buttons.append(mp_bg)
+	mp_buttons.append(mp_title)
+	mp_buttons.append(mp_hh)
+	mp_buttons.append(mp_hhinc)
+	
 	#Make Loot PIP menu
 	lp_buttons = []
 	lp_title = Button(settings, screen, "",
@@ -155,10 +175,12 @@ def run():
 	while True:
 		clock.tick(50)
 		gf.check_events(	settings, screen, stats, buttons, 
-							ig_buttons, lp_buttons, ip_buttons, loots, 
+							ig_buttons, lp_buttons, ip_buttons, mp_buttons,
+							loots, 
 							hoods, player)
 		gf.update_screen(	settings,screen, stats, buttons, ig_buttons, 
-							lp_buttons, ip_buttons, player, loots, 
+							lp_buttons, ip_buttons, mp_buttons,
+							player, loots, 
 							hoods)
 run()
 	
