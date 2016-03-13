@@ -4,6 +4,7 @@ import pygame
 from pygame.sprite import Sprite
 import libs
 import copy
+import time
 
 gen_init = 	[choice(('loot','part')),None,None,None,[],[],[],None,
 			None,[],[],[],'','',[],[],[],None,[],[],[],[],'',[]]
@@ -63,7 +64,7 @@ class Loot(object):
 			self.t_color = []
 			self.sprite = ''
 			self.label = []
-			
+					
 		#overwrite ref if one was provided
 		if ref:
 			self.ref = ref
@@ -182,7 +183,7 @@ class Loot(object):
 		#check redundancy
 		if not self.parts:
 			#assign l_type parts array to self.parts
-			self.parts = copy.copy(self.l_type[2])	
+			self.parts = self.l_type[2]	
 			#assign materials to each part and sum v_normal
 			score = 0
 			for i,part in enumerate(self.parts):
@@ -199,6 +200,9 @@ class Loot(object):
 					score = part[3] # largest contribution so far
 				if i == 1:
 					self.trim_cat = part_mat_cat
+				#if given 2 qtys, pick randint betweent them
+				if str(part[2].__class__) ==("<class 'list'>"):
+					part[2][2] = randint(part[2][0],part[2][1])
 			#assign largest part
 			self.largest = leader
 					
@@ -302,7 +306,8 @@ class Loot(object):
 					self.trim.append(self.trim[1])
 					self.t_color = self.trim[1]
 					self.t_color_name = self.trim[0]
-			else:
+					
+			elif self.raw == "loot" and len(self.parts) == 1:
 				#for parts and single part loots, pick randomly
 				self.trimx = choice(self.colors)
 				self.trim = []
@@ -312,8 +317,9 @@ class Loot(object):
 				self.t_color = self.trim[1]
 				self.t_color_name = self.trim[0]
 				print(self.name+' now has '+str(self.t_color_name))
+				
 		elif not self.trim:
-			if len(self.parts) > 1:
+			if self.raw == "loot" and len(self.parts) > 1:
 				#assign second part material as trim material	
 				self.trim = self.parts[1][6]
 				self.t_color = self.trim[2]
@@ -324,7 +330,8 @@ class Loot(object):
 					self.ct = randint(0,len(self.colors)-1)
 					self.t_color =  self.colors[self.ct][1]					
 					self.t_color_name =  self.colors[self.ct][0]
-			else:
+					
+			elif self.raw == "loot" and len(self.parts) == 1:
 				#for parts and single part loots, pick randomly
 				self.trimx = choice(self.colors)
 				self.trim = []
@@ -389,7 +396,11 @@ class Loot(object):
 			self.parts_desc = []
 			for part in self.parts: 
 				#assign part qty. + part material + part name
-				pd = str(part[2]) + ' ' + str(part[6][0]) + ' '+ part[0]
+				if str(part[2].__class__) == "<class 'list'>":
+					part_qty = part[2][2]
+				else:
+					part_qty = part[2]
+				pd = str(part_qty) + ' ' + str(part[6][0]) + ' '+ part[0]
 				self.parts_desc.append(pd)
 	
 	def roll_sprite(self):

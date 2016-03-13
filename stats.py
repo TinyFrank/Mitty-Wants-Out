@@ -24,7 +24,11 @@ class Stats():
 		#holds items in stock in the shop
 		self.stock = []
 		
-		#initiate Nanny State
+		#currently watched household
+		self.current_hh = []
+		self.chhx,self.chhy = 0,0
+		
+		#initialize Nanny State
 		self.min_wage = 15
 		self.work_age = 18
 		self.work_day = 8
@@ -32,6 +36,7 @@ class Stats():
 		self.poverty = self.work_day * self.work_week * 52 * self.min_wage
 		
 	def roll_nstate(self):
+		#update nanny state
 		self.poverty = self.work_day * self.work_week * 52 * self.min_wage
 		
 	def reset_stats(self):
@@ -50,6 +55,7 @@ class Stats():
 		self.s_time = 20
 		self.su_timer = self.s_time
 		self.sd_timer = self.s_time
+		
 	def scroll_inv_up(self):
 		self.inv_scroll-=1
 		if self.inv_scroll <= -len(self.inv):

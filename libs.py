@@ -344,7 +344,7 @@ loot_types ={				1:[
 							'Classic Book ',
 							['classicbook'],
 							[["covers ","sheet ",2,1,['paper'],None,None],
-							["pages ","sheet ",1,10,['paper'],None,None]],
+							["pages ","sheet ",[100,500,0],10,['paper'],None,None]],
 							.5],
 							23:[
 							'Cookie Tin ',
@@ -411,13 +411,13 @@ loot_types ={				1:[
 							'Magazine ',
 							['peepmagazine'],
 							[["covers ","sheet ",2,1,['paper'],None,None],
-							["pages ","sheet ",1,10,['paper'],None,None]],
+							["pages ","sheet ",[10,50,0],10,['paper'],None,None]],
 							.1],
 							33:[
 							'Smut Novel ',
 							['smutnovel'],
 							[["covers ","sheet ",2,1,['paper','plastic'],None,None],
-							["pages ","sheet ",1,10,['paper','plastic'],None,None]],
+							["pages ","sheet ",[100,200,0],10,['paper','plastic'],None,None]],
 							.3],
 							34:[
 							'Soy Bottle ',

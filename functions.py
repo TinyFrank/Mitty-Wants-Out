@@ -12,15 +12,15 @@ from maps import Hood
 
 def place_loot(settings, screen, stats, loots):
 	debug_init = gen_init
-	debug_init[0]='loot'
+	debug_init[0]='part'
 	#debug_init[2]= 'Bar'
-	debug_init[3]=37
+	#debug_init[3]=37
 	#debug_init[7]= 1.0
 	#debug_init[9]=['Gold ',80,(255,210,48),19.32]
 	#debug_init[10]=['Gold ',80,(255,210,48),19.32]
 	#instantiate one loot
-	#loot_inst = Loot(settings, screen, stats.loot_val,debug_init) 
-	loot_inst = Loot(settings, screen, stats.loot_val) 
+	loot_inst = Loot(settings, screen, stats.loot_val,debug_init) 
+	#loot_inst = Loot(settings, screen, stats.loot_val) 
 	loot_inst.construct()
 	placed = False
 	timeout=0
@@ -87,6 +87,8 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 		hoods[0].grow_hood(100)
 		hoods[0].tiles = []
 		hoods[0].roll_rects()
+		if stats.current_hh:
+			update_chh(stats, mp_buttons)
 	elif event.key == pygame.K_i:
 		if not stats.inv_pip:
 			inv_pip(settings,screen,stats,ip_buttons)
@@ -176,11 +178,25 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 			if not ip_buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 				close_inv_pip(stats,settings,screen,ip_buttons)
 		elif stats.map_pip:
+			lot_hit = False
 			for i in hoods[0].tiles:
 				if i.rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 					if hoods[0].roadmap[i.refx][i.refy][0] == 'L':
-						mp_buttons[2].msg = str(hoods[0].roadmap[i.refx][i.refy][2].lname) + ' Household'
-						mp_buttons[2].prep_msg()
+						stats.current_hh = hoods[0].roadmap[i.refx][i.refy][2]
+						stats.chhx = i.refx
+						stats.chhy = i.refy
+						lot_hit = True
+				if not lot_hit:
+					stats.current_hh = []
+					mp_buttons[2].msg=''
+					mp_buttons[2].prep_msg()
+					mp_buttons[3].msg=''
+					mp_buttons[3].prep_msg()
+				elif lot_hit:
+					mp_buttons[2].msg = str(stats.current_hh.lname) + ' Household'
+					mp_buttons[2].prep_msg()
+					mp_buttons[3].msg = str(stats.current_hh.hh_value) + ' Value'
+					mp_buttons[3].prep_msg()
 		elif not stats.loot_pip and not stats.inv_pip:
 			for i,loot in enumerate(loots):
 				if loot.rect.collidepoint(mouse_pos[0], mouse_pos[1]):
@@ -193,6 +209,12 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 				player.dest = mouse_pos
 		elif ig_buttons[4].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 			stats.game_active=False
+			
+def update_chh(stats, mp_buttons):	
+	mp_buttons[2].msg = str(stats.current_hh.lname) + ' Household'
+	mp_buttons[2].prep_msg()
+	mp_buttons[3].msg = str(stats.current_hh.hh_value) + ' Value'
+	mp_buttons[3].prep_msg()
 			
 def loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i):	
 	stats.inv_pip = False

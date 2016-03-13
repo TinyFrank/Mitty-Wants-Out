@@ -181,6 +181,8 @@ class Hood(object):
 					self.x_lot = choice(self.lots)
 					if self.roadmap[self.x_lot[0]][self.x_lot[1]][1]<154:
 						self.roadmap[self.x_lot[0]][self.x_lot[1]][1]+=1
+						self.roadmap[self.x_lot[0]][self.x_lot[1]][2].lot_value = self.roadmap[self.x_lot[0]][self.x_lot[1]][1]
+						self.roadmap[self.x_lot[0]][self.x_lot[1]][2].roll_hh_value()
 						turns -= 1			
 			tries -= 1
 			

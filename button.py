@@ -50,5 +50,6 @@ class Button():
 			self.screen.blit(self.image, self.image_rect)
 		except:
 			pass
-		self.screen.blit(self.msg_image, self.msg_image_rect)
+		if self.msg:
+			self.screen.blit(self.msg_image, self.msg_image_rect)
 

@@ -33,7 +33,8 @@ class Household(object):
 		"""Roll a household value based on lot value, the poverty line 
 		and a random offset of +/- 20%"""
 		self.hhv_offset = ((randint(0,41)-20)/100)+1
-		self.hh_value = round((self.lot_value * self.hhv_offset) * self.stats.poverty,0)
+		self.lv_offset = (self.lot_value*0.1)+1
+		self.hh_value = round((self.lv_offset * self.hhv_offset) * self.stats.poverty,0)
 		
 	def roll_lname(self):
 		"""Pick a last name"""
