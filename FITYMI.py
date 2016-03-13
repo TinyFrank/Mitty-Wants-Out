@@ -71,14 +71,23 @@ def run():
 		ms/2-10,100,(100,100,100),None,20)
 	mp_hh = Button(settings, screen, "",
 		scx+(ms/4)+10, scy-(ms/2)+110, 
-		ms/2-10,60,(100,100,100),None,20)
+		ms/2-10,40,(100,100,100),None,15)
 	mp_hhinc = Button(settings, screen, "",
-		scx+(ms/4)+10, scy-(ms/2)+170, 
+		scx+(ms/4)+10, scy-(ms/2)+150, 
+		ms/2-10,40,(100,100,100),None,15)
+	mp_num = Button(settings, screen, "",
+		scx+(ms/4)+10, scy-(ms/2)+190, 
+		ms/2-10,40,(100,100,100),None,15)
+	mp_goto = Button(settings, screen, "",
+		scx+(ms/4)+10, scy-(ms/2)+230, 
 		ms/2-10,60,(100,100,100),None,20)
 	mp_buttons.append(mp_bg)
 	mp_buttons.append(mp_title)
 	mp_buttons.append(mp_hh)
 	mp_buttons.append(mp_hhinc)
+	mp_buttons.append(mp_num)
+	mp_buttons.append(mp_goto)
+	
 	
 	#Make Loot PIP menu
 	lp_buttons = []

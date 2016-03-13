@@ -88,7 +88,7 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 		hoods[0].tiles = []
 		hoods[0].roll_rects()
 		if stats.current_hh:
-			update_chh(stats, mp_buttons)
+			update_chh(settings, screen, stats, mp_buttons)
 	elif event.key == pygame.K_i:
 		if not stats.inv_pip:
 			inv_pip(settings,screen,stats,ip_buttons)
@@ -186,17 +186,20 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 						stats.chhx = i.refx
 						stats.chhy = i.refy
 						lot_hit = True
+						update_chh(settings, screen, stats, mp_buttons)
 				if not lot_hit:
 					stats.current_hh = []
 					mp_buttons[2].msg=''
 					mp_buttons[2].prep_msg()
 					mp_buttons[3].msg=''
 					mp_buttons[3].prep_msg()
-				elif lot_hit:
-					mp_buttons[2].msg = str(stats.current_hh.lname) + ' Household'
-					mp_buttons[2].prep_msg()
-					mp_buttons[3].msg = str(stats.current_hh.hh_value) + ' Value'
-					mp_buttons[3].prep_msg()
+					mp_buttons[4].msg=''
+					mp_buttons[4].prep_msg()
+					mp_buttons[5].msg=''
+					mp_buttons[5].prep_msg()
+					del mp_buttons[6:]
+				#elif lot_hit:
+					#update_chh(settings, screen, stats, mp_buttons)
 		elif not stats.loot_pip and not stats.inv_pip:
 			for i,loot in enumerate(loots):
 				if loot.rect.collidepoint(mouse_pos[0], mouse_pos[1]):
@@ -210,11 +213,35 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 		elif ig_buttons[4].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 			stats.game_active=False
 			
-def update_chh(stats, mp_buttons):	
+def update_chh(settings, screen, stats, mp_buttons):
+	del mp_buttons[6:]	
 	mp_buttons[2].msg = str(stats.current_hh.lname) + ' Household'
 	mp_buttons[2].prep_msg()
 	mp_buttons[3].msg = str(stats.current_hh.hh_value) + ' Value'
 	mp_buttons[3].prep_msg()
+	mp_buttons[4].msg = str(stats.current_hh.num_proles) + ' Residents'
+	mp_buttons[4].prep_msg()
+	mp_buttons[5].msg = 'GO TO'
+	mp_buttons[5].prep_msg()
+	x = mp_buttons[5].x
+	y = mp_buttons[5].y+60 
+	for i in range(0,stats.current_hh.num_proles):
+		tp_fname = stats.current_hh.proles[i].fname
+		tp_age = str(stats.current_hh.proles[i].age)
+		tp_bday = str(stats.current_hh.proles[i].bday)
+		tp_salary = str(stats.current_hh.proles[i].salary) 
+		text_line = Button(settings, screen, tp_fname,
+			x, y+i*25, 75,30,(0,0,0),None,15)
+		mp_buttons.append(text_line)
+		text_line = Button(settings, screen, tp_age,
+			x+75, y+i*25, 40,30,(0,0,0),None,15)
+		mp_buttons.append(text_line)
+		text_line = Button(settings, screen, tp_bday,
+			x+115, y+i*25, 125,30,(0,0,0),None,15)
+		mp_buttons.append(text_line)
+		text_line = Button(settings, screen, tp_salary,
+			x+240, y+i*25, 75,30,(0,0,0),None,15)
+		mp_buttons.append(text_line)
 			
 def loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i):	
 	stats.inv_pip = False

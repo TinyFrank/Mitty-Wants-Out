@@ -183,6 +183,7 @@ class Hood(object):
 						self.roadmap[self.x_lot[0]][self.x_lot[1]][1]+=1
 						self.roadmap[self.x_lot[0]][self.x_lot[1]][2].lot_value = self.roadmap[self.x_lot[0]][self.x_lot[1]][1]
 						self.roadmap[self.x_lot[0]][self.x_lot[1]][2].roll_hh_value()
+						self.roadmap[self.x_lot[0]][self.x_lot[1]][2].adjust_wages()
 						turns -= 1			
 			tries -= 1
 			

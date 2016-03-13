@@ -29,6 +29,7 @@ class Stats():
 		self.chhx,self.chhy = 0,0
 		
 		#initialize Nanny State
+		self.current_year = 2016
 		self.min_wage = 15
 		self.work_age = 18
 		self.work_day = 8

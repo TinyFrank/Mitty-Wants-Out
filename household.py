@@ -1,4 +1,5 @@
 import pygame
+import random
 from random import randint,choice
 
 lnames = [ 	'Manning','Tsang','MacLeod','Flood','Elston','Rayner',
@@ -13,6 +14,18 @@ mnames = [	'Josh','Nick','Pete','Caleb','Phil','Garth','Matt','Micah',
 fnames = [	'Cherry','Tessa','Carron','Sharon','Mel','Hannah','Lila',
 			'Meghan','Becca','Sarah','Kate','Ali','Pat']
 
+months = [	('January',31),
+			('February',29),
+			('March',31),
+			('April',30),
+			('May',31),
+			('June',30),
+			('July',31),
+			('August',31),
+			('September',30),
+			('October',31),
+			('November',30),
+			('December',31) ]
 
 class Household(object):
 	def __init__(	self,settings, screen, stats, lot_value=None, 
@@ -85,7 +98,12 @@ class Household(object):
 									self.hh_value,lname=self.lname,
 									age=x_age)
 					self.proles.append(prole)
-		
+			
+	def adjust_wages(self):
+		for i in range(self.num_adults):
+			self.proles[i].salary = int(self.hh_value*self.wages[i])
+				
+			
 	def construct(self):
 		self.roll_hh_value()
 		self.roll_lname()
@@ -93,16 +111,16 @@ class Household(object):
 		self.roll_wages()
 		self.roll_proles()
 			
-		for prole in self.proles:
-			print(prole.fname+prole.lname+' '+str(prole.salary))
-		print('Yearly Household Income: ' + str(self.hh_value))
-		print('\n')		
+		#for prole in self.proles:
+			#print(prole.fname+prole.lname+' '+str(prole.salary))
+		#print('Yearly Household Income: ' + str(self.hh_value))
+		#print('\n')		
 				
 		
 class Prole(object):
 	def __init__(	self,settings, screen, stats, hh_value=None, 
 					materials=None, colors=None, lname=None, fname=None,
-					salary=None, age=None, sex=None):
+					salary=None, age=None, sex=None, bday=None):
 		self.settings = settings
 		self.screen = screen
 		self.stats = stats
@@ -114,12 +132,14 @@ class Prole(object):
 		self.salary = salary
 		self.age = age
 		self.sex = sex
+		self.bday = bday
 		
 		self.construct()
 		
 	def construct(self):
 		self.roll_sex()
-		self.roll_name()		
+		self.roll_name()
+		self.roll_bday()		
 		
 	def roll_sex(self):
 		if not self.sex:
@@ -131,4 +151,16 @@ class Prole(object):
 				self.fname = choice(mnames) + ' '
 			elif self.sex == 'F':
 				self.fname = choice(fnames) + ' '
+	
+	def roll_bday(self):
+		if not self.bday:
+			random.seed()
+			self.bday = randint(0,365)
+			for i in range(12):
+				if self.bday <= months[i][1]:
+					self.bday = months[i][0] + ' ' + str(self.bday)
+					break
+				else:
+					self.bday -= months[i][1]
+		
 		

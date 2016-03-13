@@ -5,6 +5,8 @@ class Button():
 	def __init__(self, settings, screen, msg,x,y,w,h,colour,image,
 				fontsize=32,refx=None,refy=None):
 		"""Initialize button attributes"""
+		self.x = x
+		self.y = y
 		self.im = image
 		self.msg = msg
 		self.screen = screen
