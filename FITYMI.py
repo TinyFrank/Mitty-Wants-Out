@@ -11,6 +11,7 @@ import display
 import functions as gf
 from stats import Stats
 from player import Player
+from brands import Brand,ctg_retail,ctg_industrial
 
 def run():
 	#Initialize game, settings and create a screen object
@@ -168,7 +169,16 @@ def run():
 	player = Player(settings, screen)
 	loots = []
 	hoods = []
+	brands = []
 	
+	#Generate world brands
+	current_ctgs = []
+	while len(current_ctgs) < (len(ctg_retail)+len(ctg_industrial)-2):
+		brand = Brand(settings,stats)
+		if brand.ctg not in current_ctgs:
+			current_ctgs.append(brand.ctg)
+		print(brand.name)
+		brands.append(brand)
 	
 	#Create clock to stabilize framerate
 	clock = pygame.time.Clock()

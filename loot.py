@@ -7,7 +7,7 @@ import copy
 import time
 
 gen_init = 	[choice(('loot','part')),None,None,None,[],[],[],None,
-			None,[],[],[],'','',[],[],[],None,[],[],[],[],'',[]]
+			None,[],[],[],'','',[],[],[],None,[],[],[],[],'',[],'']
 """can be initialized with a presets for 0,2,3,7,9,10"""
 class Loot(object):
 	def __init__(	self,settings,screen,loot_val,init_array=None,ref=None):
@@ -40,6 +40,7 @@ class Loot(object):
 			self.t_color = init_array[20]#list - rgb
 			self.sprite = init_array[21]#string - sprite file handle
 			self.label = init_array[22]#array - label color palette
+			self.brand = init_array[23]#string - brand name
 		else:
 			self.raw = choice(('loot','part'))
 			self.l_type = None
@@ -64,6 +65,7 @@ class Loot(object):
 			self.t_color = []
 			self.sprite = ''
 			self.label = []
+			self.brand = ''
 					
 		#overwrite ref if one was provided
 		if ref:
@@ -106,6 +108,7 @@ class Loot(object):
 		self.part_sprites = libs.part_sprites
 
 	def construct(self):
+		self.roll_brand()
 		if self.raw == 'loot':
 			self.roll_l_type()
 		self.roll_weight()
@@ -134,7 +137,7 @@ class Loot(object):
 			self.weight,self.value,self.material, self.trim,
 			self.quality,self.short_name,self.name,self.desc,
 			self.parts_desc,self.condition,self.mat_cat,self.color,
-			self.m_color,self.t_color,self.sprite,self.label]
+			self.m_color,self.t_color,self.sprite,self.label,self.brand]
 			
 	def rebuild(self):
 		self.roll_image()
@@ -144,12 +147,16 @@ class Loot(object):
 			self.weight,self.value,self.material, self.trim,
 			self.quality,self.short_name,self.name,self.desc,
 			self.parts_desc,self.condition,self.mat_cat,self.color,
-			self.m_color,self.t_color,self.sprite,self.label]
+			self.m_color,self.t_color,self.sprite,self.label,self.brand]
 			
+	def roll_brand(self):
+		if not self.brand:
+			self.brand = 'N/A'
+	
 	def roll_l_type(self):
 		if not self.l_type_num:
 			while True:
-				#roll a randow number within the range of loot types
+				#roll a random number within the range of loot types
 				self.l_type_num = randint(1,len(self.loot_types))
 				#only continue loop if this l_type_num is forbidden
 				if self.l_type_num not in self.typ_forbid:
