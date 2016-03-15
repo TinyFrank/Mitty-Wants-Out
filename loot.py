@@ -191,16 +191,31 @@ class Loot(object):
 	def roll_parts(self):
 		#check redundancy
 		if not self.parts:
+			print(self.l_type[0])
 			#assign l_type parts array to self.parts
 			self.parts = self.l_type[2]	
 			#assign materials to each part and sum v_normal
 			score = 0
 			for i,part in enumerate(self.parts):
-				#store address of mat_cat info list for this part
+				#store address of mat_cat info list for this part	
 				part_mat_cat = choice(part[4])
-				#append rolled material array to this part
-				part.append(None)
-				part[6]=choice(self.std_w[part_mat_cat][1])
+				if part[0] == 'contents ':
+					#roll for weird exceptions (milk in a propane tank)
+					weird_roll = randint(0,100)
+					if weird_roll > 95:
+						#append rolled material array to this part
+						part[6]=choice(self.std_w[part_mat_cat][1])							
+					else:
+						for mat in self.std_w[part[4][0]][1]:
+							if mat[0] == part[1]:
+								part[6] = mat
+							
+					part_mat_cat = choice(part[4])
+				else:	
+					#append rolled material array to this part
+					part[6]=choice(self.std_w[part_mat_cat][1])
+				print(part[0])
+				print(part[6])
 				#add part contribution to v_normal
 				self.val_normal += part[3]
 				#find largest part
@@ -309,6 +324,7 @@ class Loot(object):
 					#incrememnt value by part weight * part mat. value
 					self.value += part[7]*part[6][1]
 				self.value *= self.quality[1]
+				self.value *= self.brand.markup * self.manufacturer.markup
 			elif self.raw == 'part':
 				self.value = self.weight*self.material[1]*(self.quality[1]**self.level)
 		self.value = round(self.value,2)
@@ -338,7 +354,6 @@ class Loot(object):
 				self.trim.append(self.trim[1])
 				self.t_color = self.trim[1]
 				self.t_color_name = self.trim[0]
-				print(self.name+' now has '+str(self.t_color_name))
 				
 		elif not self.trim:
 			if self.raw == "loot" and len(self.parts) > 1:

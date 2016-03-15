@@ -5,7 +5,7 @@ ctg_retail = [	'patio','entertainment','kitchenware','clothing',
 				'sanitary','toys','plumbing','hardware',
 				'souvenirs','foods','publishers','stationery',
 				'pharmaceutical','automotive','camping','appliance',
-				'spirits']
+				'spirits','pet supplies','furniture']
 
 ctg_industrial = ['retail','electronics','petrochemical','plastics','fabricators',
 				'agriculture','carpentry','printers','glassworks','paper',
@@ -14,12 +14,15 @@ ctg_industrial = ['retail','electronics','petrochemical','plastics','fabricators
 words1 = [	'First','Best','Solid','OK','High','Golden','Sunny','Jelly',
 			'Friendly','Happy','Fresh','Tall','Great','Awesome','Perfect',
 			'Summer','Winter','Wintry','Reliable','Dependable','Magic',
-			'Magical','Salty','Super','Master','Plentiful']
+			'Magical','Salty','Super','Master','Plentiful','Quick','Fast',
+			'Speedy','Excellent','Superb','Silver','Shiny','Terrific']
 			
 words2 = [	'Friends','Friend','Neighbour','Brother','Sister','Family',
 			'Tree','Path','Beach','Town','Bend','Answer','Work','Time',
 			'Cat','Dog','Bear','Lion','Tiger','Man','Woman','Machine',
-			'Bean','Beans','Cats','Dogs','Men','Women','Gravy']
+			'Bean','Beans','Cats','Dogs','Men','Women','Gravy','Titan',
+			'Gargoyle','Animal','State','Statue','Solution','Solutions']
+			
 class Brand(object):
 	def __init__(	self,settings,stats):
 		self.settings = settings
@@ -33,6 +36,7 @@ class Brand(object):
 	def construct(self):
 		self.roll_industry()
 		self.roll_name()
+		self.roll_markup()
 		
 	def roll_industry(self):
 		if not self.ri:
@@ -67,3 +71,6 @@ class Brand(object):
 			self.name += choice(words2) + ' '
 		self.name += self.ctg.title() + ' Inc.'
 		
+	def roll_markup(self):
+		self.markup = 1+(randint(5,50)/100)
+		self.markup *= self.markup

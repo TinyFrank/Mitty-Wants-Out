@@ -14,13 +14,13 @@ def place_loot(settings, screen, stats, loots,brands):
 	debug_init = gen_init
 	debug_init[0]='loot'
 	#debug_init[2]= 'Bar'
-	debug_init[3]=4
+	debug_init[3]=37
 	#debug_init[7]= 1.0
 	#debug_init[9]=['Gold ',80,(255,210,48),19.32]
 	#debug_init[10]=['Gold ',80,(255,210,48),19.32]
 	#instantiate one loot
-	loot_inst = Loot(settings, screen, stats.loot_val,debug_init,brands=brands) 
-	#loot_inst = Loot(settings, screen, stats.loot_val,brands=brands) 
+	#loot_inst = Loot(settings, screen, stats.loot_val,debug_init,brands=brands) 
+	loot_inst = Loot(settings, screen, stats.loot_val,brands=brands) 
 	loot_inst.construct()
 	placed = False
 	timeout=0
@@ -135,8 +135,7 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 			#sort inv by value
 			close_inv_pip(stats,settings,screen,ip_buttons)
 			stats.inv = sorted(stats.inv, key=lambda item: item.value)
-			inv_pip(settings,screen,stats,ip_buttons)
-			print('z was hit')							
+			inv_pip(settings,screen,stats,ip_buttons)		
 		elif event.key == pygame.K_c:
 			#sort inv by name
 			close_inv_pip(stats,settings,screen,ip_buttons)
