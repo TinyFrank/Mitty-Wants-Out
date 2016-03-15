@@ -7,10 +7,11 @@ import copy
 import time
 
 gen_init = 	[choice(('loot','part')),None,None,None,[],[],[],None,
-			None,[],[],[],'','',[],[],[],None,[],[],[],[],'',[],'']
+			None,[],[],[],'','',[],[],[],None,[],[],[],[],'',[],'','']
 """can be initialized with a presets for 0,2,3,7,9,10"""
 class Loot(object):
-	def __init__(	self,settings,screen,loot_val,init_array=None,ref=None):
+	def __init__(	self,settings,screen,loot_val,init_array=None,ref=None,
+					brands=[]):
 		
 		#initialization array for creating sprite copies
 		#self.init_array = init_array
@@ -41,6 +42,7 @@ class Loot(object):
 			self.sprite = init_array[21]#string - sprite file handle
 			self.label = init_array[22]#array - label color palette
 			self.brand = init_array[23]#string - brand name
+			self.manufacturer = init_array[24]#string - name of manufacturer
 		else:
 			self.raw = choice(('loot','part'))
 			self.l_type = None
@@ -66,6 +68,7 @@ class Loot(object):
 			self.sprite = ''
 			self.label = []
 			self.brand = ''
+			self.manufacturer = ''
 					
 		#overwrite ref if one was provided
 		if ref:
@@ -83,6 +86,7 @@ class Loot(object):
 		self.level = loot_val
 		self.settings = settings
 		self.screen = screen
+		self.brands = brands
 		self.spritepath = 'images/'
 		sys_r = random.SystemRandom()
 		
@@ -108,13 +112,13 @@ class Loot(object):
 		self.part_sprites = libs.part_sprites
 
 	def construct(self):
-		self.roll_brand()
 		if self.raw == 'loot':
 			self.roll_l_type()
 		self.roll_weight()
 		if self.raw == 'loot':
 			self.roll_parts()
 			self.roll_condition()
+			self.roll_brand()
 		self.roll_material()
 		self.roll_color()
 		if self.raw == 'part':
@@ -137,7 +141,8 @@ class Loot(object):
 			self.weight,self.value,self.material, self.trim,
 			self.quality,self.short_name,self.name,self.desc,
 			self.parts_desc,self.condition,self.mat_cat,self.color,
-			self.m_color,self.t_color,self.sprite,self.label,self.brand]
+			self.m_color,self.t_color,self.sprite,self.label,self.brand,
+			self.manufacturer]
 			
 	def rebuild(self):
 		self.roll_image()
@@ -147,11 +152,8 @@ class Loot(object):
 			self.weight,self.value,self.material, self.trim,
 			self.quality,self.short_name,self.name,self.desc,
 			self.parts_desc,self.condition,self.mat_cat,self.color,
-			self.m_color,self.t_color,self.sprite,self.label,self.brand]
-			
-	def roll_brand(self):
-		if not self.brand:
-			self.brand = 'N/A'
+			self.m_color,self.t_color,self.sprite,self.label,self.brand,
+			self.manufacturer]
 	
 	def roll_l_type(self):
 		if not self.l_type_num:
@@ -228,7 +230,19 @@ class Loot(object):
 			if self.trim and len(self.parts)>1:
 				if self.trim in self.std_w[self.trim_cat][1]:
 					self.parts[1][6] = self.trim
-	
+			
+	def roll_brand(self):
+		if not self.brand:
+			relevant_brands = []
+			relevant_industries = []
+			for brand in self.brands:
+				if brand.ctg in self.l_type[5]:
+					relevant_brands.append(brand)
+				if brand.ctg in self.l_type[4]:
+					relevant_industries.append(brand)
+		self.brand = choice(relevant_brands)
+		self.manufacturer = choice(relevant_industries)
+		
 	def roll_condition(self):
 		if not self.condition:
 			#select condition at random
@@ -294,6 +308,7 @@ class Loot(object):
 				for part in self.parts:
 					#incrememnt value by part weight * part mat. value
 					self.value += part[7]*part[6][1]
+				self.value *= self.quality[1]
 			elif self.raw == 'part':
 				self.value = self.weight*self.material[1]*(self.quality[1]**self.level)
 		self.value = round(self.value,2)
@@ -394,6 +409,15 @@ class Loot(object):
 				self.desc.append("Color: " + self.color[0].upper())
 			except:
 				self.desc.append("Color: N/A")
+			try:
+				self.desc.append("Retailer: " + self.brand.name)
+			except:
+				self.desc.append("Retailer: N/A")
+			try:
+				self.desc.append("Manufacturer: " + self.manufacturer.name)
+			except:
+				self.desc.append("Manufacturer: N/A")
+				
 			self.desc.append("Value: $" + str(round(self.value,2)))
 			self.desc.append("Weight: " + str(self.weight).upper() + 'kg')
 			

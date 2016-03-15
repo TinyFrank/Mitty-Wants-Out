@@ -8,10 +8,10 @@ qualities = (				('shoddy ',0.9),
 							('dated ',1.), 
 							('passable ',1.02),
 							('regular ',1.05),
-							('impressive ',1.1), 
-							('top notch ',1.2), 
-							('special edition ',1.3), 
-							('luxury ',1.5))
+							('impressive ',1.2), 
+							('top notch ',1.5), 
+							('special edition ',2), 
+							('luxury ',3))
 		
 		#list of possible loot conditions
 conditions = (				('junk ',0.2),
@@ -209,7 +209,7 @@ loot_types ={				1:[
 							["guts ","chunk ",1,6,['plastic'],None,None],
 							["screws ","chunk ",20,0.25,['metal','plastic'],None,None],
 							["cd ","chunk ",1,.1,['plastic'],None,None]],
-							4,['electronics'],['electronics']],
+							4,['electronics'],['entertainment']],
 							3:[
 							'Coffee Mug ',
 							['cmug'],
@@ -225,7 +225,7 @@ loot_types ={				1:[
 							['cdcase'],
 							[["front ","sheet ",1,1,['plastic'],None,None],
 							["back ","sheet ",1,1,['plastic'],None,None]],
-							.1,['plastics'],['electronics','souvenirs']],
+							.1,['plastics'],['entertainment','souvenirs']],
 							6:[
 							'Detergent Jug ',
 							['detergent'],
@@ -448,7 +448,7 @@ loot_types ={				1:[
 							[["body ","chunk ",1,1,['plastic','ceramic'],None,None],
 							["stopper ","chunk ",1,1,['plastic','rubber'],None,None],
 							["contents ","fluid",1,80,['fluid'],None,None]],
-							1.5,['glassworks'],['distillery','foods']]
+							1.5,['glassworks'],['spirits','foods']]
 							}
 	
 		#list of material categories

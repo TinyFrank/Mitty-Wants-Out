@@ -99,7 +99,7 @@ def run():
 	lpdesc_button = Button(settings, screen, "",
 		scx+25, scy-50, 200,175,(0,0,0),None,10)
 	lp_window = Button(settings, screen, "",
-		scx-275, scy-200, 550,350,(100,100,100),None)
+		scx-275, scy-200, 670,350,(100,100,100),None)
 	lp_loot_window = Button(settings, screen, "",
 		scx-225, scy-125, 200,250,(180,180,180),None)
 	lp_loot = Button(settings, screen, "",
@@ -116,7 +116,7 @@ def run():
 	#font used by inventory list buttons 
 	ip_font = 12
 	ip_window = Button(settings, screen, "",
-		scx-500, scy-145, 1000,290,(100,100,100),None,20)
+		scx-500, scy-145, 1120,290,(100,100,100),None,20)
 	ip_itemt5_button = Button(settings, screen, "",
 		scx-494, scy-135, 448,20,(200,0,0),None,14)
 	ip_itemt5_button.font.set_bold(True)
@@ -173,11 +173,11 @@ def run():
 	
 	#Generate world brands
 	current_ctgs = []
-	while len(current_ctgs) < (len(ctg_retail)+len(ctg_industrial)-2):
+	while len(current_ctgs) < (len(ctg_retail)+len(ctg_industrial)):
 		brand = Brand(settings,stats)
 		if brand.ctg not in current_ctgs:
 			current_ctgs.append(brand.ctg)
-		print(brand.name)
+		#print(brand.name)
 		brands.append(brand)
 	
 	#Create clock to stabilize framerate
@@ -195,11 +195,9 @@ def run():
 		clock.tick(50)
 		gf.check_events(	settings, screen, stats, buttons, 
 							ig_buttons, lp_buttons, ip_buttons, mp_buttons,
-							loots, 
-							hoods, player)
+							loots, hoods, brands, player)
 		gf.update_screen(	settings,screen, stats, buttons, ig_buttons, 
 							lp_buttons, ip_buttons, mp_buttons,
-							player, loots, 
-							hoods)
+							player, loots, hoods)
 run()
 	

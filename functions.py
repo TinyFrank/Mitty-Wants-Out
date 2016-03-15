@@ -10,17 +10,17 @@ from button import Button
 import math
 from maps import Hood
 
-def place_loot(settings, screen, stats, loots):
+def place_loot(settings, screen, stats, loots,brands):
 	debug_init = gen_init
-	debug_init[0]='part'
+	debug_init[0]='loot'
 	#debug_init[2]= 'Bar'
-	#debug_init[3]=37
+	debug_init[3]=4
 	#debug_init[7]= 1.0
 	#debug_init[9]=['Gold ',80,(255,210,48),19.32]
 	#debug_init[10]=['Gold ',80,(255,210,48),19.32]
 	#instantiate one loot
-	loot_inst = Loot(settings, screen, stats.loot_val,debug_init) 
-	#loot_inst = Loot(settings, screen, stats.loot_val) 
+	loot_inst = Loot(settings, screen, stats.loot_val,debug_init,brands=brands) 
+	#loot_inst = Loot(settings, screen, stats.loot_val,brands=brands) 
 	loot_inst.construct()
 	placed = False
 	timeout=0
@@ -67,13 +67,15 @@ def take_loot(stats,loots,lp_buttons):
 	close_loot_pip(stats,lp_buttons)
 	
 def check_keydown_events(	event, settings, screen, stats, loots, 
-							lp_buttons, ip_buttons,mp_buttons,hoods):
+							lp_buttons, ip_buttons,mp_buttons,hoods,
+							brands):
 	"""Respond to keypresses"""
 	if event.key == pygame.K_q:
 		if not stats.loot_pip:
 			sys.exit()
 		else:
 			close_loot_pip(stats,lp_buttons)
+			
 	elif event.key == pygame.K_m:
 		#toggle map pip
 		if stats.map_pip == True:
@@ -82,6 +84,7 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 			close_inv_pip(stats,settings,screen,ip_buttons)
 			close_loot_pip(stats,lp_buttons)
 			stats.map_pip = True
+			
 	elif event.key == pygame.K_k:
 		#debug - grow hood
 		hoods[0].grow_hood(100)
@@ -89,11 +92,13 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 		hoods[0].roll_rects()
 		if stats.current_hh:
 			update_chh(settings, screen, stats, mp_buttons)
+			
 	elif event.key == pygame.K_i:
 		if not stats.inv_pip:
 			inv_pip(settings,screen,stats,ip_buttons)
 		else:
 			close_inv_pip(stats,settings,screen,ip_buttons)
+			
 	elif event.key == pygame.K_l:
 		#create/destroy debug hood
 		if stats.map_pip == True:
@@ -108,6 +113,7 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 			d_hood.roll_rects()
 			hoods.append(d_hood)
 			stats.map_pip = True
+			
 	elif stats.inv_pip:
 		if event.key == pygame.K_ESCAPE: 
 			close_inv_pip(stats,settings,screen, ip_buttons)
@@ -124,19 +130,30 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 				stats.scroll_inv_down()
 				close_inv_pip(stats,settings,screen,ip_buttons)
 				inv_pip(settings,screen,stats,ip_buttons)	
-				stats.scrolldown = True
+				stats.scrolldown = True		
+		elif event.key == pygame.K_z:
+			#sort inv by value
+			close_inv_pip(stats,settings,screen,ip_buttons)
+			stats.inv = sorted(stats.inv, key=lambda item: item.value)
+			inv_pip(settings,screen,stats,ip_buttons)
+			print('z was hit')							
+		elif event.key == pygame.K_c:
+			#sort inv by name
+			close_inv_pip(stats,settings,screen,ip_buttons)
+			stats.inv = sorted(stats.inv, key=lambda item: item.quality[1])
+			inv_pip(settings,screen,stats,ip_buttons)
+				
 	elif stats.loot_pip:
 		if event.key == pygame.K_ESCAPE:
 			close_loot_pip(stats,lp_buttons)
 		elif event.key == pygame.K_e:
-			take_loot(stats,loots,lp_buttons)			
-	elif event.key == pygame.K_c:
-		#debug, place_loot(settings, screen, stats, loots)
-		stats.sort_inv_name()
+			take_loot(stats,loots,lp_buttons)
+		
 	elif event.key == pygame.K_f:
 		#debug, create a shit load of loot
 		for i in range(0,200):
-			place_loot(settings, screen, stats, loots)
+			place_loot(settings, screen, stats, loots, brands)
+			
 	elif event.key == pygame.K_g:
 		#debug, put all loot into inventory
 		while True:
@@ -258,7 +275,7 @@ def loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i):
 							
 	for x in range(0,len(loot.desc)):
 		text_line = Button(settings, screen, loot.desc[x],
-		scx+10, scy-55+x*25, 230,30,(0,0,0),None,14)
+		scx+10, scy-55+x*25, 350,30,(0,0,0),None,14)
 		lp_buttons.append(text_line)
 		
 	lp_buttons[6].rect.center = lp_buttons[4].rect.center 
@@ -295,7 +312,7 @@ def inv_pip(settings,screen,stats,ip_buttons):
 			ip_buttons[1+i].prep_msg()
 		for x in range(0,len(inv_inst.desc)):
 			text_line = Button(settings, screen, inv_inst.desc[x],
-			scx+190, scy-160+x*25, 300,30,(0,0,0),None,15)
+			scx+190, scy-160+x*25, 425,30,(0,0,0),None,15)
 			ip_buttons.append(text_line)
 		ip_buttons.append(inv_inst)
 		ip_buttons[-1].rect.center = ip_buttons[13].rect.center 
@@ -320,8 +337,8 @@ def close_inv_pip(stats,settings,screen,ip_buttons):
 	screen.fill(settings.bg_colour)
 			
 def check_events(	settings, screen, stats, buttons, ig_buttons, 
-					lp_buttons, ip_buttons, mp_buttons, loots, hoods, 
-					player):
+					lp_buttons, ip_buttons, mp_buttons, loots, hoods,
+					brands, player):
 	"""Respond to keyboard and mouse events"""
 	
 	#create variables for screen center
@@ -334,7 +351,7 @@ def check_events(	settings, screen, stats, buttons, ig_buttons,
 		elif event.type == pygame.KEYDOWN:
 			check_keydown_events(	event, settings, screen, stats, 
 									loots, lp_buttons, ip_buttons, 
-									mp_buttons, hoods)		
+									mp_buttons, hoods,brands)		
 		elif event.type == pygame.KEYUP:
 			check_keyup_events(		event, settings, screen, stats,
 									loots, lp_buttons, ip_buttons, hoods)	
