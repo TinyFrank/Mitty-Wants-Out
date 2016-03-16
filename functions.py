@@ -10,14 +10,15 @@ from button import Button
 import math
 from maps import Hood
 
-def place_loot(settings, screen, stats, loots,brands):
+def place_loot(settings, screen, stats, loots, brands, retailers):
 	debug_init = gen_init
 	debug_init[0]='loot'
 	#debug_init[2]= 'Bar'
-	debug_init[3]=37
+	debug_init[3]=33
 	#debug_init[7]= 1.0
 	#debug_init[9]=['Gold ',80,(255,210,48),19.32]
 	#debug_init[10]=['Gold ',80,(255,210,48),19.32]
+	#debug_init[23] = retailers[0]
 	#instantiate one loot
 	#loot_inst = Loot(settings, screen, stats.loot_val,debug_init,brands=brands) 
 	loot_inst = Loot(settings, screen, stats.loot_val,brands=brands) 
@@ -72,7 +73,7 @@ def take_loot(stats,loots,lp_buttons):
 	
 def check_keydown_events(	event, settings, screen, stats, loots, 
 							lp_buttons, ip_buttons,mp_buttons,hoods,
-							brands):
+							brands, retailers):
 	"""Respond to keypresses"""
 	if event.key == pygame.K_q:
 		if not stats.loot_pip:
@@ -144,6 +145,17 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 			#sort inv by name
 			close_inv_pip(stats,settings,screen,ip_buttons)
 			stats.inv = sorted(stats.inv, key=lambda item: item.quality[1])
+			inv_pip(settings,screen,stats,ip_buttons)	
+		elif event.key == pygame.K_b:
+			#sort inv by name
+			close_inv_pip(stats,settings,screen,ip_buttons)
+			for loot in stats.inv:
+				try:
+					print(loot.mfr.name)
+				except:
+					print('cant!')
+					print(loot.name)
+			stats.inv = sorted(stats.inv, key=lambda item: item.brand.name)
 			inv_pip(settings,screen,stats,ip_buttons)
 				
 	elif stats.loot_pip:
@@ -155,7 +167,7 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 	elif event.key == pygame.K_f:
 		#debug, create a shit load of loot
 		for i in range(0,200):
-			place_loot(settings, screen, stats, loots, brands)
+			place_loot(settings, screen, stats, loots, brands, retailers)
 			
 	elif event.key == pygame.K_g:
 		#debug, put all loot into inventory
@@ -341,7 +353,7 @@ def close_inv_pip(stats,settings,screen,ip_buttons):
 			
 def check_events(	settings, screen, stats, buttons, ig_buttons, 
 					lp_buttons, ip_buttons, mp_buttons, loots, hoods,
-					brands, player):
+					brands, retailers, player):
 	"""Respond to keyboard and mouse events"""
 	
 	#create variables for screen center
@@ -354,7 +366,7 @@ def check_events(	settings, screen, stats, buttons, ig_buttons,
 		elif event.type == pygame.KEYDOWN:
 			check_keydown_events(	event, settings, screen, stats, 
 									loots, lp_buttons, ip_buttons, 
-									mp_buttons, hoods,brands)		
+									mp_buttons, hoods, brands, retailers)		
 		elif event.type == pygame.KEYUP:
 			check_keyup_events(		event, settings, screen, stats,
 									loots, lp_buttons, ip_buttons, hoods)	

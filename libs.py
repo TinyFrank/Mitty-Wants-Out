@@ -213,7 +213,7 @@ loot_types ={				1:[
 							["guts ","chunk ",1,6,['plastic'],None,None],
 							["screws ","chunk ",20,0.25,['metal','plastic'],None,None],
 							["cd ","chunk ",1,.1,['plastic'],None,None]],
-							4,['electronics'],['entertainment']],
+							4,['semiconductor'],['entertainment','electronics']],
 							3:[
 							'Coffee Mug ',
 							['cmug'],
@@ -248,7 +248,7 @@ loot_types ={				1:[
 							'Soap Bar ',
 							['soap'],
 							[["body ","chunk ",1,1,['natural'],None,None]],
-							.5,['chemical'],['sanitary']],
+							.5,['soapworks'],['sanitary']],
 							9:[
 							'Baseball Cap ',
 							['baseballcap'],
@@ -285,7 +285,7 @@ loot_types ={				1:[
 							'Screws ',
 							['screw'],
 							[["body ","chunk ",10,10,['metal','plastic'],None,None]],
-							.1,['fabricators'],['hardware']],
+							.1,['fabricators','plastics'],['hardware']],
 							14:[
 							'2L Pop Bottle ',
 							['2lpop'],
@@ -317,14 +317,14 @@ loot_types ={				1:[
 							[["body ","sheet ",1,4,['plastic'],None,None],
 							["cap ","chunk ",1,1,['plastic'],None,None],
 							["contents ","Pain Killer ",1,100,['pills'],None,None]],
-							.5,['plastics'],['pharmaceutical']],
+							.5,['plastics'],['medical']],
 							18:[
 							'Pill Bottle ',
 							['pillbottle'],
 							[["body ","sheet ",1,4,['plastic'],None,None],
 							["cap ","chunk ",1,1,['plastic'],None,None],
 							["contents ","Lessphine ",1,100,['pills'],None,None]],
-							.1,['plastics'],['pharmaceutical']],
+							.1,['plastics'],['medical']],
 							19:[
 							'Scissors ',
 							['scissor'],
@@ -343,7 +343,7 @@ loot_types ={				1:[
 							'Bowl ',
 							['bowl'],
 							[["body ","chunk ",1,1,['metal','plastic','ceramic','wood'],None,None]],
-							.2,['plastics','fabricators','carpentry'],['kitchenware','pet supplies']],
+							.2,['plastics','fabricators','carpentry','glassworks'],['kitchenware','pet supplies']],
 							22:[
 							'Classic Book ',
 							['classicbook'],
@@ -410,7 +410,7 @@ loot_types ={				1:[
 							["legs ","bar ",4,4,['plastic','metal','wood'],None,None],
 							["frame ","sheet ",1,3,['plastic','metal','wood'],None,None],
 							["screws ","chunk ",2,0.01,['metal','plastic'],None,None]],
-							6,['fabricators','plastics','carpentry'],['furniture','patio']],
+							6,['fabricators','plastics','carpentry','glassworks'],['furniture','patio']],
 							32:[
 							'Magazine ',
 							['peepmagazine'],
@@ -429,7 +429,7 @@ loot_types ={				1:[
 							[["body ","chunk ",1,4,['plastic','ceramic'],None,None],
 							["lid ","chunk ",1,1,['plastic'],None,None],
 							["contents ","Soya Sauce ",1,200,['fluid'],None,None]],
-							.3,['plastics'],['foods','kitchenware']],
+							.3,['plastics','glassworks'],['foods','kitchenware']],
 							35:[
 							'Toaster ',
 							['toaster'],
@@ -438,7 +438,7 @@ loot_types ={				1:[
 							["element ","wire ",1,2,['metal'],None,None],
 							["cable ","wire ",1,2,['metal'],None,None],
 							["spring ","wire ",10,1,['metal'],None,None]],
-							2.5,['electronics'],['kitchenware','appliance']],
+							2.5,['fabricators'],['kitchenware','appliance','electronics']],
 							36:[
 							'Water Bottle ',
 							['waterbottle'],
@@ -450,9 +450,9 @@ loot_types ={				1:[
 							'Wine Bottle ',
 							['wine1','wine2'],
 							[["body ","chunk ",1,1,['plastic','ceramic'],None,None],
-							["stopper ","chunk ",1,1,['plastic','rubber'],None,None],
+							["stopper ","chunk ",1,1,['plastic','rubber','soft solid'],None,None],
 							["contents ","Wine ",1,80,['fluid'],None,None]],
-							1.5,['glassworks'],['spirits','foods']]
+							1.5,['glassworks','plastics'],['spirits','foods']]
 							}
 	
 		#list of material categories

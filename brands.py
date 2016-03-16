@@ -4,24 +4,59 @@ from random import choice
 ctg_retail = [	'patio','entertainment','kitchenware','clothing',
 				'sanitary','toys','plumbing','hardware',
 				'souvenirs','foods','publishers','stationery',
-				'pharmaceutical','automotive','camping','appliance',
-				'spirits','pet supplies','furniture']
+				'medical','automotive','camping','appliance',
+				'spirits','pet supplies','furniture','electronics']
 
-ctg_industrial = ['retail','electronics','petrochemical','plastics','fabricators',
+ctg_industrial = ['petrochemical','plastics','fabricators',
 				'agriculture','carpentry','printers','glassworks','paper',
-				'fabrics','toolmaking','garment','chemical','distillery']
+				'fabrics','toolmaking','garment','chemical','distillery',
+				'soapworks','semiconductor','pharmaceutical','minerals']
 				
 words1 = [	'First','Best','Solid','OK','High','Golden','Sunny','Jelly',
 			'Friendly','Happy','Fresh','Tall','Great','Awesome','Perfect',
 			'Summer','Winter','Wintry','Reliable','Dependable','Magic',
 			'Magical','Salty','Super','Master','Plentiful','Quick','Fast',
-			'Speedy','Excellent','Superb','Silver','Shiny','Terrific']
+			'Speedy','Excellent','Superb','Silver','Shiny','Terrific',
+			'Creamy','Wonderful','Instant','Smart','Clever','Wise','Snappy',
+			'Sweet','Savory','Old','Young','Silent','Huge','Gross','Whole',
+			'Humble','Nightly','Future','Silicon','Sheer','Adequate',
+			'Good Times','Local','Family','Center','Back','Ye Olde','Royal',
+			'Dunking','Smashing','Zig-Zag','Running','New','Hidden','Quiet',
+			'Covert','Half','Mostly','Full','Quarter','Gigantic','Giant',
+			'Discount','Tri','Little','Short','Tiny','Baby','Cute','Rolling',
+			'Bouncing','Fun','Thrifty','Winning','Determined','Unstoppable',
+			'Entertaining','Premium','Amused','General','Illustrious',
+			'Long','Flagrant','Fragrant','Strong','Mighty','Proud','Hypnotic',
+			'Greasey','Non-Stop','Wry','Furtive','Yummy','Cheap','Bargain',
+			'Festive','Prickly','Divergent','Nimble','Famous','Puzzled','Cool',
+			'Normal','Soft','Jolly','Exclusive','Lush','Far','Substantial',
+			'Harsh','Tenuous','Shallow','Tight-Fisted','Hard-Boiled','Iron-Fisted',
+			'Irregular','Dynamic','Sassy','Tasteful','Ossified','Hapless',
+			'Neat','Pastoral','Graceful','Upbeat','Successful','Special',
+			'Chief','Tangible','Didactic','Near','Wet','Sneaky','Fantastic',
+			'Cloistered','Vivacious','Glorious','Steady','Instinctive',
+			'Armoatic','Economical','Powerful','Spiffy','Jiffy','Average',
+			'Decent','Fair']
+			
+
 			
 words2 = [	'Friends','Friend','Neighbour','Brother','Sister','Family',
 			'Tree','Path','Beach','Town','Bend','Answer','Work','Time',
 			'Cat','Dog','Bear','Lion','Tiger','Man','Woman','Machine',
 			'Bean','Beans','Cats','Dogs','Men','Women','Gravy','Titan',
-			'Gargoyle','Animal','State','Statue','Solution','Solutions']
+			'Gargoyle','Animal','State','Statue','Solution','Solutions',
+			'Invention','Player','Worker','Boss','Place','House','Meat',
+			'Baps','Shop','Exchange','Things','Stuff','Bonanza','Madness',
+			'Corner','Job','Hand','Foot','Nose','Eye','Eyes','Finger',
+			'Fingers','Fruit','Produce','Production','Lord','Lady','Knight',
+			'Tower','Castle','Alley','Depot','Center','Market','Shoppe',
+			'Firkin','Club','Jelly','Specialists','Kaboom','Dollar','Penny',
+			'Nickel','Dime','Quarter','Discount','Dimes','Snipe','Ray','Chicken',
+			'Troll','Judas','Partner','Kirk','Cricket','Fun','Spot','Child']
+
+btype = [ ' Inc.',' Co.',' Ltd.',' LLC',' Outlet']
+
+conj = [' & ',' + ',' and ',' of ',' for ']
 			
 class Brand(object):
 	def __init__(	self,settings,stats):
@@ -37,6 +72,7 @@ class Brand(object):
 		self.roll_industry()
 		self.roll_name()
 		self.roll_markup()
+		self.roll_specs()
 		
 	def roll_industry(self):
 		if not self.ri:
@@ -47,7 +83,7 @@ class Brand(object):
 			self.ctg = choice(ctg_industrial)
 	
 	def roll_name(self):
-		name_type = randint(0,20)
+		name_type = randint(0,27)
 		if name_type <= 1:
 			self.name += choice(lnames) + ' '
 		elif 1 < name_type <= 2:
@@ -66,11 +102,36 @@ class Brand(object):
 		elif 14 < name_type <= 16:
 			self.name += choice(words1) + ' ' + choice(lnames) + ' '
 		elif 16 < name_type <= 18:
-			self.name += choice(words2) + ' ' + choice(lnames) + ' '
+			self.name += choice(lnames) + ' ' + choice(words2) + ' '
 		elif 18 < name_type <= 20:
 			self.name += choice(words2) + ' '
-		self.name += self.ctg.title() + ' Inc.'
+		elif 20 < name_type <= 25:
+			self.name += choice(words2) + choice(conj) + choice(words2) + ' '
+		elif 25 < name_type <= 27:
+			self.name += choice(words1) + ' '
+		self.name += self.ctg.title() + choice(btype)
 		
 	def roll_markup(self):
 		self.markup = 1+(randint(5,50)/100)
 		self.markup *= self.markup
+	
+	def roll_specs(self):
+		self.num_mats = randint(3,8)
+		self.mats = []
+		self.num_colors = randint(3,5)
+		self.colors = []
+		for i in range(0,self.num_colors):
+			self.colors.append(choice(colors))
+		self.label = []
+		for i in range(0,25):
+			self.label.append(choice(colors))
+		#if this is a retail brand, create fav mfrs
+		if self.ri == 'retail':
+			self.num_mfrs = randint(1,6)
+			self.mfrs = []
+		#print(self.name)
+		#print(self.num_mats)
+		#print(self.num_colors)
+		#print(self.colors)
+		#for color in self.label:
+			#print(color[0])
