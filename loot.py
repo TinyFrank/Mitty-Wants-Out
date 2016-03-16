@@ -191,7 +191,6 @@ class Loot(object):
 	def roll_parts(self):
 		#check redundancy
 		if not self.parts:
-			print(self.l_type[0])
 			#assign l_type parts array to self.parts
 			self.parts = self.l_type[2]	
 			#assign materials to each part and sum v_normal
@@ -214,8 +213,6 @@ class Loot(object):
 				else:	
 					#append rolled material array to this part
 					part[6]=choice(self.std_w[part_mat_cat][1])
-				print(part[0])
-				print(part[6])
 				#add part contribution to v_normal
 				self.val_normal += part[3]
 				#find largest part
@@ -551,7 +548,10 @@ class Loot(object):
 		self.rect.normalize()
 		self.collide_rect = self.rect.copy()
 		self.screen_rect = self.screen.get_rect()
-		self.collide_rect.inflate(-10,-10)
+		footprint = self.collide_rect.width/self.collide_rect.height
+		if footprint < 2:
+			self.collide_rect.height = self.collide_rect.width * (1/2)
+			self.collide_rect.bottom = self.rect.bottom
 		self.collide_rect.normalize()
 		
 	def blit_alpha(self,target, source, location, opacity):

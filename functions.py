@@ -29,12 +29,14 @@ def place_loot(settings, screen, stats, loots,brands):
 		y = randint(150,screen.get_height()-50)
 		loot_inst.rect.x = x - (loot_inst.rect.width/2)
 		loot_inst.rect.y = y - (loot_inst.rect.height/2)
+		loot_inst.collide_rect.bottom = loot_inst.rect.bottom
+		loot_inst.collide_rect.x = loot_inst.rect.x
 		hits = 0
 		if loots:
 			for i in loots:
 				xhits = 0
 				yhits = 0
-				if i.rect.colliderect(loot_inst.rect):
+				if i.collide_rect.colliderect(loot_inst.collide_rect):
 					#xhits=1
 				#w_avg = (i.rect.width + loot_inst.rect.width)/2
 				#if ((abs(i.rect.x-loot_inst.rect.x)*0.5) > w_avg):
@@ -56,7 +58,9 @@ def place_loot(settings, screen, stats, loots,brands):
 			placed = True
 		timeout+=1
 		if timeout > 50:
-			placed = True	
+			placed = True
+		
+		loots.sort(key=lambda loot: loot.rect.bottom)	
 
 def take_loot(stats,loots,lp_buttons):
 	#delete original loot from the loot pile
