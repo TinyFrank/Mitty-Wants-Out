@@ -10,19 +10,24 @@ from button import Button
 import math
 from maps import Hood
 
-def place_loot(settings, screen, stats, loots, brands, retailers):
+def place_loot(settings, screen, stats, loots, brands, retailers, mfrs):
 	debug_init = gen_init
 	debug_init[0]='loot'
 	#debug_init[2]= 'Bar'
-	debug_init[3]=33
+	#ebug_init[3]=34
 	#debug_init[7]= 1.0
 	#debug_init[9]=['Gold ',80,(255,210,48),19.32]
 	#debug_init[10]=['Gold ',80,(255,210,48),19.32]
-	#debug_init[23] = retailers[0]
+	debug_init[23] = retailers[0]
+	#debug_init[24] = mfrs[0]
 	#instantiate one loot
-	#loot_inst = Loot(settings, screen, stats.loot_val,debug_init,brands=brands) 
-	loot_inst = Loot(settings, screen, stats.loot_val,brands=brands) 
+	loot_inst = Loot(settings, screen, stats.loot_val,gen_init,brands=brands) 
+	#loot_inst = Loot(settings, screen, stats.loot_val,brands=brands) 
 	loot_inst.construct()
+	locate_loot(settings, screen, stats, loot_inst, loots)
+	
+def locate_loot(settings, screen, stats, loot_inst, loots):
+	
 	placed = False
 	timeout=0
 	while not placed:
@@ -73,7 +78,7 @@ def take_loot(stats,loots,lp_buttons):
 	
 def check_keydown_events(	event, settings, screen, stats, loots, 
 							lp_buttons, ip_buttons,mp_buttons,hoods,
-							brands, retailers):
+							brands, retailers, mfrs):
 	"""Respond to keypresses"""
 	if event.key == pygame.K_q:
 		if not stats.loot_pip:
@@ -95,8 +100,8 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 		hoods[0].grow_hood(100)
 		hoods[0].tiles = []
 		hoods[0].roll_rects()
-		if stats.current_hh:
-			update_chh(settings, screen, stats, mp_buttons)
+		if stats.watched_hh:
+			update_whh(settings, screen, stats, mp_buttons)
 			
 	elif event.key == pygame.K_i:
 		if not stats.inv_pip:
@@ -109,7 +114,7 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 		if stats.map_pip == True:
 			stats.map_pip = False
 			del hoods[0]
-		if stats.map_pip == False:
+		elif stats.map_pip == False:
 			d_hood = Hood(settings,screen,stats)
 			mp_buttons[1].msg = d_hood.name
 			mp_buttons[1].prep_msg()
@@ -149,12 +154,6 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 		elif event.key == pygame.K_b:
 			#sort inv by name
 			close_inv_pip(stats,settings,screen,ip_buttons)
-			for loot in stats.inv:
-				try:
-					print(loot.mfr.name)
-				except:
-					print('cant!')
-					print(loot.name)
 			stats.inv = sorted(stats.inv, key=lambda item: item.brand.name)
 			inv_pip(settings,screen,stats,ip_buttons)
 				
@@ -167,7 +166,8 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 	elif event.key == pygame.K_f:
 		#debug, create a shit load of loot
 		for i in range(0,200):
-			place_loot(settings, screen, stats, loots, brands, retailers)
+			place_loot(	settings, screen, stats, loots, brands, retailers,
+						mfrs)
 			
 	elif event.key == pygame.K_g:
 		#debug, put all loot into inventory
@@ -189,8 +189,8 @@ def check_keyup_events(	event,settings, screen, stats,loots,
 			stats.sd_timer = stats.s_time
 
 def check_buttons(	settings, screen, stats, buttons, ig_buttons, 
-					lp_buttons, ip_buttons, mp_buttons, loots, 
-					mouse_pos, player,hoods):
+					lp_buttons, ip_buttons, mp_buttons, loots, retailers,
+					brands,	mouse_pos, player,hoods):
 	"""Start new game when player clicks Play"""
 	scx = settings.screen_width/2
 	scy = settings.screen_height/2
@@ -214,24 +214,98 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 			for i in hoods[0].tiles:
 				if i.rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 					if hoods[0].roadmap[i.refx][i.refy][0] == 'L':
-						stats.current_hh = hoods[0].roadmap[i.refx][i.refy][2]
-						stats.chhx = i.refx
-						stats.chhy = i.refy
+						stats.watched_hh = hoods[0].roadmap[i.refx][i.refy][2]
+						stats.whhx = i.refx
+						stats.whhy = i.refy
+						stats.watched_hh.x = i.refx
+						stats.watched_hh.y = i.refy
+						stats.watched_hh.town = hoods[0].name
 						lot_hit = True
-						update_chh(settings, screen, stats, mp_buttons)
-				if not lot_hit:
-					stats.current_hh = []
-					mp_buttons[2].msg=''
-					mp_buttons[2].prep_msg()
-					mp_buttons[3].msg=''
-					mp_buttons[3].prep_msg()
-					mp_buttons[4].msg=''
-					mp_buttons[4].prep_msg()
-					mp_buttons[5].msg=''
-					mp_buttons[5].prep_msg()
-					del mp_buttons[6:]
-				#elif lot_hit:
-					#update_chh(settings, screen, stats, mp_buttons)
+						update_whh(settings, screen, stats, mp_buttons)
+						print(stats.watched_hh.lname)
+			if not mp_buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+				stats.map_pip = False
+			elif mp_buttons[5].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+				#go to the Current HouseHold
+				if not stats.active_hh:
+					#clear debug loot
+					for loot in loots:
+						del loot
+				
+				stats.previous_hh = stats.active_hh
+				stats.active_hh = stats.watched_hh
+				print('active is ' + stats.active_hh.lname)
+				for prole in stats.active_hh.proles:
+					prole.roll_favs(retailers)
+				#pop loots back into whh loot list
+				while True:
+					try:
+						stats.previous_hh.yard_loot.append(loots.pop())
+					except:
+						break
+				#check for existing yard loot
+				if not stats.active_hh.yard_loot:
+					cap = (randint(10,50)/10000)*stats.active_hh.hh_value
+					stats.active_hh.yl_cap = cap
+					print('household vlaue is ' + str(stats.active_hh.hh_value))
+					print(' cap has been set at $' + str(cap))
+					while True:
+						init = gen_init
+						roll = randint(1,3)
+						print('rolled a ' + str(roll))
+						prole = choice(stats.active_hh.proles)
+						if roll == 1:
+							#pick by fav material
+							while True:
+								init[9] = choice(prole.fav_mats)
+								print('sending material: ' + str(init[9]))
+								loot_inst = Loot(settings, screen, stats.loot_val,init,brands=brands)
+								loot_inst.construct()
+								if (stats.active_hh.yl_tally+loot_inst.value) < (stats.active_hh.yl_cap*1.2):
+									stats.active_hh.yl_tally += loot_inst.value
+									locate_loot(settings, screen, stats,loot_inst, loots)
+									#stats.active_hh.yard_loot.append(loot_inst)
+									print('got something made from '+init[9][0])
+									break
+						if roll == 2:
+							#pick by fav brand
+							while True:
+								init[23] = choice(prole.fav_brands)
+								loot_inst = Loot(settings, screen, stats.loot_val,init,brands=brands)
+								loot_inst.construct()
+								if (stats.active_hh.yl_tally+loot_inst.value) < (stats.active_hh.yl_cap*1.2):
+									stats.active_hh.yl_tally += loot_inst.value
+									locate_loot(settings, screen, stats,loot_inst, loots)
+									#stats.active_hh.yard_loot.append(loot_inst)
+									print('got something from '+init[23].name)
+									break
+						if roll == 3:
+							#pick by fav color
+							while True:
+								init[18] = choice(prole.fav_colors)
+								loot_inst = Loot(settings, screen, stats.loot_val,init,brands=brands)
+								loot_inst.construct()
+								if (stats.active_hh.yl_tally+loot_inst.value) < (stats.active_hh.yl_cap*1.2):
+									stats.active_hh.yl_tally += loot_inst.value
+									locate_loot(settings, screen, stats,loot_inst, loots)
+									#stats.active_hh.yard_loot.append(loot_inst)
+									print('got something '+init[18][0])
+									break
+						if stats.active_hh.yl_tally > stats.active_hh.yl_cap:
+							print(str(stats.active_hh.yl_tally)+'dollars in the yard')
+							break
+			if not lot_hit:
+				stats.watched_hh = []
+				mp_buttons[2].msg=''
+				mp_buttons[2].prep_msg()
+				mp_buttons[3].msg=''
+				mp_buttons[3].prep_msg()
+				mp_buttons[4].msg=''
+				mp_buttons[4].prep_msg()
+				mp_buttons[5].msg=''
+				mp_buttons[5].prep_msg()
+				del mp_buttons[6:]
+													
 		elif not stats.loot_pip and not stats.inv_pip:
 			for i,loot in enumerate(loots):
 				if loot.rect.collidepoint(mouse_pos[0], mouse_pos[1]):
@@ -245,23 +319,24 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 		elif ig_buttons[4].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 			stats.game_active=False
 			
-def update_chh(settings, screen, stats, mp_buttons):
+def update_whh(settings, screen, stats, mp_buttons):
+	#update the Current HouseHold buttons in the map pip
 	del mp_buttons[6:]	
-	mp_buttons[2].msg = str(stats.current_hh.lname) + ' Household'
+	mp_buttons[2].msg = str(stats.watched_hh.lname) + ' Household'
 	mp_buttons[2].prep_msg()
-	mp_buttons[3].msg = str(stats.current_hh.hh_value) + ' Value'
+	mp_buttons[3].msg = str(stats.watched_hh.hh_value) + ' Value'
 	mp_buttons[3].prep_msg()
-	mp_buttons[4].msg = str(stats.current_hh.num_proles) + ' Residents'
+	mp_buttons[4].msg = str(stats.watched_hh.num_proles) + ' Residents'
 	mp_buttons[4].prep_msg()
 	mp_buttons[5].msg = 'GO TO'
 	mp_buttons[5].prep_msg()
 	x = mp_buttons[5].x
 	y = mp_buttons[5].y+60 
-	for i in range(0,stats.current_hh.num_proles):
-		tp_fname = stats.current_hh.proles[i].fname
-		tp_age = str(stats.current_hh.proles[i].age)
-		tp_bday = str(stats.current_hh.proles[i].bday)
-		tp_salary = str(stats.current_hh.proles[i].salary) 
+	for i in range(0,stats.watched_hh.num_proles):
+		tp_fname = stats.watched_hh.proles[i].fname
+		tp_age = str(stats.watched_hh.proles[i].age)
+		tp_bday = str(stats.watched_hh.proles[i].bday)
+		tp_salary = str(stats.watched_hh.proles[i].salary) 
 		text_line = Button(settings, screen, tp_fname,
 			x, y+i*25, 75,30,(0,0,0),None,15)
 		mp_buttons.append(text_line)
@@ -353,7 +428,7 @@ def close_inv_pip(stats,settings,screen,ip_buttons):
 			
 def check_events(	settings, screen, stats, buttons, ig_buttons, 
 					lp_buttons, ip_buttons, mp_buttons, loots, hoods,
-					brands, retailers, player):
+					brands, retailers, mfrs, player):
 	"""Respond to keyboard and mouse events"""
 	
 	#create variables for screen center
@@ -366,7 +441,8 @@ def check_events(	settings, screen, stats, buttons, ig_buttons,
 		elif event.type == pygame.KEYDOWN:
 			check_keydown_events(	event, settings, screen, stats, 
 									loots, lp_buttons, ip_buttons, 
-									mp_buttons, hoods, brands, retailers)		
+									mp_buttons, hoods, brands, retailers,
+									mfrs)		
 		elif event.type == pygame.KEYUP:
 			check_keyup_events(		event, settings, screen, stats,
 									loots, lp_buttons, ip_buttons, hoods)	
@@ -374,7 +450,7 @@ def check_events(	settings, screen, stats, buttons, ig_buttons,
 			mouse_pos = pygame.mouse.get_pos()
 			check_buttons(	settings, screen, stats, buttons, 
 							ig_buttons, lp_buttons, ip_buttons, 
-							mp_buttons, loots, 
+							mp_buttons, loots, retailers, brands,
 							mouse_pos, player, hoods)
 				
 def update_screen(	settings, screen, stats, buttons, ig_buttons, 

@@ -171,6 +171,7 @@ def run():
 	hoods = []
 	brands = []
 	retailers = []
+	mfrs = []
 	#Generate world brands
 	current_ctgs = []
 	while len(current_ctgs) < (len(ctg_retail)+len(ctg_industrial)):
@@ -179,13 +180,8 @@ def run():
 			current_ctgs.append(brand.ctg)
 		if brand.ri == 'retail':
 			retailers.append(brand)
-		#print(brand.name)
-		#try:
-			#print(brand.num_mfrs)
-			#for mfr in brand.mfrs:
-				#print('\t'+brand.name)
-		#except:
-			#pass
+		if brand.ri == 'industrial':
+			mfrs.append(brand)
 		brands.append(brand)
 	
 	#Create clock to stabilize framerate
@@ -203,7 +199,7 @@ def run():
 		clock.tick(50)
 		gf.check_events(	settings, screen, stats, buttons, 
 							ig_buttons, lp_buttons, ip_buttons, mp_buttons,
-							loots, hoods, brands, retailers, player)
+							loots, hoods, brands, retailers, mfrs, player)
 		gf.update_screen(	settings,screen, stats, buttons, ig_buttons, 
 							lp_buttons, ip_buttons, mp_buttons,
 							player, loots, hoods)

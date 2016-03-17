@@ -73,6 +73,7 @@ class Brand(object):
 		self.roll_name()
 		self.roll_markup()
 		self.roll_specs()
+		self.roll_quality()
 		
 	def roll_industry(self):
 		if not self.ri:
@@ -116,22 +117,23 @@ class Brand(object):
 		self.markup *= self.markup
 	
 	def roll_specs(self):
-		self.num_mats = randint(3,8)
+		self.num_mats = randint(1,4)
 		self.mats = []
-		self.num_colors = randint(3,5)
+		self.num_colors = randint(1,4)
 		self.colors = []
 		for i in range(0,self.num_colors):
 			self.colors.append(choice(colors))
 		self.label = []
 		for i in range(0,25):
 			self.label.append(choice(colors))
+			
 		#if this is a retail brand, create fav mfrs
 		if self.ri == 'retail':
 			self.num_mfrs = randint(1,6)
 			self.mfrs = []
-		#print(self.name)
-		#print(self.num_mats)
-		#print(self.num_colors)
-		#print(self.colors)
-		#for color in self.label:
-			#print(color[0])
+	
+	def roll_quality(self):
+		self.qtys = []
+		qtys = randint(1,3)
+		for i in range(qtys):
+			self.qtys.append(choice(qualities))

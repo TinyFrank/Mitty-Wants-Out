@@ -10,7 +10,7 @@ import time
 sources = [ ('petrochemical',['fluid','rubber']),
 			('plastics',['plastic']),
 			('fabricators',['metal']),
-			('agriculture',[]),
+			('agriculture',['drink','lqd food','pwdr food','soft food']),
 			('carpentry',['wood']),
 			('printers',['paper','plastic']),
 			('glassworks',['ceramic']),
@@ -19,11 +19,13 @@ sources = [ ('petrochemical',['fluid','rubber']),
 			('toolmaking',['plastic','metal']),
 			('garment',['fibre']),
 			('chemical',['fluid','mineral','rubber']),
-			('distillery',['fluid']),
+			('distillery',['fluid','drink','pwdr food']),
 			('soapworks',['soft solid','natural']),
 			('semiconductor',['plastic','metal']),
 			('minerals',['mineral']),
 			('pharmaceutical',['pills'])]
+
+lqds = ['fluid','drink','lqd food']
 
 gen_init = 	[choice(('loot','part')),None,None,None,[],[],[],None,
 			None,[],[],[],'','',[],[],[],None,[],[],[],[],'',[],'','']
@@ -140,10 +142,10 @@ class Loot(object):
 			self.roll_condition()
 			self.roll_mfr()
 		self.roll_material()
-		self.roll_color()
 		if self.raw == 'part':
 			self.roll_shape() 
 			self.roll_industry()
+		self.roll_color()
 		self.roll_quality()
 		self.roll_value()
 		self.roll_trim()
@@ -183,29 +185,14 @@ class Loot(object):
 			while True:
 				self.brand = choice(self.brands)
 				if self.brand.ri == 'retail':
-					break
+					if not self.l_type_num:
+						break
+					else:
+						if self.brand.ctg in self.loot_types[self.l_type_num][5]:
+							break
 				count -= 1
 				#print(count)
 		self.label = self.brand.label
-		
-		"""
-	def roll_brand(self):
-		#roll retailer and manufacturer
-		if not self.brand:
-			#create list for retailers/mfrs in relevant categories
-			relevant_brands = []
-			self.relevant_industries = []
-			for brand in self.brands:
-				#if retailer/mfr is in a relevant category, add to list
-				if brand.ctg in self.l_type[5]:
-					relevant_brands.append(brand)
-				if brand.ctg in self.l_type[4]:
-					self.relevant_industries.append(brand)
-		#pick from retailer/mfr from relevant categories
-		self.brand = choice(relevant_brands)
-		self.manufacturer = choice(self.relevant_industries)
-		self.label = self.brand.label
-		"""
 		
 	def roll_l_type(self):
 		if not self.l_type_num:
@@ -336,87 +323,45 @@ class Loot(object):
 					self.parts[1][6] = self.trim
 					
 	def roll_mfr(self):
-		while True:
-			count = 20
-			industry = choice(sources)
-			if self.source in industry[1]:
-				if industry[0] in self.l_type[4]:
-					break
-			count -= 1
-			#if count < 3:
-				#print(count)
-				#print(340)
-			if count < 1:
-				break
-		if len(self.brand.mfrs) > 1:
-			count = 100
-			while True:
-				self.mfr = choice(self.brand.mfrs)
-				if self.mfr.ctg == industry[0]:
-					break
-				count -= 1
-				#if count < 3:
-					#print(count)
-					#print(352)
-				if count < 1:
-					break
-		else:
-			count = 100
-			while True:
-				self.mfr = choice(self.brands)
-				if self.mfr.ctg == industry[0]:
-					self.brand.mfrs.append(self.mfr)
-					break
-				count -= 1
-				#if count < 3:
-					#print(count)
-					#print(363)
-				if count < 1:
-					break
-					
-		"""	
-	def roll_mfr(self):
 		if not self.mfr:
-			#figure out what industry produces this
-			print('getting mfr...')
-			count = 50
 			while True:
+				count = 20
 				industry = choice(sources)
 				if self.source in industry[1]:
 					if industry[0] in self.l_type[4]:
 						break
 				count -= 1
+				#if count < 3:
+					#print(count)
+					#print(340)
 				if count < 1:
 					break
-			#create list for mfrs in relevant categories
-			self.relevant_industries = []
-			for brand in self.brands:
-				#if mfr is in a relevant category, add to list
-				if brand.ctg == industry[0]:
-					self.relevant_industries.append(brand)
-			#if brand has mfrs...
-			if len(self.brand.mfrs) >= self.brand.num_mfrs:
-				count = 10
-				print(industry[0])
-				for ind in self.relevant_industries:
-					print(ind.name)
+			if len(self.brand.mfrs) > 1:
+				count = 100
 				while True:
-					print(count)
 					self.mfr = choice(self.brand.mfrs)
 					if self.mfr.ctg == industry[0]:
 						break
 					count -= 1
+					#if count < 3:
+						#print(count)
+						#print(352)
 					if count < 1:
-						self.mfr =choice(self.relevant_industries)
+						break
+			else:
+				count = 100
+				while True:
+					self.mfr = choice(self.brands)
+					if self.mfr.ctg == industry[0]:
 						self.brand.mfrs.append(self.mfr)
 						break
-			#if brand has only some mfrs...
-			else:
-				self.mfr =choice(self.relevant_industries)
-				self.brand.mfrs.append(self.mfr)
-			print('DONT!')
-	"""
-	
+					count -= 1
+					#if count < 3:
+						#print(count)
+						#print(363)
+					if count < 1:
+						break
+						
 	def roll_condition(self):
 		if not self.condition:
 			#select condition at random
@@ -432,7 +377,7 @@ class Loot(object):
 					self.material = self.parts[0][6]
 				self.m_color = self.material[2]
 				self.color = choice(self.brand.colors)
-			if self.raw == 'part':
+			if self.raw == 'part' and not self.mfr:
 				self.mat_cat = 'fluid'
 				if self.shape:
 					#with predefined shape, find suitable category
@@ -440,7 +385,7 @@ class Loot(object):
 						self.mat_cat = self.mat_cats[randint(0,len(self.mat_cats)-1)]
 				#pick and mat cat but fluid
 				elif not self.shape:
-					while self.mat_cat == 'fluid':
+					while self.mat_cat in ['fluid','drink','lqd food']:
 						self.mat_cat = self.mat_cats[randint(0,len(self.mat_cats)-1)]
 					#material becomes any mat array from chosen category
 				self.material = choice(self.std_w[self.mat_cat][1])
@@ -452,6 +397,20 @@ class Loot(object):
 				if self.mat_cat in self.dyed:
 					self.ct = randint(0,len(self.colors)-1)
 					self.color =  self.colors[self.ct]
+			elif self.raw == 'part' and self.mfr:
+				for source in sources:
+					if source[0] == self.mfr.ctg:
+						self.source = source
+						break
+				self.mat_cat = 'fluid'
+				while self.mat_cat in lqds:		
+					self.mat_cat = choice(self.source[1])
+				self.material = choice(self.std_w[self.mat_cat][1])
+		if self.material:
+			for cat in self.mat_cats:
+				if self.material in self.std_w[cat]:
+					self.mat_cat = cat
+					print(self.mat_cat + ' is the the new loot category')
 					
 	def roll_color(self):
 		if not self.color:
@@ -463,40 +422,42 @@ class Loot(object):
 				self.color[1] = self.material[2]
 				self.color[0] = self.material[0]
 				if self.mat_cat in self.dyed:
-					self.ct = randint(0,len(self.colors)-1)
-					self.color =  self.colors[self.ct]
+					self.color = choice(self.brand.colors)
 					
 	def roll_shape(self):
 		if not self.shape:
 			self.shape = choice(self.shapes[self.mat_cat])	
 			
 	def roll_industry(self):
-		count = 1000
-		while True:
-			self.ctg = choice(sources)
-			if self.mat_cat in self.ctg[1]:
-				break
-			count -= 1
-			#print(count)
-			if count < 1:
-				print(self.mat_cat)	
-				break
-		count = 1000
-		while True:
-			self.brand = choice(self.brands)
-			if self.ctg[0] == self.brand.ctg:
-				self.mfr = self.brand
-				break	
-			count -= 1
-			#print(count)
-			if count < 1:
-				print(self.ctg)	
-				break	
-		
+		if not self.mfr:
+			count = 1000
+			while True:
+				self.ctg = choice(sources)
+				if self.mat_cat in self.ctg[1]:
+					break
+				count -= 1
+				#print(count)
+				if count < 1:
+					print(self.mat_cat)	
+					break
+			count = 1000
+			while True:
+				self.brand = choice(self.brands)
+				if self.ctg[0] == self.brand.ctg:
+					self.mfr = self.brand
+					break	
+				count -= 1
+				#print(count)
+				if count < 1:
+					print(self.ctg)	
+					break	
+		else:
+			self.brand = self.mfr
+			
 	def roll_quality(self):
 		if not self.quality:
 			#select condition at random
-			self.quality = choice(self.qualities)
+			self.quality = choice(self.brand.qtys)
 								
 	def roll_value(self):
 		if not self.value:
@@ -509,6 +470,7 @@ class Loot(object):
 				self.value *= self.brand.markup * self.mfr.markup
 			elif self.raw == 'part':
 				self.value = self.weight*self.material[1]*(self.quality[1]**self.level)
+				self.value *= self.mfr.markup
 		self.value = round(self.value,2)
 	
 	def roll_trim(self):
@@ -519,7 +481,7 @@ class Loot(object):
 					self.t_color_name = ''
 				else:
 					#for parts and single part loots, pick randomly
-					self.trimx = choice(self.colors)
+					self.trimx = choice(self.brand.colors)
 					self.trim = []
 					for col in self.trimx:
 						self.trim.append(col)
@@ -529,7 +491,7 @@ class Loot(object):
 					
 			elif self.raw == "loot" and len(self.parts) == 1:
 				#for parts and single part loots, pick randomly
-				self.trimx = choice(self.colors)
+				self.trimx = choice(self.brand.colors)
 				self.trim = []
 				for col in self.trimx:
 					self.trim.append(col)
@@ -546,13 +508,13 @@ class Loot(object):
 				#if the material is dyed, select a dye color 
 				self.trim_cat = self.parts[1][4][0]
 				if self.trim_cat in self.dyed:
-					self.ct = randint(0,len(self.colors)-1)
+					self.ct = randint(0,len(self.brand.colors)-1)
 					self.t_color =  self.colors[self.ct][1]					
-					self.t_color_name =  self.colors[self.ct][0]
+					self.t_color_name =  self.brand.colors[self.ct][0]
 					
 			elif self.raw == "loot" and len(self.parts) == 1:
 				#for parts and single part loots, pick randomly
-				self.trimx = choice(self.colors)
+				self.trimx = choice(self.brand.colors)
 				self.trim = []
 				for col in self.trimx:
 					self.trim.append(col)

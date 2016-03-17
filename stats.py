@@ -25,8 +25,14 @@ class Stats():
 		self.stock = []
 		
 		#currently watched household
-		self.current_hh = []
-		self.chhx,self.chhy = 0,0
+		self.watched_hh = None
+		self.whhx,whhy = 0,0
+		
+		#active location and the rpeviously active location
+		self.previous_hh = None
+		self.active_hh = None
+		self.phhx,self.phhy = 0,0
+		self.ahhx,self.ahhy = 0,0
 		
 		#initialize Nanny State
 		self.current_year = 2016

@@ -32,7 +32,7 @@ class Hood(object):
 		self.name = self.pe + choice(lnames) + self.su + self.lo
 		
 		#create 20x20 grid of empty fields
-		self.roadmap = [[['F',1,None]for y in range(20)]for x in range(20)]
+		self.roadmap = [[['F',1,None,[]]for y in range(20)]for x in range(20)]
 		
 		#tile color dictionary
 		self.tile_dict = {	'R':((0,0,0),'Road'),

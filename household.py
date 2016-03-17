@@ -1,6 +1,7 @@
 import pygame
 import random
 from random import randint,choice
+from libs import *
 
 lnames = [ 	'Manning','Tsang','MacLeod','Flood','Elston','Rayner',
 			'Triantafilou','Cracknell','Shetler','Robertson','Smith',
@@ -26,6 +27,8 @@ months = [	('January',31),
 			('October',31),
 			('November',30),
 			('December',31) ]
+			
+lqds = ['fluid','drink','lqd food']
 
 class Household(object):
 	def __init__(	self,settings, screen, stats, lot_value=None, 
@@ -41,6 +44,12 @@ class Household(object):
 		self.num_kids = num_kids
 		self.proles = proles
 		self.lname = lname
+		self.x = None
+		self.y = None
+		self.town = ''
+		self.yard_loot = [] #contains loot in yard
+		self.yl_tally = 0	#tally of current total yard loot value
+		self.yl_cap = 0
 					
 	def roll_hh_value(self):
 		"""Roll a household value based on lot value, the poverty line 
@@ -102,20 +111,13 @@ class Household(object):
 	def adjust_wages(self):
 		for i in range(self.num_adults):
 			self.proles[i].salary = int(self.hh_value*self.wages[i])
-				
 			
 	def construct(self):
 		self.roll_hh_value()
 		self.roll_lname()
 		self.roll_num_proles()
 		self.roll_wages()
-		self.roll_proles()
-			
-		#for prole in self.proles:
-			#print(prole.fname+prole.lname+' '+str(prole.salary))
-		#print('Yearly Household Income: ' + str(self.hh_value))
-		#print('\n')		
-				
+		self.roll_proles()				
 		
 class Prole(object):
 	def __init__(	self,settings, screen, stats, hh_value=None, 
@@ -139,7 +141,7 @@ class Prole(object):
 	def construct(self):
 		self.roll_sex()
 		self.roll_name()
-		self.roll_bday()		
+		self.roll_bday()	
 		
 	def roll_sex(self):
 		if not self.sex:
@@ -163,4 +165,28 @@ class Prole(object):
 				else:
 					self.bday -= months[i][1]
 		
+	def roll_favs(self,retailers):
+		clrs = randint(1,3)
+		self.fav_colors = []
+		for i in range(clrs):
+			self.fav_colors.append(choice(colors))
+			
+		brnds = randint(1,3)
+		self.fav_brands = []
+		for i in range(brnds):
+			self.fav_brands.append(choice(retailers))
+			
+		mats = randint(1,3)
+		self.fav_mats = []
+		for i in range(mats):
+			temp_mat_cat = 'fluid'
+			while temp_mat_cat in lqds:
+				temp_mat_cat = choice(mat_cats)
+			print(temp_mat_cat)
+			self.fav_mats.append(choice(std_w[temp_mat_cat][1]))
 		
+		print(self.fname + ' ' + self.lname)
+		print(self.fav_colors)
+		for brand in self.fav_brands:
+			print(brand.name)
+		print(self.fav_mats)
