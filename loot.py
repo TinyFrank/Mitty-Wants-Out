@@ -204,6 +204,7 @@ class Loot(object):
 				if self.brand.ctg in self.loot_types[self.l_type_num][5]:
 					break
 				count -= 1
+				print('trying')
 				#print(count)
 			
 		if not self.l_type: 
@@ -248,50 +249,16 @@ class Loot(object):
 						#append rolled material array to this part
 						part[6]=choice(self.std_w[part_mat_cat][1])							
 					else:
+						#otherwise use standard contents
 						for mat in self.std_w[part[4][0]][1]:
 							if mat[0] == part[1]:
 								part[6] = mat
 							
-					#part_mat_cat = choice(part[4])
 				else:	
-					#for the primary part...
-					if i == 0:
-						self.source = part_mat_cat
-						#if the brand already has picked it's materials...
-						if len(self.brand.mats) >= self.brand.num_mats:
-							#pick one of those materials
-							count = 200
-							while True:
-								part[6] = choice(self.brand.mats)
-								if part[6] in self.std_w[part_mat_cat][1]:
-									break
-								count -= 1
-								#if count < 3:
-									#print(count)
-									#print(276)
-								if count < 1:
-									#pick one from the same category
-									part[6] = choice(self.std_w[part_mat_cat][1])
-									#append material to brand mats
-									self.brand.mats.append(part[6])
-									break
-						#if the brand has at least started picking...
-						elif len(self.brand.mats) > 0:
-							#pick one from the same category
-							part[6] = choice(self.std_w[part_mat_cat][1])
-							#append material to brand mats
-							self.brand.mats.append(part[6])							
-						#if the brand has not started picking...
-						elif len(self.brand.mats) == 0:
-							#append rolled material array to this part
-							part[6]=choice(self.std_w[part_mat_cat][1])
-							#append rolled mat_cat and material to brand
-							self.brand.mats.append(part[6])
-					else:	
-						#pick a mat cat
-						part_mat_cat = choice(part[4])
-						#append rolled material array to this part
-						part[6]=choice(self.std_w[part_mat_cat][1])
+					#pick a mat cat
+					part_mat_cat = choice(part[4])
+					#append rolled material array to this part
+					part[6]=choice(self.std_w[part_mat_cat][1])
 				#add part contribution to v_normal
 				self.val_normal += part[3]
 				#find largest part
@@ -300,11 +267,49 @@ class Loot(object):
 					score = part[3] # largest contribution so far
 				if i == 1:
 					self.trim_cat = part_mat_cat
-				#if given 2 qtys, pick randint betweent them
+				"""if given 2 qtys, pick randint betweent them
+				this creates an arbitrary # of parts where requested
+				such as pages in a book"""
 				if str(part[2].__class__) ==("<class 'list'>"):
 					part[2][2] = randint(part[2][0],part[2][1])
+					
 			#assign largest part
 			self.largest = leader
+			
+			#re-roll largest part as brand material
+			part_mat_cat = choice(self.parts[self.largest][4])
+			self.source = part_mat_cat
+			#if the brand already has picked it's materials...
+			if len(self.brand.mats) >= self.brand.num_mats:
+				#pick one of those materials
+				count = 200
+				while True:
+					self.parts[self.largest][6] = choice(self.brand.mats)
+					if self.parts[self.largest][6] in self.std_w[part_mat_cat][1]:
+						break
+					count -= 1
+					#if count < 3:
+						#print(count)
+						#print(276)
+					if count < 1:
+						#pick one from the same category
+						self.parts[self.largest][6] = choice(self.std_w[part_mat_cat][1])
+						#append material to brand mats
+						self.brand.mats.append(self.parts[self.largest][6])
+						break
+			#if the brand has at least started picking...
+			elif len(self.brand.mats) > 0:
+				#pick one from the same category
+				self.parts[self.largest][6] = choice(self.std_w[part_mat_cat][1])
+				#append material to brand mats
+				self.brand.mats.append(part[6])							
+			#if the brand has not started picking...
+			elif len(self.brand.mats) == 0:
+				#append rolled material array to this part
+				part[6]=choice(self.std_w[part_mat_cat][1])
+				#append rolled mat_cat and material to brand
+				self.brand.mats.append(self.parts[self.largest][6])
+
 					
 			#divide each part's contribution by v_normal to normalize it
 			for part in self.parts:
@@ -325,10 +330,14 @@ class Loot(object):
 	def roll_mfr(self):
 		if not self.mfr:
 			while True:
-				count = 20
+				count = 200
+				#pick a source industry entry at random
 				industry = choice(sources)
+				#if the loot material is made by this industry...
 				if self.source in industry[1]:
+					#...and the industry appears in the loot's mfr list
 					if industry[0] in self.l_type[4]:
+						print('new industry for this ' +self.parts[self.largest][6][0] +' '+self.l_type[0]+ ' is ' +industry[0])
 						break
 				count -= 1
 				#if count < 3:
