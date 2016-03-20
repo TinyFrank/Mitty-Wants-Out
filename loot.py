@@ -27,7 +27,7 @@ sources = [ ('petrochemical',['fluid','rubber']),
 
 lqds = ['fluid','drink','lqd food']
 
-gen_init = 	[choice(('loot','part')),None,None,None,[],[],[],None,
+gen_init = 	[None,None,None,None,[],[],[],None,
 			None,[],[],[],'','',[],[],[],None,[],[],[],[],'',[],'','']
 """can be initialized with a presets for 0,2,3,7,9,10"""
 class Loot(object):
@@ -100,6 +100,8 @@ class Loot(object):
 			self.raw = 'part'	
 			self.condition = None
 			self.parts = [None]
+		else:
+			self.raw = choice(['part','loot'])
 		
 		#temp attributes for calculation
 		self.val_x = 0 #float - multiplier of part values
@@ -199,18 +201,17 @@ class Loot(object):
 			count = 100
 			while True:
 				#roll a random number within the range of loot types
-				self.l_type_num = randint(1,len(self.loot_types))
+				self.l_type_num = choice(range(1,len(self.loot_types)))
 				#only continue loop if this l_type_num is forbidden
 				if self.brand.ctg in self.loot_types[self.l_type_num][5]:
 					break
 				count -= 1
-				print('trying')
 				#print(count)
 			
 		if not self.l_type: 
 			#assign that index's array to l_type
 			self.l_type = self.loot_types[self.l_type_num]
-			
+		
 	def roll_weight(self):
 		if not self.weight:
 			if self.raw == 'loot':
@@ -276,8 +277,11 @@ class Loot(object):
 			#assign largest part
 			self.largest = leader
 			
-			#re-roll largest part as brand material
-			part_mat_cat = choice(self.parts[self.largest][4])
+			#re-roll largest part as brand material, assuming it isn't contents
+			if self.parts[self.largest][0] != 'contents ':
+				part_mat_cat = choice(self.parts[self.largest][4])
+			else:
+				part_mat_cat = choice(self.parts[0][4])
 			self.source = part_mat_cat
 			#if the brand already has picked it's materials...
 			if len(self.brand.mats) >= self.brand.num_mats:
@@ -288,9 +292,6 @@ class Loot(object):
 					if self.parts[self.largest][6] in self.std_w[part_mat_cat][1]:
 						break
 					count -= 1
-					#if count < 3:
-						#print(count)
-						#print(276)
 					if count < 1:
 						#pick one from the same category
 						self.parts[self.largest][6] = choice(self.std_w[part_mat_cat][1])
@@ -329,35 +330,31 @@ class Loot(object):
 					
 	def roll_mfr(self):
 		if not self.mfr:
+			count = 200
 			while True:
-				count = 200
 				#pick a source industry entry at random
 				industry = choice(sources)
 				#if the loot material is made by this industry...
 				if self.source in industry[1]:
 					#...and the industry appears in the loot's mfr list
 					if industry[0] in self.l_type[4]:
-						print('new industry for this ' +self.parts[self.largest][6][0] +' '+self.l_type[0]+ ' is ' +industry[0])
+						#print('new industry for this ' +self.parts[self.largest][6][0] +self.l_type[0]+ 'is ' +industry[0])
 						break
 				count -= 1
-				#if count < 3:
-					#print(count)
-					#print(340)
 				if count < 1:
+					#print('could not find industry for '+self.parts[self.largest][6][0] +' '+self.l_type[0])
 					break
-			if len(self.brand.mfrs) > 1:
+			if len(self.brand.mfrs) > 0:
 				count = 100
 				while True:
 					self.mfr = choice(self.brand.mfrs)
 					if self.mfr.ctg == industry[0]:
 						break
 					count -= 1
-					#if count < 3:
-						#print(count)
-						#print(352)
 					if count < 1:
+						self.mfr = ''
 						break
-			else:
+			if not self.mfr:
 				count = 100
 				while True:
 					self.mfr = choice(self.brands)
@@ -365,9 +362,6 @@ class Loot(object):
 						self.brand.mfrs.append(self.mfr)
 						break
 					count -= 1
-					#if count < 3:
-						#print(count)
-						#print(363)
 					if count < 1:
 						break
 						
@@ -416,10 +410,10 @@ class Loot(object):
 					self.mat_cat = choice(self.source[1])
 				self.material = choice(self.std_w[self.mat_cat][1])
 		if self.material:
-			for cat in self.mat_cats:
-				if self.material in self.std_w[cat]:
-					self.mat_cat = cat
-					print(self.mat_cat + ' is the the new loot category')
+			if not self.mat_cat:
+				for cat in self.mat_cats:
+					if self.material in self.std_w[cat][1]:
+						self.mat_cat = cat
 					
 	def roll_color(self):
 		if not self.color:

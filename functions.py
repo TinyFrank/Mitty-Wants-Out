@@ -6,6 +6,7 @@ from player import Player
 from loot import *
 import pygame
 import copy
+import libs
 from button import Button
 import math
 from maps import Hood
@@ -226,6 +227,9 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 			if not mp_buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 				stats.map_pip = False
 			elif mp_buttons[5].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+				lot_hit = True
+				if stats.active_hh == stats.watched_hh:
+					return None
 				#go to the Current HouseHold
 				if not stats.active_hh:
 					#clear debug loot
@@ -250,45 +254,76 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 					print('household vlaue is ' + str(stats.active_hh.hh_value))
 					print(' cap has been set at $' + str(cap))
 					while True:
-						init = gen_init
 						roll = randint(1,3)
 						print('rolled a ' + str(roll))
 						prole = choice(stats.active_hh.proles)
 						if roll == 1:
 							#pick by fav material
+							count=100
 							while True:
-								init[9] = choice(prole.fav_mats)
-								print('sending material: ' + str(init[9]))
-								loot_inst = Loot(settings, screen, stats.loot_val,init,brands=brands)
+								pick = choice(prole.fav_mats)
+								pick_cat = ''
+								print('sending material: ' + pick[0])
+								for cat in libs.mat_cats:
+									if pick in libs.std_w[cat][1]:
+										pick_cat = cat
+								loot_inst = Loot(settings, screen, stats.loot_val,brands=brands)
 								loot_inst.construct()
-								if (stats.active_hh.yl_tally+loot_inst.value) < (stats.active_hh.yl_cap*1.2):
+								legit = False
+								if loot_inst.raw == 'loot':
+									if pick_cat in loot_inst.parts[loot_inst.largest][4]:
+										loot_inst.parts[loot_inst.largest][6] = pick
+										loot_inst.material = pick
+										loot_inst.mat_cat = pick_cat
+										loot_inst.source = pick_cat
+										loot_inst.roll_mfr()
+										loot_inst.roll_value()
+										loot_inst.roll_name()
+										loot_inst.roll_desc()
+										loot_inst.roll_parts_desc()
+										legit = True
+								if loot_inst.raw == 'part':
+									loot_inst.material = pick
+									loot_inst.mat_cat = pick_cat
+									loot_inst.roll_shape()
+									loot_inst.roll_industry()
+									loot_inst.roll_value()
+									loot_inst.roll_name()
+									loot_inst.roll_desc()
+									legit = True
+								temp_val = stats.active_hh.yl_tally+loot_inst.value
+								cap_buffer = stats.active_hh.yl_cap*1.2
+								if (temp_val < cap_buffer) and legit:
 									stats.active_hh.yl_tally += loot_inst.value
 									locate_loot(settings, screen, stats,loot_inst, loots)
-									#stats.active_hh.yard_loot.append(loot_inst)
-									print('got something made from '+init[9][0])
+									print('got something made from '+pick[0])
+									break
+								count -= 1
+								if count < 1:
 									break
 						if roll == 2:
 							#pick by fav brand
 							while True:
-								init[23] = choice(prole.fav_brands)
-								loot_inst = Loot(settings, screen, stats.loot_val,init,brands=brands)
+								loot_inst = Loot(settings, screen, stats.loot_val,brands=brands)
 								loot_inst.construct()
 								if (stats.active_hh.yl_tally+loot_inst.value) < (stats.active_hh.yl_cap*1.2):
-									stats.active_hh.yl_tally += loot_inst.value
-									locate_loot(settings, screen, stats,loot_inst, loots)
-									#stats.active_hh.yard_loot.append(loot_inst)
-									print('got something from '+init[23].name)
-									break
+									print('value is kosher!')
+									if loot_inst.brand in prole.fav_brands:
+										stats.active_hh.yl_tally += loot_inst.value
+										locate_loot(settings, screen, stats,loot_inst, loots)
+										print('got something from '+loot_inst.brand.name)
+										break
+								print(loot_inst.brand.name + str(prole.fav_brands))
 						if roll == 3:
 							#pick by fav color
 							while True:
+								init = gen_init
 								init[18] = choice(prole.fav_colors)
 								loot_inst = Loot(settings, screen, stats.loot_val,init,brands=brands)
 								loot_inst.construct()
 								if (stats.active_hh.yl_tally+loot_inst.value) < (stats.active_hh.yl_cap*1.2):
 									stats.active_hh.yl_tally += loot_inst.value
 									locate_loot(settings, screen, stats,loot_inst, loots)
-									#stats.active_hh.yard_loot.append(loot_inst)
 									print('got something '+init[18][0])
 									break
 						if stats.active_hh.yl_tally > stats.active_hh.yl_cap:

@@ -30,6 +30,8 @@ months = [	('January',31),
 			
 lqds = ['fluid','drink','lqd food']
 
+cntnts = ['fluid','drink','lqd food','pwdr food','soft food','soft solid','pills']
+
 class Household(object):
 	def __init__(	self,settings, screen, stats, lot_value=None, 
 					materials=None, colors=None, num_proles=None,
@@ -180,13 +182,14 @@ class Prole(object):
 		self.fav_mats = []
 		for i in range(mats):
 			temp_mat_cat = 'fluid'
-			while temp_mat_cat in lqds:
+			while temp_mat_cat in cntnts:
 				temp_mat_cat = choice(mat_cats)
-			print(temp_mat_cat)
 			self.fav_mats.append(choice(std_w[temp_mat_cat][1]))
 		
-		print(self.fname + ' ' + self.lname)
-		print(self.fav_colors)
+		print(self.fname.upper() + ' ' + self.lname.upper())
+		for color in self.fav_colors:
+			print(color[0])
+		for mat in self.fav_mats:
+			print(mat[0])
 		for brand in self.fav_brands:
 			print(brand.name)
-		print(self.fav_mats)
