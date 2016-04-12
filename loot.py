@@ -101,7 +101,8 @@ class Loot(object):
 			self.condition = None
 			self.parts = [None]
 		else:
-			self.raw = choice(['part','loot'])
+			if not self.raw:
+				self.raw = choice(['part','loot'])
 		
 		#temp attributes for calculation
 		self.val_x = 0 #float - multiplier of part values
@@ -134,23 +135,45 @@ class Loot(object):
 		self.std_w = libs.std_w
 		self.part_sprites = libs.part_sprites
 
+		self.forbidden_lts = []
+		self.legit_lts = []
+
 	def construct(self):
-		if self.raw == 'loot':
+		print('this is a '+self.raw)
+		if self.material:
+			self.get_mat_cat()
+			if self.raw == 'loot':
+				self.clean_l_types()
+		else:
 			self.roll_brand()
+		#print('BRAND DONE')
+		if self.raw == 'loot':
 			self.roll_l_type()
+			if self.material:
+				self.roll_brand()
+			print('LTYPE DONE')
 		self.roll_weight()
+		#print('WEIGHT DONE')
 		if self.raw == 'loot':
 			self.roll_parts()
+			#print('PARTS DONE')
 			self.roll_condition()
+			#print('CONDITION DONE')
 			self.roll_mfr()
+			#print('MFR DONE')
 		self.roll_material()
+		#print('MATERIAL DONE')
 		if self.raw == 'part':
 			self.roll_shape() 
+			#print('SHAPE DONE')
 			self.roll_industry()
+			#print('INDUSTRY DONE')
 		self.roll_color()
+		#print('COLOUR DONE')
 		self.roll_quality()
 		self.roll_value()
 		self.roll_trim()
+		#print('TRIM DONE')
 		self.roll_short_name()
 		self.roll_name()
 		self.roll_desc()
@@ -180,34 +203,78 @@ class Loot(object):
 			self.m_color,self.t_color,self.sprite,self.label,self.brand,
 			self.mfr]
 	
+	def get_mat_cat(self):
+		#determine mat_cat of specified material
+		for cat in self.mat_cats:
+			if self.material in self.std_w[cat][1]:
+				self.mat_cat = cat
+			
+	def clean_l_types(self):
+		#iterate over each loot type entry
+		for i in range(1,len(self.loot_types)):
+			"""Find the Largest Part"""
+			score = 0
+			leader = None
+			#start scorekeeping, iterate over each part in this loot
+			for n,part in enumerate(self.loot_types[i][2]):
+				if part[3] > score:
+					score = part[3] #record current highest weight
+					leader = n #record current leader
+			if self.mat_cat not in self.loot_types[i][2][leader][4]:
+				#forbid loots whose largest parts cannot be made from target mat
+				self.forbidden_lts.append(i)
+		for n in range(1,len(self.loot_types)):
+			if n not in self.forbidden_lts:
+				self.legit_lts.append(n)
+			
+			
 	def roll_brand(self):
-		#roll retailer and manufacturer
-		if not self.brand:
-			count = 100
-			while True:
-				self.brand = choice(self.brands)
-				if self.brand.ri == 'retail':
-					if not self.l_type_num:
+		#roll retailer 
+		count = 100
+		while True:
+			self.brand = choice(self.brands)
+			if self.brand.ri == 'retail': #for retail brands...
+				if not self.l_type_num: #...and no loot type was picked
+					break
+				else:#..and a loot type is picked
+					if self.brand.ctg in self.loot_types[self.l_type_num][5]:
 						break
-					else:
-						if self.brand.ctg in self.loot_types[self.l_type_num][5]:
-							break
-				count -= 1
-				#print(count)
+			count -= 1
+			#print(count)
 		self.label = self.brand.label
 		
 	def roll_l_type(self):
 		if not self.l_type_num:
-			count = 100
-			while True:
-				#roll a random number within the range of loot types
-				self.l_type_num = choice(range(1,len(self.loot_types)))
-				#only continue loop if this l_type_num is forbidden
-				if self.brand.ctg in self.loot_types[self.l_type_num][5]:
+			if self.brand:
+				count = 100
+				while True:
+					legit_types = []
+					for lt in self.loot_types:
+						if self.brand.ctg in self.loot_types[lt][5]:
+							legit_types.append(lt)
+							#print(self.loot_types[lt][0]+' seems legit')
+					self.l_type_num = choice(legit_types)
 					break
-				count -= 1
-				#print(count)
-			
+					##roll a random number within the range of loot types
+					#self.l_type_num = choice(range(1,len(self.loot_types)))
+					##only continue loop if this l_type_num is forbidden
+					#print('trying to find '+self.brand.ctg+' in '+str(self.loot_types[self.l_type_num][5]))
+					#if self.brand.ctg in self.loot_types[self.l_type_num][5]:
+						#break
+					#count -= 1
+					##print(count)
+			elif self.material:
+				count = 100
+				while True:
+					#roll a random number within the range of loot types
+					self.l_type_num = choice(self.legit_lts)
+					#only continue loop if this l_type_num is forbidden
+					print('trying to make '+str(self.loot_types[self.l_type_num][0])+' from '+str(self.material[0]))
+					if self.l_type_num not in self.forbidden_lts:
+						break
+					count -=1
+					if count <= 0:
+						break
 		if not self.l_type: 
 			#assign that index's array to l_type
 			self.l_type = self.loot_types[self.l_type_num]
@@ -344,14 +411,15 @@ class Loot(object):
 				if count < 1:
 					#print('could not find industry for '+self.parts[self.largest][6][0] +' '+self.l_type[0])
 					break
-			if len(self.brand.mfrs) > 0:
+			if len(self.brand.mfrs) > 0: #if some mfrs have been picked for this brand...
 				count = 100
 				while True:
-					self.mfr = choice(self.brand.mfrs)
-					if self.mfr.ctg == industry[0]:
+					self.mfr = choice(self.brand.mfrs)#make loot mfr one of the brand's mfrs
+					if self.mfr.ctg == industry[0]: #if the mfr matches the loot's industry, break
 						break
 					count -= 1
 					if count < 1:
+						#if a suitable mfr can't be found in 100 tries, reset to null and break
 						self.mfr = ''
 						break
 			if not self.mfr:
@@ -386,7 +454,7 @@ class Loot(object):
 					#with predefined shape, find suitable category
 					while self.shape not in self.shapes[self.mat_cat]:
 						self.mat_cat = self.mat_cats[randint(0,len(self.mat_cats)-1)]
-				#pick and mat cat but fluid
+				#pick any mat cat but fluid
 				elif not self.shape:
 					while self.mat_cat in ['fluid','drink','lqd food']:
 						self.mat_cat = self.mat_cats[randint(0,len(self.mat_cats)-1)]
@@ -432,30 +500,39 @@ class Loot(object):
 			self.shape = choice(self.shapes[self.mat_cat])	
 			
 	def roll_industry(self):
-		if not self.mfr:
+		if not self.mfr: # if no mfr was specified...
 			count = 1000
-			while True:
+			while True: #pick a random source ctg and check for a match
 				self.ctg = choice(sources)
 				if self.mat_cat in self.ctg[1]:
 					break
 				count -= 1
 				#print(count)
 				if count < 1:
-					print(self.mat_cat)	
+					#print(self.mat_cat+' LINE 445')	
 					break
 			count = 1000
 			while True:
-				self.brand = choice(self.brands)
+				legit_brands = []
+				for brand in self.brands:
+					if self.ctg[0] == self.brand.ctg:
+						legit_brands.append(brand)
+				if len(legit_brands) > 0:
+					self.brand = choice(legit_brands)
+				else:
+					self.brand = choice(self.brands)
+				#print('trying to match '+self.ctg[0] +' with '+str(self.brand.ctg))
 				if self.ctg[0] == self.brand.ctg:
 					self.mfr = self.brand
 					break	
 				count -= 1
 				#print(count)
 				if count < 1:
-					print(self.ctg)	
+					#print(str(self.ctg)+' LINE 456')	
 					break	
 		else:
 			self.brand = self.mfr
+		#print('this is a part made by '+self.mfr.name)
 			
 	def roll_quality(self):
 		if not self.quality:
@@ -535,66 +612,63 @@ class Loot(object):
 				self.short_name = str(self.l_type[0])
 	
 	def roll_name(self):
-		if not self.name:
-			self.name = ''
-			#add quality,color and material short name
-			self.name += str(self.quality[0].title())
-			if self.color[0] != self.material[0]:
-				self.name += str(self.color[0]).title()
-			self.name += str(self.material[0])
-			self.name += self.short_name
+		self.name = ''
+		#add quality,color and material short name
+		self.name += str(self.quality[0].title())
+		if self.color[0] != self.material[0]:
+			self.name += str(self.color[0]).title()
+		self.name += str(self.material[0])
+		self.name += self.short_name
 			
 	def roll_desc(self):
-		if not self.desc:
-			#compose descriptive string for PIP
-			self.desc = []
-			self.desc.append("Material: " + self.material[0].upper())
-			try:
-				if self.t_color_name:
-					self.desc.append("Trim: "+self.t_color_name.upper()+' ')
-					if self.t_color_name != self.trim[0]:
-						self.desc[1] += self.trim[0].upper()
-				elif not self.t_color_name:
-					self.desc.append("Trim: "+ self.trim[0].upper())
-			except:
-				self.desc.append("Trim: N/A")
-			self.desc.append("Quality: " + self.quality[0].upper())
-			try:
-				self.desc.append("Shape: " + self.shape.upper())
-			except:
-				self.desc.append("Shape: N/A")
-			try:
-				self.desc.append("Condition: " + self.condition[0].upper())
-			except:
-				self.desc.append("Condition: N/A")
-			try:
-				self.desc.append("Color: " + self.color[0].upper())
-			except:
-				self.desc.append("Color: N/A")
-			try:
-				self.desc.append("Retailer: " + self.brand.name)
-			except:
-				self.desc.append("Retailer: N/A")
-			try:
-				self.desc.append("Manufacturer: " + self.mfr.name)
-			except:
-				self.desc.append("Manufacturer: N/A")
-				
-			self.desc.append("Value: $" + str(round(self.value,2)))
-			self.desc.append("Weight: " + str(self.weight).upper() + 'kg')
+		#compose descriptive string for PIP
+		self.desc = []
+		self.desc.append("Material: " + self.material[0].upper())
+		try:
+			if self.t_color_name:
+				self.desc.append("Trim: "+self.t_color_name.upper()+' ')
+				if self.t_color_name != self.trim[0]:
+					self.desc[1] += self.trim[0].upper()
+			elif not self.t_color_name:
+				self.desc.append("Trim: "+ self.trim[0].upper())
+		except:
+			self.desc.append("Trim: N/A")
+		self.desc.append("Quality: " + self.quality[0].upper())
+		try:
+			self.desc.append("Shape: " + self.shape.upper())
+		except:
+			self.desc.append("Shape: N/A")
+		try:
+			self.desc.append("Condition: " + self.condition[0].upper())
+		except:
+			self.desc.append("Condition: N/A")
+		try:
+			self.desc.append("Color: " + self.color[0].upper())
+		except:
+			self.desc.append("Color: N/A")
+		try:
+			self.desc.append("Retailer: " + self.brand.name)
+		except:
+			self.desc.append("Retailer: N/A")
+		try:
+			self.desc.append("Manufacturer: " + self.mfr.name)
+		except:
+			self.desc.append("Manufacturer: N/A")
+			
+		self.desc.append("Value: $" + str(round(self.value,2)))
+		self.desc.append("Weight: " + str(self.weight).upper() + 'kg')
 			
 	def roll_parts_desc(self):
 		#compose list of descriptive strings for parts
-		if not self.parts_desc:
-			self.parts_desc = []
-			for part in self.parts: 
-				#assign part qty. + part material + part name
-				if str(part[2].__class__) == "<class 'list'>":
-					part_qty = part[2][2]
-				else:
-					part_qty = part[2]
-				pd = str(part_qty) + ' ' + str(part[6][0]) + ' '+ part[0]
-				self.parts_desc.append(pd)
+		self.parts_desc = []
+		for part in self.parts: 
+			#assign part qty. + part material + part name
+			if str(part[2].__class__) == "<class 'list'>":
+				part_qty = part[2][2]
+			else:
+				part_qty = part[2]
+			pd = str(part_qty) + ' ' + str(part[6][0]) + ' '+ part[0]
+			self.parts_desc.append(pd)
 	
 	def roll_sprite(self):
 		#set sprite by shape or loot type

@@ -255,7 +255,8 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 					print(' cap has been set at $' + str(cap))
 					while True:
 						roll = randint(1,3)
-						print('rolled a ' + str(roll))
+						roll = 1
+						#print('rolled a ' + str(roll))
 						prole = choice(stats.active_hh.proles)
 						if roll == 1:
 							#pick by fav material
@@ -263,11 +264,14 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 							while True:
 								pick = choice(prole.fav_mats)
 								pick_cat = ''
-								print('sending material: ' + pick[0])
 								for cat in libs.mat_cats:
 									if pick in libs.std_w[cat][1]:
 										pick_cat = cat
-								loot_inst = Loot(settings, screen, stats.loot_val,brands=brands)
+										#pick_cat now holds the category of the working material
+								init = gen_init
+								init[9] = pick
+								init[0] = 'loot'
+								loot_inst = Loot(settings, screen, stats.loot_val,init,brands=brands)
 								loot_inst.construct()
 								legit = False
 								if loot_inst.raw == 'loot':
@@ -296,7 +300,9 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 								if (temp_val < cap_buffer) and legit:
 									stats.active_hh.yl_tally += loot_inst.value
 									locate_loot(settings, screen, stats,loot_inst, loots)
-									print('got something made from '+pick[0])
+									print('sent material: ' + pick[0])
+									#print('got something made from '+pick[0]+' by '+loot_inst.mfr.name)
+									print('got '+loot_inst.name)
 									break
 								count -= 1
 								if count < 1:
@@ -304,21 +310,27 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 						if roll == 2:
 							#pick by fav brand
 							while True:
-								loot_inst = Loot(settings, screen, stats.loot_val,brands=brands)
+								init = gen_init
+								init[0] = 'loot'
+								loot_inst = Loot(settings, screen, stats.loot_val,init,brands=prole.fav_brands)
 								loot_inst.construct()
 								if (stats.active_hh.yl_tally+loot_inst.value) < (stats.active_hh.yl_cap*1.2):
-									print('value is kosher!')
+									#print('value is kosher!')
 									if loot_inst.brand in prole.fav_brands:
 										stats.active_hh.yl_tally += loot_inst.value
 										locate_loot(settings, screen, stats,loot_inst, loots)
 										print('got something from '+loot_inst.brand.name)
 										break
-								print(loot_inst.brand.name + str(prole.fav_brands))
+								prole_brands = []
+								for i in prole.fav_brands:
+									prole_brands.append(i.name)
+								print(loot_inst.brand.name + str(prole_brands))
 						if roll == 3:
 							#pick by fav color
 							while True:
 								init = gen_init
 								init[18] = choice(prole.fav_colors)
+								init[0] = 'loot'
 								loot_inst = Loot(settings, screen, stats.loot_val,init,brands=brands)
 								loot_inst.construct()
 								if (stats.active_hh.yl_tally+loot_inst.value) < (stats.active_hh.yl_cap*1.2):
@@ -327,7 +339,7 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 									print('got something '+init[18][0])
 									break
 						if stats.active_hh.yl_tally > stats.active_hh.yl_cap:
-							print(str(stats.active_hh.yl_tally)+'dollars in the yard')
+							print(str(round(stats.active_hh.yl_tally,2))+' dollars in the yard')
 							break
 			if not lot_hit:
 				stats.watched_hh = []
