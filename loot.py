@@ -8,9 +8,9 @@ import time
 
 #which primary materials are known to come from which industrial ctgs
 sources = [ ('petrochemical',['fluid','rubber']),
-			('plastics',['plastic']),
+			('plastics',['plastic','rubber']),
 			('fabricators',['metal']),
-			('agriculture',['drink','lqd food','pwdr food','soft food']),
+			('agriculture',['drink','lqd food','pwdr food','soft food','natural']),
 			('carpentry',['wood']),
 			('printers',['paper','plastic']),
 			('glassworks',['ceramic']),
@@ -144,6 +144,7 @@ class Loot(object):
 			self.get_mat_cat()
 			if self.raw == 'loot':
 				self.clean_l_types()
+				print('LOOT TYPES ARE CLEAN')
 		else:
 			self.roll_brand()
 		#print('BRAND DONE')
@@ -162,6 +163,8 @@ class Loot(object):
 			self.roll_mfr()
 			#print('MFR DONE')
 		self.roll_material()
+		if self.raw == 'part':
+			self.roll_brand()
 		#print('MATERIAL DONE')
 		if self.raw == 'part':
 			self.roll_shape() 
@@ -211,7 +214,7 @@ class Loot(object):
 			
 	def clean_l_types(self):
 		#iterate over each loot type entry
-		for i in range(1,len(self.loot_types)):
+		for i in range(1,len(self.loot_types)+1):
 			"""Find the Largest Part"""
 			score = 0
 			leader = None
@@ -223,21 +226,25 @@ class Loot(object):
 			if self.mat_cat not in self.loot_types[i][2][leader][4]:
 				#forbid loots whose largest parts cannot be made from target mat
 				self.forbidden_lts.append(i)
-		for n in range(1,len(self.loot_types)):
+		for n in range(1,len(self.loot_types)+1):
 			if n not in self.forbidden_lts:
 				self.legit_lts.append(n)
-			
-			
+				
 	def roll_brand(self):
 		#roll retailer 
 		count = 100
 		while True:
 			self.brand = choice(self.brands)
-			if self.brand.ri == 'retail': #for retail brands...
-				if not self.l_type_num: #...and no loot type was picked
-					break
-				else:#..and a loot type is picked
-					if self.brand.ctg in self.loot_types[self.l_type_num][5]:
+			if self.raw == 'loot':
+				if self.brand.ri == 'retail': #for retail brands...
+					if not self.l_type_num: #...and no loot type was picked
+						break
+					else:#..and a loot type is picked
+						if self.brand.ctg in self.loot_types[self.l_type_num][5]:
+							break
+			if self.raw == 'part':
+				if self.brand.ri == 'industrial':
+					if self.mat_cat in self.brand.mat_cats:
 						break
 			count -= 1
 			#print(count)
@@ -255,14 +262,7 @@ class Loot(object):
 							#print(self.loot_types[lt][0]+' seems legit')
 					self.l_type_num = choice(legit_types)
 					break
-					##roll a random number within the range of loot types
-					#self.l_type_num = choice(range(1,len(self.loot_types)))
-					##only continue loop if this l_type_num is forbidden
-					#print('trying to find '+self.brand.ctg+' in '+str(self.loot_types[self.l_type_num][5]))
-					#if self.brand.ctg in self.loot_types[self.l_type_num][5]:
-						#break
-					#count -= 1
-					##print(count)
+					
 			elif self.material:
 				count = 100
 				while True:
@@ -275,6 +275,7 @@ class Loot(object):
 					count -=1
 					if count <= 0:
 						break
+						
 		if not self.l_type: 
 			#assign that index's array to l_type
 			self.l_type = self.loot_types[self.l_type_num]
@@ -346,10 +347,14 @@ class Loot(object):
 			
 			#re-roll largest part as brand material, assuming it isn't contents
 			if self.parts[self.largest][0] != 'contents ':
-				part_mat_cat = choice(self.parts[self.largest][4])
+				if not self.material:
+					part_mat_cat = choice(self.parts[self.largest][4])
+				else:
+					part_mat_cat = self.mat_cat
 			else:
 				part_mat_cat = choice(self.parts[0][4])
 			self.source = part_mat_cat
+			print('current source is '+str(self.source))
 			#if the brand already has picked it's materials...
 			if len(self.brand.mats) >= self.brand.num_mats:
 				#pick one of those materials
@@ -416,18 +421,21 @@ class Loot(object):
 				while True:
 					self.mfr = choice(self.brand.mfrs)#make loot mfr one of the brand's mfrs
 					if self.mfr.ctg == industry[0]: #if the mfr matches the loot's industry, break
+						print(self.mfr.name+' is suitable and already works for our brand!')
 						break
 					count -= 1
 					if count < 1:
 						#if a suitable mfr can't be found in 100 tries, reset to null and break
 						self.mfr = ''
 						break
+						print('none of the brand mfrs matched the loot ctg')
 			if not self.mfr:
 				count = 100
 				while True:
 					self.mfr = choice(self.brands)
 					if self.mfr.ctg == industry[0]:
 						self.brand.mfrs.append(self.mfr)
+						print(self.mfr.name+' now works for '+self.brand.name)
 						break
 					count -= 1
 					if count < 1:
@@ -532,7 +540,7 @@ class Loot(object):
 					break	
 		else:
 			self.brand = self.mfr
-		#print('this is a part made by '+self.mfr.name)
+		print('this is a part made by '+self.mfr.name)
 			
 	def roll_quality(self):
 		if not self.quality:
@@ -546,7 +554,7 @@ class Loot(object):
 				for part in self.parts:
 					#incrememnt value by part weight * part mat. value
 					self.value += part[7]*part[6][1]
-				self.value *= self.quality[1]
+				self.value *= self.quality[1] * self.condition[1]
 				self.value *= self.brand.markup * self.mfr.markup
 			elif self.raw == 'part':
 				self.value = self.weight*self.material[1]*(self.quality[1]**self.level)

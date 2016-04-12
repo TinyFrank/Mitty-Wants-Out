@@ -204,7 +204,7 @@ colors = (					('red ',(200,30,30)),
 loot_types ={				1:[
 							'Propane Barbecue ',
 							['pbbq'],
-							[["base ","sheet ",1,6,['metal'],None,None],
+							[["base ","sheet ",1,6,['metal'],None,None],###
 							["legs ","rod ",4,3,['metal'],None,None],
 							["grill ","mesh ",1,5,['metal'],None,None],
 							["trays ","sheet ",2,3,['wood','plastic'],None,None],
@@ -217,7 +217,7 @@ loot_types ={				1:[
 							2:[
 							'Stereo ',
 							['stereo'],
-							[["frame ","sheet ",1,6,['plastic','metal'],None,None],
+							[["frame ","sheet ",1,6,['plastic','metal'],None,None],###
 							["grill ","mesh ",2,2,['plastic','metal'],None,None],
 							["drive motor ","chunk ",1,3,['metal'],None,None],
 							["handle ","rod ",1,2,['plastic','metal'],None,None],
@@ -353,7 +353,7 @@ loot_types ={				1:[
 							21:[
 							'Bowl ',
 							['bowl'],
-							[["body ","chunk ",1,1,['metal','plastic','ceramic','wood'],None,None]],
+							[["body ","chunk ",1,1,['metal','plastic','ceramic','wood','mineral','rubber'],None,None]],
 							.2,['plastics','fabricators','carpentry','glassworks'],['kitchenware','pet supplies']],
 							22:[
 							'Classic Book ',

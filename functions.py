@@ -249,7 +249,7 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 						break
 				#check for existing yard loot
 				if not stats.active_hh.yard_loot:
-					cap = (randint(10,50)/10000)*stats.active_hh.hh_value
+					cap = round((randint(10,50)/10000)*stats.active_hh.hh_value,2)
 					stats.active_hh.yl_cap = cap
 					print('household vlaue is ' + str(stats.active_hh.hh_value))
 					print(' cap has been set at $' + str(cap))
@@ -302,7 +302,7 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 									locate_loot(settings, screen, stats,loot_inst, loots)
 									print('sent material: ' + pick[0])
 									#print('got something made from '+pick[0]+' by '+loot_inst.mfr.name)
-									print('got '+loot_inst.name)
+									print('got '+loot_inst.name+'\n\n')
 									break
 								count -= 1
 								if count < 1:

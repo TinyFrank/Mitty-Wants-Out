@@ -1,6 +1,7 @@
 from libs import *
 from household import fnames,mnames,lnames
 from random import choice
+from loot import sources as sources
 ctg_retail = [	'patio','entertainment','kitchenware','clothing',
 				'sanitary','toys','plumbing','hardware',
 				'souvenirs','foods','publishers','stationery',
@@ -131,6 +132,12 @@ class Brand(object):
 		if self.ri == 'retail':
 			self.num_mfrs = randint(1,6)
 			self.mfrs = []
+		
+		#record viable mat_cats for this company
+		if self.ri == 'industrial':
+			for source in sources:
+				if self.ctg == source[0]: 
+					self.mat_cats = source[1]
 	
 	def roll_quality(self):
 		self.qtys = []
