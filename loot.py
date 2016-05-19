@@ -94,6 +94,8 @@ class Loot(object):
 		#overwrite ref if one was provided
 		if ref:
 			self.ref = ref
+		else:
+			self.ref = 0
 			
 		#cast loot as a part if shape was given (no condition or sub-parts)	
 		if self.shape:

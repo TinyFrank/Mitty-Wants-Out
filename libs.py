@@ -421,7 +421,7 @@ loot_types ={				1:[
 							["legs ","bar ",4,4,['plastic','metal','wood'],None,None],
 							["frame ","sheet ",1,3,['plastic','metal','wood'],None,None],
 							["screws ","chunk ",2,0.01,['metal','plastic'],None,None]],
-							6,['fabricators','plastics','carpentry','glassworks'],['furniture','patio']],
+							20,['fabricators','plastics','carpentry','glassworks'],['furniture','patio']],
 							32:[
 							'Magazine ',
 							['peepmagazine'],

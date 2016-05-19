@@ -172,17 +172,22 @@ def run():
 	brands = []
 	retailers = []
 	mfrs = []
+	
+	def generate_world_brands():
+		#Generate world brands
+		current_ctgs = []
+		while len(current_ctgs) < (len(ctg_retail)+len(ctg_industrial)):
+			brand = Brand(settings,stats)
+			if brand.ctg not in current_ctgs:
+				current_ctgs.append(brand.ctg)
+			if brand.ri == 'retail':
+				retailers.append(brand)
+			if brand.ri == 'industrial':
+				mfrs.append(brand)
+			brands.append(brand)
+			
 	#Generate world brands
-	current_ctgs = []
-	while len(current_ctgs) < (len(ctg_retail)+len(ctg_industrial)):
-		brand = Brand(settings,stats)
-		if brand.ctg not in current_ctgs:
-			current_ctgs.append(brand.ctg)
-		if brand.ri == 'retail':
-			retailers.append(brand)
-		if brand.ri == 'industrial':
-			mfrs.append(brand)
-		brands.append(brand)
+	generate_world_brands()
 	
 	#Create clock to stabilize framerate
 	clock = pygame.time.Clock()
@@ -204,4 +209,4 @@ def run():
 							lp_buttons, ip_buttons, mp_buttons,
 							player, loots, hoods)
 run()
-	
+

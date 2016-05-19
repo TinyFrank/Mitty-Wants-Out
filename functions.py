@@ -12,6 +12,8 @@ import math
 from maps import Hood
 
 def place_loot(settings, screen, stats, loots, brands, retailers, mfrs):
+	"""create a new piece of loot"""
+	
 	debug_init = gen_init
 	debug_init[0]='loot'
 	#debug_init[2]= 'Bar'
@@ -28,50 +30,50 @@ def place_loot(settings, screen, stats, loots, brands, retailers, mfrs):
 	locate_loot(settings, screen, stats, loot_inst, loots)
 	
 def locate_loot(settings, screen, stats, loot_inst, loots):
+	"""find a location for a new loot inst that doesnt collide with others
+	already on screen"""
 	
 	placed = False
 	timeout=0
 	while not placed:
 		x = randint(50,screen.get_width()-50)
-		y = randint(150,screen.get_height()-50)
+			#pick random x inside screen
+		y = randint(150,screen.get_height()-50) 
+			#pick random y inside screen
 		loot_inst.rect.x = x - (loot_inst.rect.width/2)
 		loot_inst.rect.y = y - (loot_inst.rect.height/2)
+			#centre rect on this random coord
 		loot_inst.collide_rect.bottom = loot_inst.rect.bottom
 		loot_inst.collide_rect.x = loot_inst.rect.x
-		hits = 0
-		if loots:
-			for i in loots:
-				xhits = 0
-				yhits = 0
-				if i.collide_rect.colliderect(loot_inst.collide_rect):
-					#xhits=1
-				#w_avg = (i.rect.width + loot_inst.rect.width)/2
-				#if ((abs(i.rect.x-loot_inst.rect.x)*0.5) > w_avg):
-					#print(str(abs(i.rect.x-loot_inst.rect.x)) + ' is less than ' +str(w_avg))
-					#yhits=1
-				#if xhits and yhits:
-					hits=1
-		if not hits and loots:
-			loot_inst.rect.x = x - (loot_inst.rect.width/2)
-			loot_inst.rect.y = y - (loot_inst.rect.height/2)
+			#align collision rect with image rect
+		
+		hits = check_for_hits(loot_inst,loots)
+					
+		if not hits:
 			loots.append(loot_inst)
+				#add this inst to the loots list
 			loots.sort(key = lambda x: x.rect.y)
+				#re-sort the list by y coord to place inst at the right depth
 			placed = True
-		if not hits and not loots:
-			loot_inst.rect.x = x - (loot_inst.rect.width/2)
-			loot_inst.rect.y = y - (loot_inst.rect.height/2)
-			loots.append(loot_inst)
-			loots.sort(key = lambda x: x.rect.y)
-			placed = True
+			
 		timeout+=1
 		if timeout > 50:
 			placed = True
 		
 		loots.sort(key=lambda loot: loot.rect.bottom)	
 
+def check_for_hits(loot_inst,loots):
+	"""check a loot_inst for collisions against other insts in a loots list"""
+	hits = 0
+	for i in loots:
+		if i.collide_rect.colliderect(loot_inst.collide_rect):
+			hits=1
+	return(hits)
+			
 def take_loot(stats,loots,lp_buttons):
-	#delete original loot from the loot pile
-	#add coppied loot to inventory
+	"""delete the original loot from the loots list and add a copied 
+	loot to mitty's inventory"""
+	
 	stats.inv.append(lp_buttons[6])
 	del loots[lp_buttons[6].ref]	
 	
@@ -81,17 +83,21 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 							lp_buttons, ip_buttons,mp_buttons,hoods,
 							brands, retailers, mfrs):
 	"""Respond to keypresses"""
+	
 	if event.key == pygame.K_q:
-		if not stats.loot_pip:
+		if not (stats.loot_pip or stats.inv_pip):
 			sys.exit()
-		else:
-			close_loot_pip(stats,lp_buttons)
 			
-	elif event.key == pygame.K_m:
+	if event.key == pygame.K_m:
 		#toggle map pip
 		if stats.map_pip == True:
 			stats.map_pip = False
 		elif stats.map_pip == False and len(hoods)> 0:
+			close_inv_pip(stats,settings,screen,ip_buttons)
+			close_loot_pip(stats,lp_buttons)
+			stats.map_pip = True
+		elif stats.map_pip == False:
+			
 			close_inv_pip(stats,settings,screen,ip_buttons)
 			close_loot_pip(stats,lp_buttons)
 			stats.map_pip = True
@@ -109,75 +115,111 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 			inv_pip(settings,screen,stats,ip_buttons)
 		else:
 			close_inv_pip(stats,settings,screen,ip_buttons)
-			
-	elif event.key == pygame.K_l:
-		#create/destroy debug hood
-		if stats.map_pip == True:
-			stats.map_pip = False
-			del hoods[0]
-		elif stats.map_pip == False:
-			d_hood = Hood(settings,screen,stats)
-			mp_buttons[1].msg = d_hood.name
-			mp_buttons[1].prep_msg()
-			d_hood.grow_hood(10)
-			d_hood.seed_hq()
-			d_hood.roll_rects()
-			hoods.append(d_hood)
-			stats.map_pip = True
-			
+				
 	elif stats.inv_pip:
-		if event.key == pygame.K_ESCAPE: 
-			close_inv_pip(stats,settings,screen, ip_buttons)
-		elif event.key == pygame.K_i:
-			close_inv_pip(stats,settings,screen,ip_buttons)
-		elif event.key == pygame.K_UP or event.key == pygame.K_w:
-			if not stats.scrolldown:
-				stats.scroll_inv_up()
-				close_inv_pip(stats,settings,screen,ip_buttons)
-				inv_pip(settings,screen,stats,ip_buttons)	
-				stats.scrollup = True
-		elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-			if not stats.scrollup:
-				stats.scroll_inv_down()
-				close_inv_pip(stats,settings,screen,ip_buttons)
-				inv_pip(settings,screen,stats,ip_buttons)	
-				stats.scrolldown = True		
-		elif event.key == pygame.K_z:
-			#sort inv by value
-			close_inv_pip(stats,settings,screen,ip_buttons)
-			stats.inv = sorted(stats.inv, key=lambda item: item.value)
-			inv_pip(settings,screen,stats,ip_buttons)		
-		elif event.key == pygame.K_c:
-			#sort inv by name
-			close_inv_pip(stats,settings,screen,ip_buttons)
-			stats.inv = sorted(stats.inv, key=lambda item: item.quality[1])
-			inv_pip(settings,screen,stats,ip_buttons)	
-		elif event.key == pygame.K_b:
-			#sort inv by name
-			close_inv_pip(stats,settings,screen,ip_buttons)
-			stats.inv = sorted(stats.inv, key=lambda item: item.brand.name)
-			inv_pip(settings,screen,stats,ip_buttons)
+		check_inv_keys(	event, settings, screen, stats, loots, 
+							lp_buttons, ip_buttons,mp_buttons,hoods,
+							brands, retailers, mfrs)
 				
 	elif stats.loot_pip:
-		if event.key == pygame.K_ESCAPE:
-			close_loot_pip(stats,lp_buttons)
-		elif event.key == pygame.K_e:
-			take_loot(stats,loots,lp_buttons)
+		check_loot_keys(	event, settings, screen, stats, loots, 
+							lp_buttons, ip_buttons,mp_buttons,hoods,
+							brands, retailers, mfrs)
+
+	elif stats.map_pip:
+		check_map_keys(	event, settings, screen, stats, loots, 
+							lp_buttons, ip_buttons,mp_buttons,hoods,
+							brands, retailers, mfrs)
 		
 	elif event.key == pygame.K_f:
-		#debug, create a shit load of loot
+		#debug, create a (f)uck load of loot
 		for i in range(0,200):
 			place_loot(	settings, screen, stats, loots, brands, retailers,
 						mfrs)
 			
 	elif event.key == pygame.K_g:
-		#debug, put all loot into inventory
+		#debug, (g)et all loot into inventory
 		while True:
 			try:
 				stats.inv.append(loots.pop(-1))
 			except:
 				break	
 				
+def check_inv_keys(	event, settings, screen, stats, loots, 
+							lp_buttons, ip_buttons,mp_buttons,hoods,
+							brands, retailers, mfrs):
+	"""check keys while the inv pip is active"""
+
+	if event.key == pygame.K_ESCAPE: 
+		close_inv_pip(stats,settings,screen, ip_buttons)
+	elif event.key == pygame.K_i:
+		close_inv_pip(stats,settings,screen,ip_buttons)
+	elif event.key == pygame.K_q:
+		close_inv_pip(stats,settings,screen,ip_buttons)
+	elif event.key == pygame.K_UP or event.key == pygame.K_w:
+		if not stats.scrolldown:
+			stats.scroll_inv_up()
+			close_inv_pip(stats,settings,screen,ip_buttons)
+			inv_pip(settings,screen,stats,ip_buttons)	
+			stats.scrollup = True
+	elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+		if not stats.scrollup:
+			stats.scroll_inv_down()
+			close_inv_pip(stats,settings,screen,ip_buttons)
+			inv_pip(settings,screen,stats,ip_buttons)	
+			stats.scrolldown = True		
+	elif event.key == pygame.K_z:
+		#sort inv by value
+		close_inv_pip(stats,settings,screen,ip_buttons)
+		stats.inv = sorted(stats.inv, key=lambda item: item.value)
+		inv_pip(settings,screen,stats,ip_buttons)		
+	elif event.key == pygame.K_c:
+		#sort inv by name
+		close_inv_pip(stats,settings,screen,ip_buttons)
+		stats.inv = sorted(stats.inv, key=lambda item: item.quality[1])
+		inv_pip(settings,screen,stats,ip_buttons)	
+	elif event.key == pygame.K_b:
+		#sort inv by name
+		close_inv_pip(stats,settings,screen,ip_buttons)
+		stats.inv = sorted(stats.inv, key=lambda item: item.brand.name)
+		inv_pip(settings,screen,stats,ip_buttons)
+
+def check_loot_keys(	event, settings, screen, stats, loots, 
+							lp_buttons, ip_buttons,mp_buttons,hoods,
+							brands, retailers, mfrs):
+	"""check keys while the loot pip is active"""
+	
+	if event.key == pygame.K_ESCAPE:
+		close_loot_pip(stats,lp_buttons)
+	if event.key == pygame.K_q:
+		close_loot_pip(stats,lp_buttons)
+	elif event.key == pygame.K_e:
+		take_loot(stats,loots,lp_buttons)	
+
+def check_map_keys(	event, settings, screen, stats, loots, 
+							lp_buttons, ip_buttons,mp_buttons,hoods,
+							brands, retailers, mfrs):
+	"""check keys while the map pip is active"""
+	
+	if event.key == pygame.K_l:
+		#create/destroy debug hood
+		stats.map_pip = False
+		if len(hoods) > 0:
+			del hoods[0]
+		roll_hood(settings,screen,stats,mp_buttons,hoods)
+		stats.map_pip = True	
+
+def roll_hood(settings,screen,stats,mp_buttons,hoods):
+	"""roll a new hood"""
+	
+	d_hood = Hood(settings,screen,stats)
+	mp_buttons[1].msg = d_hood.name
+	mp_buttons[1].prep_msg()
+	d_hood.grow_hood(10)
+	d_hood.seed_hq()
+	d_hood.roll_rects()
+	hoods.append(d_hood)
+											
 def check_keyup_events(	event,settings, screen, stats,loots, 
 						lp_buttons, ip_buttons, hoods):
 	"""Respond to keyreleases"""	
@@ -405,6 +447,7 @@ def loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i):
 						loot_val = stats.loot_val,
 						init_array = loot.init_array,
 						ref = i)
+	print("current ref is " + str(loot_inst.ref))
 	loot_inst.rebuild()					
 	lp_buttons.append(loot_inst)
 	lp_buttons[1] = Button(	settings, screen, loot.name, scx-275, 
