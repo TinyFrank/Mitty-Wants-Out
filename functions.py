@@ -24,8 +24,8 @@ def place_loot(settings, screen, stats, loots, brands, retailers, mfrs):
 	debug_init[23] = retailers[0]
 	#debug_init[24] = mfrs[0]
 	#instantiate one loot
-	loot_inst = Loot(settings, screen, stats.loot_val,gen_init,brands=brands) 
-	#loot_inst = Loot(settings, screen, stats.loot_val,brands=brands) 
+	#loot_inst = Loot(settings, screen, stats.loot_val,gen_init,brands=brands) 
+	loot_inst = Loot(settings, screen, stats.loot_val,brands=brands) 
 	loot_inst.construct()
 	locate_loot(settings, screen, stats, loot_inst, loots)
 	
@@ -64,6 +64,7 @@ def locate_loot(settings, screen, stats, loot_inst, loots):
 
 def check_for_hits(loot_inst,loots):
 	"""check a loot_inst for collisions against other insts in a loots list"""
+	
 	hits = 0
 	for i in loots:
 		if i.collide_rect.colliderect(loot_inst.collide_rect):
@@ -97,7 +98,6 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 			close_loot_pip(stats,lp_buttons)
 			stats.map_pip = True
 		elif stats.map_pip == False:
-			
 			close_inv_pip(stats,settings,screen,ip_buttons)
 			close_loot_pip(stats,lp_buttons)
 			stats.map_pip = True
@@ -152,32 +152,39 @@ def check_inv_keys(	event, settings, screen, stats, loots,
 
 	if event.key == pygame.K_ESCAPE: 
 		close_inv_pip(stats,settings,screen, ip_buttons)
+		
 	elif event.key == pygame.K_i:
 		close_inv_pip(stats,settings,screen,ip_buttons)
+		
 	elif event.key == pygame.K_q:
 		close_inv_pip(stats,settings,screen,ip_buttons)
+		
 	elif event.key == pygame.K_UP or event.key == pygame.K_w:
 		if not stats.scrolldown:
 			stats.scroll_inv_up()
 			close_inv_pip(stats,settings,screen,ip_buttons)
 			inv_pip(settings,screen,stats,ip_buttons)	
 			stats.scrollup = True
+			
 	elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
 		if not stats.scrollup:
 			stats.scroll_inv_down()
 			close_inv_pip(stats,settings,screen,ip_buttons)
 			inv_pip(settings,screen,stats,ip_buttons)	
-			stats.scrolldown = True		
+			stats.scrolldown = True	
+				
 	elif event.key == pygame.K_z:
 		#sort inv by value
 		close_inv_pip(stats,settings,screen,ip_buttons)
 		stats.inv = sorted(stats.inv, key=lambda item: item.value)
-		inv_pip(settings,screen,stats,ip_buttons)		
+		inv_pip(settings,screen,stats,ip_buttons)
+				
 	elif event.key == pygame.K_c:
 		#sort inv by name
 		close_inv_pip(stats,settings,screen,ip_buttons)
 		stats.inv = sorted(stats.inv, key=lambda item: item.quality[1])
-		inv_pip(settings,screen,stats,ip_buttons)	
+		inv_pip(settings,screen,stats,ip_buttons)
+			
 	elif event.key == pygame.K_b:
 		#sort inv by name
 		close_inv_pip(stats,settings,screen,ip_buttons)
@@ -191,8 +198,10 @@ def check_loot_keys(	event, settings, screen, stats, loots,
 	
 	if event.key == pygame.K_ESCAPE:
 		close_loot_pip(stats,lp_buttons)
+		
 	if event.key == pygame.K_q:
 		close_loot_pip(stats,lp_buttons)
+		
 	elif event.key == pygame.K_e:
 		take_loot(stats,loots,lp_buttons)	
 
@@ -223,6 +232,7 @@ def roll_hood(settings,screen,stats,mp_buttons,hoods):
 def check_keyup_events(	event,settings, screen, stats,loots, 
 						lp_buttons, ip_buttons, hoods):
 	"""Respond to keyreleases"""	
+	
 	if stats.inv_pip:
 		if event.key == pygame.K_UP or event.key == pygame.K_w:
 			stats.scrollup = False
@@ -234,179 +244,214 @@ def check_keyup_events(	event,settings, screen, stats,loots,
 def check_buttons(	settings, screen, stats, buttons, ig_buttons, 
 					lp_buttons, ip_buttons, mp_buttons, loots, retailers,
 					brands,	mouse_pos, player,hoods):
-	"""Start new game when player clicks Play"""
+	"""React to mouse clicks on buttons"""
+	
 	scx = settings.screen_width/2
 	scy = settings.screen_height/2
-	if not stats.game_active:
-		if buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
-			stats.game_active=True
-		elif  buttons[1].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
-			sys.exit()
 	
-	elif stats.game_active:
-		if stats.loot_pip:
-			if lp_buttons[2].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
-				take_loot(stats,loots,lp_buttons)
-			else:
-				close_loot_pip(stats,lp_buttons)
-		elif stats.inv_pip and not stats.loot_pip:
-			if not ip_buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
-				close_inv_pip(stats,settings,screen,ip_buttons)
-		elif stats.map_pip:
-			lot_hit = False
-			for i in hoods[0].tiles:
-				if i.rect.collidepoint(mouse_pos[0], mouse_pos[1]):
-					if hoods[0].roadmap[i.refx][i.refy][0] == 'L':
-						stats.watched_hh = hoods[0].roadmap[i.refx][i.refy][2]
-						stats.whhx = i.refx
-						stats.whhy = i.refy
-						stats.watched_hh.x = i.refx
-						stats.watched_hh.y = i.refy
-						stats.watched_hh.town = hoods[0].name
-						lot_hit = True
-						update_whh(settings, screen, stats, mp_buttons)
-						print(stats.watched_hh.lname)
-			if not mp_buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
-				stats.map_pip = False
-			elif mp_buttons[5].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
-				lot_hit = True
-				if stats.active_hh == stats.watched_hh:
-					return None
-				#go to the Current HouseHold
-				if not stats.active_hh:
-					#clear debug loot
-					for loot in loots:
-						del loot
-				
-				stats.previous_hh = stats.active_hh
-				stats.active_hh = stats.watched_hh
-				print('active is ' + stats.active_hh.lname)
-				for prole in stats.active_hh.proles:
-					prole.roll_favs(retailers)
-				#pop loots back into whh loot list
-				while True:
-					try:
-						stats.previous_hh.yard_loot.append(loots.pop())
-					except:
-						break
-				#check for existing yard loot
-				if not stats.active_hh.yard_loot:
-					cap = round((randint(10,50)/10000)*stats.active_hh.hh_value,2)
-					stats.active_hh.yl_cap = cap
-					print('household vlaue is ' + str(stats.active_hh.hh_value))
-					print(' cap has been set at $' + str(cap))
-					while True:
-						roll = randint(1,3)
-						roll = 1
-						#print('rolled a ' + str(roll))
-						prole = choice(stats.active_hh.proles)
-						if roll == 1:
-							#pick by fav material
-							count=100
-							while True:
-								pick = choice(prole.fav_mats)
-								pick_cat = ''
-								for cat in libs.mat_cats:
-									if pick in libs.std_w[cat][1]:
-										pick_cat = cat
-										#pick_cat now holds the category of the working material
-								init = gen_init
-								init[9] = pick
-								init[0] = 'loot'
-								loot_inst = Loot(settings, screen, stats.loot_val,init,brands=brands)
-								loot_inst.construct()
-								legit = False
-								if loot_inst.raw == 'loot':
-									if pick_cat in loot_inst.parts[loot_inst.largest][4]:
-										loot_inst.parts[loot_inst.largest][6] = pick
-										loot_inst.material = pick
-										loot_inst.mat_cat = pick_cat
-										loot_inst.source = pick_cat
-										loot_inst.roll_mfr()
-										loot_inst.roll_value()
-										loot_inst.roll_name()
-										loot_inst.roll_desc()
-										loot_inst.roll_parts_desc()
-										legit = True
-								if loot_inst.raw == 'part':
-									loot_inst.material = pick
-									loot_inst.mat_cat = pick_cat
-									loot_inst.roll_shape()
-									loot_inst.roll_industry()
-									loot_inst.roll_value()
-									loot_inst.roll_name()
-									loot_inst.roll_desc()
-									legit = True
-								temp_val = stats.active_hh.yl_tally+loot_inst.value
-								cap_buffer = stats.active_hh.yl_cap*1.2
-								if (temp_val < cap_buffer) and legit:
-									stats.active_hh.yl_tally += loot_inst.value
-									locate_loot(settings, screen, stats,loot_inst, loots)
-									print('sent material: ' + pick[0])
-									#print('got something made from '+pick[0]+' by '+loot_inst.mfr.name)
-									print('got '+loot_inst.name+'\n\n')
-									break
-								count -= 1
-								if count < 1:
-									break
-						if roll == 2:
-							#pick by fav brand
-							while True:
-								init = gen_init
-								init[0] = 'loot'
-								loot_inst = Loot(settings, screen, stats.loot_val,init,brands=prole.fav_brands)
-								loot_inst.construct()
-								if (stats.active_hh.yl_tally+loot_inst.value) < (stats.active_hh.yl_cap*1.2):
-									#print('value is kosher!')
-									if loot_inst.brand in prole.fav_brands:
-										stats.active_hh.yl_tally += loot_inst.value
-										locate_loot(settings, screen, stats,loot_inst, loots)
-										print('got something from '+loot_inst.brand.name)
-										break
-								prole_brands = []
-								for i in prole.fav_brands:
-									prole_brands.append(i.name)
-								print(loot_inst.brand.name + str(prole_brands))
-						if roll == 3:
-							#pick by fav color
-							while True:
-								init = gen_init
-								init[18] = choice(prole.fav_colors)
-								init[0] = 'loot'
-								loot_inst = Loot(settings, screen, stats.loot_val,init,brands=brands)
-								loot_inst.construct()
-								if (stats.active_hh.yl_tally+loot_inst.value) < (stats.active_hh.yl_cap*1.2):
-									stats.active_hh.yl_tally += loot_inst.value
-									locate_loot(settings, screen, stats,loot_inst, loots)
-									print('got something '+init[18][0])
-									break
-						if stats.active_hh.yl_tally > stats.active_hh.yl_cap:
-							print(str(round(stats.active_hh.yl_tally,2))+' dollars in the yard')
-							break
-			if not lot_hit:
-				stats.watched_hh = []
-				mp_buttons[2].msg=''
-				mp_buttons[2].prep_msg()
-				mp_buttons[3].msg=''
-				mp_buttons[3].prep_msg()
-				mp_buttons[4].msg=''
-				mp_buttons[4].prep_msg()
-				mp_buttons[5].msg=''
-				mp_buttons[5].prep_msg()
-				del mp_buttons[6:]
-													
-		elif not stats.loot_pip and not stats.inv_pip:
-			for i,loot in enumerate(loots):
-				if loot.rect.collidepoint(mouse_pos[0], mouse_pos[1]):
-					player.dest = mouse_pos
-					player.dest_ref = i
-					break	
-			if ig_buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
-				inv_pip(settings,screen,stats,ip_buttons)
-			elif player.dest_ref == None:
+	if not stats.game_active:
+		check_main_menu_buttons(stats, buttons, mouse_pos)
+		#check for clicks on the main menu
+
+	elif stats.loot_pip:
+		check_loot_pip_buttons(stats, loots, lp_buttons, mouse_pos)
+		#check for clicks in the loot pip
+		
+	elif stats.inv_pip and not stats.loot_pip:
+		check_inv_pip_buttons(	stats, loots, ip_buttons, screen, 
+								mouse_pos)
+		#check for clicks in the inv pip
+			
+	elif stats.map_pip:
+		check_map_pip_buttons(	hoods, mouse_pos, stats, mp_buttons, 
+								settings, screen, loots, brands, 
+								retailers)
+		#check for clicks in the map pip
+		
+	elif ig_buttons[4].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+		stats.game_active=False
+												
+	elif not stats.loot_pip and not stats.inv_pip:
+		for i,loot in enumerate(loots):
+			if loot.rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 				player.dest = mouse_pos
-		elif ig_buttons[4].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
-			stats.game_active=False
+				player.dest_ref = i
+				break	
+		if ig_buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+			inv_pip(settings,screen,stats,ip_buttons)
+		elif player.dest_ref == None:
+			player.dest = mouse_pos
+	
+def check_main_menu_buttons(stats, buttons, mouse_pos):
+	"""react to mouse clicks in the main menu"""
+	
+	if buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+		stats.game_active=True
+	elif  buttons[1].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+		sys.exit()	
+
+def check_loot_pip_buttons(stats, loots, lp_buttons, mouse_pos):
+	"""react to mouse clicks inside loot pip"""
+	
+	if lp_buttons[2].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+		take_loot(stats,loots,lp_buttons)
+	else:
+		close_loot_pip(stats,lp_buttons)
+
+def check_inv_pip_buttons(stats, loots, ip_buttons, screen,  mouse_pos):
+	"""react to mouse clicks inside the inventory pip"""
+	
+	if not ip_buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+		close_inv_pip(stats,settings,screen,ip_buttons)
+
+def check_map_pip_buttons(	hoods, mouse_pos, stats, mp_buttons, 
+							settings, screen, loots, brands, retailers):
+	"""react to mouse clicks inside the map pip"""
+	
+	lot_hit = False
+	for i in hoods[0].tiles:
+		if i.rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+			if hoods[0].roadmap[i.refx][i.refy][0] == 'L':
+				stats.watched_hh = hoods[0].roadmap[i.refx][i.refy][2]
+				stats.whhx = i.refx
+				stats.whhy = i.refy
+				stats.watched_hh.x = i.refx
+				stats.watched_hh.y = i.refy
+				stats.watched_hh.town = hoods[0].name
+				lot_hit = True
+				update_whh(settings, screen, stats, mp_buttons)
+				print(stats.watched_hh.lname)
+				
+	if not mp_buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+		stats.map_pip = False
+		
+	elif mp_buttons[5].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+		lot_hit = True
+		if stats.active_hh == stats.watched_hh:
+			return None
+			#go to the Current HouseHold
+		
+		if not stats.active_hh:
+			#clear debug loot
+			for loot in loots:
+				del loot
+		
+		stats.previous_hh = stats.active_hh
+		stats.active_hh = stats.watched_hh
+		print('active is ' + stats.active_hh.lname)
+		for prole in stats.active_hh.proles:
+			prole.roll_favs(retailers)
+		#pop loots back into whh loot list
+		while True:
+			try:
+				stats.previous_hh.yard_loot.append(loots.pop())
+			except:
+				break
+		#check for existing yard loot
+		if not stats.active_hh.yard_loot:
+			cap = round((randint(10,50)/10000)*stats.active_hh.hh_value,2)
+			stats.active_hh.yl_cap = cap
+			print('household vlaue is ' + str(stats.active_hh.hh_value))
+			print(' cap has been set at $' + str(cap))
+			while True:
+				roll = randint(1,3)
+				roll = 1
+				#print('rolled a ' + str(roll))
+				prole = choice(stats.active_hh.proles)
+				if roll == 1:
+					#pick by fav material
+					count=100
+					while True:
+						pick = choice(prole.fav_mats)
+						pick_cat = ''
+						for cat in libs.mat_cats:
+							if pick in libs.std_w[cat][1]:
+								pick_cat = cat
+								#pick_cat now holds the category of the working material
+						init = gen_init
+						init[9] = pick
+						init[0] = 'loot'
+						loot_inst = Loot(settings, screen, stats.loot_val,init,brands=brands)
+						loot_inst.construct()
+						legit = False
+						if loot_inst.raw == 'loot':
+							if pick_cat in loot_inst.parts[loot_inst.largest][4]:
+								loot_inst.parts[loot_inst.largest][6] = pick
+								loot_inst.material = pick
+								loot_inst.mat_cat = pick_cat
+								loot_inst.source = pick_cat
+								loot_inst.roll_mfr()
+								loot_inst.roll_value()
+								loot_inst.roll_name()
+								loot_inst.roll_desc()
+								loot_inst.roll_parts_desc()
+								legit = True
+						if loot_inst.raw == 'part':
+							loot_inst.material = pick
+							loot_inst.mat_cat = pick_cat
+							loot_inst.roll_shape()
+							loot_inst.roll_industry()
+							loot_inst.roll_value()
+							loot_inst.roll_name()
+							loot_inst.roll_desc()
+							legit = True
+						temp_val = stats.active_hh.yl_tally+loot_inst.value
+						cap_buffer = stats.active_hh.yl_cap*1.2
+						if (temp_val < cap_buffer) and legit:
+							stats.active_hh.yl_tally += loot_inst.value
+							locate_loot(settings, screen, stats,loot_inst, loots)
+							print('sent material: ' + pick[0])
+							#print('got something made from '+pick[0]+' by '+loot_inst.mfr.name)
+							print('got '+loot_inst.name+'\n\n')
+							break
+						count -= 1
+						if count < 1:
+							break
+				if roll == 2:
+					#pick by fav brand
+					while True:
+						init = gen_init
+						init[0] = 'loot'
+						loot_inst = Loot(settings, screen, stats.loot_val,init,brands=prole.fav_brands)
+						loot_inst.construct()
+						if (stats.active_hh.yl_tally+loot_inst.value) < (stats.active_hh.yl_cap*1.2):
+							#print('value is kosher!')
+							if loot_inst.brand in prole.fav_brands:
+								stats.active_hh.yl_tally += loot_inst.value
+								locate_loot(settings, screen, stats,loot_inst, loots)
+								print('got something from '+loot_inst.brand.name)
+								break
+						prole_brands = []
+						for i in prole.fav_brands:
+							prole_brands.append(i.name)
+						print(loot_inst.brand.name + str(prole_brands))
+				if roll == 3:
+					#pick by fav color
+					while True:
+						init = gen_init
+						init[18] = choice(prole.fav_colors)
+						init[0] = 'loot'
+						loot_inst = Loot(settings, screen, stats.loot_val,init,brands=brands)
+						loot_inst.construct()
+						if (stats.active_hh.yl_tally+loot_inst.value) < (stats.active_hh.yl_cap*1.2):
+							stats.active_hh.yl_tally += loot_inst.value
+							locate_loot(settings, screen, stats,loot_inst, loots)
+							print('got something '+init[18][0])
+							break
+				if stats.active_hh.yl_tally > stats.active_hh.yl_cap:
+					print(str(round(stats.active_hh.yl_tally,2))+' dollars in the yard')
+					break
+	if not lot_hit:
+		stats.watched_hh = []
+		mp_buttons[2].msg=''
+		mp_buttons[2].prep_msg()
+		mp_buttons[3].msg=''
+		mp_buttons[3].prep_msg()
+		mp_buttons[4].msg=''
+		mp_buttons[4].prep_msg()
+		mp_buttons[5].msg=''
+		mp_buttons[5].prep_msg()
+		del mp_buttons[6:]
 			
 def update_whh(settings, screen, stats, mp_buttons):
 	#update the Current HouseHold buttons in the map pip

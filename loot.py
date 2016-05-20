@@ -143,18 +143,20 @@ class Loot(object):
 	def construct(self):
 		print('this is a '+self.raw)
 		if self.material:
+			#print('GETTINGS MAT_CAT')
 			self.get_mat_cat()
 			if self.raw == 'loot':
 				self.clean_l_types()
-				print('LOOT TYPES ARE CLEAN')
+				#print('LOOT TYPES ARE CLEAN')
 		else:
+			#print('GETTING BRAND...')
 			self.roll_brand()
-		#print('BRAND DONE')
+			#print('BRAND DONE')
 		if self.raw == 'loot':
 			self.roll_l_type()
 			if self.material:
 				self.roll_brand()
-			print('LTYPE DONE')
+			#print('LTYPE DONE')
 		self.roll_weight()
 		#print('WEIGHT DONE')
 		if self.raw == 'loot':
@@ -244,10 +246,18 @@ class Loot(object):
 					else:#..and a loot type is picked
 						if self.brand.ctg in self.loot_types[self.l_type_num][5]:
 							break
-			if self.raw == 'part':
+							
+			elif self.raw == 'part' and self.mat_cat:
 				if self.brand.ri == 'industrial':
 					if self.mat_cat in self.brand.mat_cats:
 						break
+					#else: 
+						#print(self.brand.name + " doesn't work with " + str(self.mat_cat))
+			
+			elif not self.mat_cat:
+				#print('picking at random.....' + self.brand.name + '!!!')
+				break
+				
 			count -= 1
 			#print(count)
 		self.label = self.brand.label
@@ -316,14 +326,17 @@ class Loot(object):
 				if part[0] == 'contents ':
 					#roll for weird exceptions (milk in a propane tank)
 					weird_roll = randint(0,100)
+					print("\nThis is a " + str(self.l_type[0]))
 					if weird_roll > 95:
 						#append rolled material array to this part
-						part[6]=choice(self.std_w[part_mat_cat][1])							
+						part[6]=choice(self.std_w[part_mat_cat][1])	
+						print("CONTENTS(WEIRD) = " + part[6][0] + '\n')						
 					else:
 						#otherwise use standard contents
 						for mat in self.std_w[part[4][0]][1]:
 							if mat[0] == part[1]:
 								part[6] = mat
+								print("CONTENTS = " + part[6][0] + '\n')		
 							
 				else:	
 					#pick a mat cat
