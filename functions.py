@@ -17,15 +17,15 @@ def place_loot(settings, screen, stats, loots, brands, retailers, mfrs):
 	debug_init = gen_init
 	debug_init[0]='loot'
 	#debug_init[2]= 'Bar'
-	#ebug_init[3]=34
+	#debug_init[3]=16
 	#debug_init[7]= 1.0
 	#debug_init[9]=['Gold ',80,(255,210,48),19.32]
 	#debug_init[10]=['Gold ',80,(255,210,48),19.32]
-	debug_init[23] = retailers[0]
+	#debug_init[23] = retailers[0]
 	#debug_init[24] = mfrs[0]
 	#instantiate one loot
-	#loot_inst = Loot(settings, screen, stats.loot_val,gen_init,brands=brands) 
-	loot_inst = Loot(settings, screen, stats.loot_val,brands=brands) 
+	loot_inst = Loot(settings, screen, stats.loot_val,gen_init,brands=brands) 
+	#loot_inst = Loot(settings, screen, stats.loot_val,brands=brands) 
 	loot_inst.construct()
 	locate_loot(settings, screen, stats, loot_inst, loots)
 	

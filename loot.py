@@ -141,7 +141,7 @@ class Loot(object):
 		self.legit_lts = []
 
 	def construct(self):
-		print('this is a '+self.raw)
+		#print('this is a '+self.raw)
 		if self.material:
 			#print('GETTINGS MAT_CAT')
 			self.get_mat_cat()
@@ -198,6 +198,13 @@ class Loot(object):
 			self.parts_desc,self.condition,self.mat_cat,self.color,
 			self.m_color,self.t_color,self.sprite,self.label,self.brand,
 			self.mfr]
+	def DECLARE(self):
+		"""declare your contents...like...at...customs? it's debug"""
+		
+		if self.raw == 'loot':
+			for part in self.parts:
+				if part[0] == 'contents ':
+					print("CONTENTS = " + part[6][0])	
 			
 	def rebuild(self):
 		self.roll_image()
@@ -281,7 +288,7 @@ class Loot(object):
 					#roll a random number within the range of loot types
 					self.l_type_num = choice(self.legit_lts)
 					#only continue loop if this l_type_num is forbidden
-					print('trying to make '+str(self.loot_types[self.l_type_num][0])+' from '+str(self.material[0]))
+					#print('trying to make '+str(self.loot_types[self.l_type_num][0])+' from '+str(self.material[0]))
 					if self.l_type_num not in self.forbidden_lts:
 						break
 					count -=1
@@ -330,13 +337,13 @@ class Loot(object):
 					if weird_roll > 95:
 						#append rolled material array to this part
 						part[6]=choice(self.std_w[part_mat_cat][1])	
-						print("CONTENTS(WEIRD) = " + part[6][0] + '\n')						
+						print("CONTENTS = " + part[6][0] + '...weird,right?')						
 					else:
 						#otherwise use standard contents
 						for mat in self.std_w[part[4][0]][1]:
 							if mat[0] == part[1]:
 								part[6] = mat
-								print("CONTENTS = " + part[6][0] + '\n')		
+								print("CONTENTS = " + part[6][0])		
 							
 				else:	
 					#pick a mat cat
@@ -367,9 +374,10 @@ class Loot(object):
 				else:
 					part_mat_cat = self.mat_cat
 			else:
+				self.largest = 0
 				part_mat_cat = choice(self.parts[0][4])
 			self.source = part_mat_cat
-			print('current source is '+str(self.source))
+			#print('current source is '+str(self.source))
 			#if the brand already has picked it's materials...
 			if len(self.brand.mats) >= self.brand.num_mats:
 				#pick one of those materials
@@ -393,12 +401,11 @@ class Loot(object):
 				self.brand.mats.append(part[6])							
 			#if the brand has not started picking...
 			elif len(self.brand.mats) == 0:
-				#append rolled material array to this part
-				part[6]=choice(self.std_w[part_mat_cat][1])
 				#append rolled mat_cat and material to brand
 				self.brand.mats.append(self.parts[self.largest][6])
 
-					
+			
+			self.DECLARE()		
 			#divide each part's contribution by v_normal to normalize it
 			for part in self.parts:
 				part[3] /= self.val_normal #part contrib is now >0 and <1
@@ -436,21 +443,21 @@ class Loot(object):
 				while True:
 					self.mfr = choice(self.brand.mfrs)#make loot mfr one of the brand's mfrs
 					if self.mfr.ctg == industry[0]: #if the mfr matches the loot's industry, break
-						print(self.mfr.name+' is suitable and already works for our brand!')
+						#print(self.mfr.name+' is suitable and already works for our brand!')
 						break
 					count -= 1
 					if count < 1:
 						#if a suitable mfr can't be found in 100 tries, reset to null and break
 						self.mfr = ''
 						break
-						print('none of the brand mfrs matched the loot ctg')
+						#print('none of the brand mfrs matched the loot ctg')
 			if not self.mfr:
 				count = 100
 				while True:
 					self.mfr = choice(self.brands)
 					if self.mfr.ctg == industry[0]:
 						self.brand.mfrs.append(self.mfr)
-						print(self.mfr.name+' now works for '+self.brand.name)
+						#print(self.mfr.name+' now works for '+self.brand.name)
 						break
 					count -= 1
 					if count < 1:
@@ -555,7 +562,7 @@ class Loot(object):
 					break	
 		else:
 			self.brand = self.mfr
-		print('this is a part made by '+self.mfr.name)
+		#print('this is a part made by '+self.mfr.name)
 			
 	def roll_quality(self):
 		if not self.quality:
