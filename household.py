@@ -56,17 +56,20 @@ class Household(object):
 	def roll_hh_value(self):
 		"""Roll a household value based on lot value, the poverty line 
 		and a random offset of +/- 20%"""
+		
 		self.hhv_offset = ((randint(0,41)-20)/100)+1
 		self.lv_offset = (self.lot_value*0.1)+1
 		self.hh_value = round((self.lv_offset * self.hhv_offset) * self.stats.poverty,0)
 		
 	def roll_lname(self):
 		"""Pick a last name"""
+		
 		if not self.lname:
 			self.lname = choice(lnames)
 		
 	def roll_num_proles(self):
 		"""Roll the number of proles living here"""
+		
 		if not self.num_proles:
 			self.num_proles = choice([1,1,1,1,2,2,2,2,3,3,3,4,5,6,7,8])
 		if not self.num_kids:
@@ -80,6 +83,7 @@ class Household(object):
 	
 	def roll_wages(self):
 		"""make a normalized map of wages for adult proles"""
+		
 		self.x_wages = []
 		self.wages = []
 		self.wages_n = 0
@@ -91,6 +95,7 @@ class Household(object):
 		
 	def roll_proles(self):
 		"""Roll each individual prole"""
+		
 		if not self.proles:
 			self.proles = []
 			#roll the adults at working age and above
@@ -186,10 +191,10 @@ class Prole(object):
 				temp_mat_cat = choice(mat_cats)
 			self.fav_mats.append(choice(std_w[temp_mat_cat][1]))
 		
-		print(self.fname.upper() + ' ' + self.lname.upper())
-		for color in self.fav_colors:
-			print(color[0])
-		for mat in self.fav_mats:
-			print(mat[0])
-		for brand in self.fav_brands:
-			print(brand.name)
+		#print(self.fname.upper() + ' ' + self.lname.upper())
+		#for color in self.fav_colors:
+			#print(color[0])
+		#for mat in self.fav_mats:
+			#print(mat[0])
+		#for brand in self.fav_brands:
+			#print(brand.name)

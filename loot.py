@@ -333,17 +333,17 @@ class Loot(object):
 				if part[0] == 'contents ':
 					#roll for weird exceptions (milk in a propane tank)
 					weird_roll = randint(0,100)
-					print("\nThis is a " + str(self.l_type[0]))
+					#print("\nThis is a " + str(self.l_type[0]))
 					if weird_roll > 95:
 						#append rolled material array to this part
 						part[6]=choice(self.std_w[part_mat_cat][1])	
-						print("CONTENTS = " + part[6][0] + '...weird,right?')						
+						#print("CONTENTS = " + part[6][0] + '...weird,right?')						
 					else:
 						#otherwise use standard contents
 						for mat in self.std_w[part[4][0]][1]:
 							if mat[0] == part[1]:
 								part[6] = mat
-								print("CONTENTS = " + part[6][0])		
+								#print("CONTENTS = " + part[6][0])		
 							
 				else:	
 					#pick a mat cat
@@ -404,8 +404,6 @@ class Loot(object):
 				#append rolled mat_cat and material to brand
 				self.brand.mats.append(self.parts[self.largest][6])
 
-			
-			self.DECLARE()		
 			#divide each part's contribution by v_normal to normalize it
 			for part in self.parts:
 				part[3] /= self.val_normal #part contrib is now >0 and <1

@@ -309,27 +309,32 @@ def check_map_pip_buttons(	hoods, mouse_pos, stats, mp_buttons,
 	"""react to mouse clicks inside the map pip"""
 	
 	lot_hit = False
-	for i in hoods[0].tiles:
-		if i.rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+	click_loc = (mouse_pos[0], mouse_pos[1]) #last mouse click position
+	for i in hoods[0].tiles: #cycle through each tile in active hood
+		if i.rect.collidepoint(click_loc): #check for click on this tile
 			if hoods[0].roadmap[i.refx][i.refy][0] == 'L':
+				#if this tile is a (L)ot...
 				stats.watched_hh = hoods[0].roadmap[i.refx][i.refy][2]
+				#assign the clicked household to (watched_h)ouse(h)old
 				stats.whhx = i.refx
 				stats.whhy = i.refy
+				#temporarily store coords in stats
 				stats.watched_hh.x = i.refx
 				stats.watched_hh.y = i.refy
 				stats.watched_hh.town = hoods[0].name
+				#rebuild watched_hh with coords and town name
 				lot_hit = True
 				update_whh(settings, screen, stats, mp_buttons)
-				print(stats.watched_hh.lname)
+				#update map pip to show mouse selection
 				
-	if not mp_buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
+	if not mp_buttons[0].rect.collidepoint(click_loc):
 		stats.map_pip = False
 		
-	elif mp_buttons[5].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
-		lot_hit = True
+	elif mp_buttons[5].rect.collidepoint(click_loc):
+		lot_hit = True #prevent lot info from being erased in map pip
 		if stats.active_hh == stats.watched_hh:
 			return None
-			#go to the Current HouseHold
+			#ignore
 		
 		if not stats.active_hh:
 			#clear debug loot
@@ -338,21 +343,25 @@ def check_map_pip_buttons(	hoods, mouse_pos, stats, mp_buttons,
 		
 		stats.previous_hh = stats.active_hh
 		stats.active_hh = stats.watched_hh
-		print('active is ' + stats.active_hh.lname)
+		
 		for prole in stats.active_hh.proles:
 			prole.roll_favs(retailers)
 		#pop loots back into whh loot list
-		while True:
-			try:
-				stats.previous_hh.yard_loot.append(loots.pop())
-			except:
-				break
+		if stats.previous_hh:
+			while True:
+				try:
+					stats.previous_hh.yard_loot.append(loots.pop())
+					#print('A LOOT WAS APPENDED!')
+				except:
+					#print('COULD NOT APPEND LOOTS TO PREVIOUS_HH.YARD!')
+					break
+					
 		#check for existing yard loot
 		if not stats.active_hh.yard_loot:
 			cap = round((randint(10,50)/10000)*stats.active_hh.hh_value,2)
 			stats.active_hh.yl_cap = cap
-			print('household vlaue is ' + str(stats.active_hh.hh_value))
-			print(' cap has been set at $' + str(cap))
+			#print('household vlaue is ' + str(stats.active_hh.hh_value))
+			#print(' cap has been set at $' + str(cap))
 			while True:
 				roll = randint(1,3)
 				roll = 1
@@ -400,9 +409,9 @@ def check_map_pip_buttons(	hoods, mouse_pos, stats, mp_buttons,
 						if (temp_val < cap_buffer) and legit:
 							stats.active_hh.yl_tally += loot_inst.value
 							locate_loot(settings, screen, stats,loot_inst, loots)
-							print('sent material: ' + pick[0])
+							#print('sent material: ' + pick[0])
 							#print('got something made from '+pick[0]+' by '+loot_inst.mfr.name)
-							print('got '+loot_inst.name+'\n\n')
+							#print('got '+loot_inst.name+'\n\n')
 							break
 						count -= 1
 						if count < 1:
@@ -419,12 +428,12 @@ def check_map_pip_buttons(	hoods, mouse_pos, stats, mp_buttons,
 							if loot_inst.brand in prole.fav_brands:
 								stats.active_hh.yl_tally += loot_inst.value
 								locate_loot(settings, screen, stats,loot_inst, loots)
-								print('got something from '+loot_inst.brand.name)
+								#print('got something from '+loot_inst.brand.name)
 								break
 						prole_brands = []
 						for i in prole.fav_brands:
 							prole_brands.append(i.name)
-						print(loot_inst.brand.name + str(prole_brands))
+						#print(loot_inst.brand.name + str(prole_brands))
 				if roll == 3:
 					#pick by fav color
 					while True:
@@ -436,11 +445,19 @@ def check_map_pip_buttons(	hoods, mouse_pos, stats, mp_buttons,
 						if (stats.active_hh.yl_tally+loot_inst.value) < (stats.active_hh.yl_cap*1.2):
 							stats.active_hh.yl_tally += loot_inst.value
 							locate_loot(settings, screen, stats,loot_inst, loots)
-							print('got something '+init[18][0])
+							#print('got something '+init[18][0])
 							break
 				if stats.active_hh.yl_tally > stats.active_hh.yl_cap:
-					print(str(round(stats.active_hh.yl_tally,2))+' dollars in the yard')
+					#print(str(round(stats.active_hh.yl_tally,2))+' dollars in the yard')
 					break
+		
+		elif stats.active_hh.yard_loot:
+			while True:
+				try:
+					loots.append(stats.active_hh.yard_loot.pop())
+				except:
+					break
+			
 	if not lot_hit:
 		stats.watched_hh = []
 		mp_buttons[2].msg=''
@@ -454,7 +471,8 @@ def check_map_pip_buttons(	hoods, mouse_pos, stats, mp_buttons,
 		del mp_buttons[6:]
 			
 def update_whh(settings, screen, stats, mp_buttons):
-	#update the Current HouseHold buttons in the map pip
+	"""update the watched household buttons in the map pip"""
+	
 	del mp_buttons[6:]	
 	mp_buttons[2].msg = str(stats.watched_hh.lname) + ' Household'
 	mp_buttons[2].prep_msg()
@@ -492,7 +510,6 @@ def loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i):
 						loot_val = stats.loot_val,
 						init_array = loot.init_array,
 						ref = i)
-	print("current ref is " + str(loot_inst.ref))
 	loot_inst.rebuild()					
 	lp_buttons.append(loot_inst)
 	lp_buttons[1] = Button(	settings, screen, loot.name, scx-275, 
