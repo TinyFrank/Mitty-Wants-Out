@@ -9,3 +9,4 @@ class Settings():
 		self.bg_colour = (140,140,140)
 		self.FPS = 30
 		self.map_size=800
+		self.yard_loot_cap = 25

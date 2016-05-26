@@ -339,6 +339,9 @@ def check_map_pip_buttons(	hoods, mouse_pos, stats, mp_buttons,
 
 def go_to_button(	hoods, mouse_pos, stats, mp_buttons, settings, screen, 
 					loots, brands, retailers, click_loc):
+	"""go to the selected household. shifts loots around and creates 
+	them based on hh if hh has not yet been visited"""
+	
 	lot_hit = True #prevent lot info from being erased in map pip
 	if stats.active_hh == stats.watched_hh:
 		return None
@@ -370,15 +373,20 @@ def go_to_button(	hoods, mouse_pos, stats, mp_buttons, settings, screen,
 			roll = randint(1,3)
 			prole = choice(stats.active_hh.proles)
 			if roll == 1:
+				print('trying to roll a 1')
 				pick_by_mat(prole, settings, screen, stats, loots, brands)
 				
 			elif roll == 2:
 				pick_by_brand(prole, settings, screen, stats, loots, brands)
+				print('trying to roll a 2')
 				
 			elif roll == 3:
 				pick_by_color(prole, settings, screen, stats, loots, brands)
+				print('trying to roll a 3')
 						
 			if stats.active_hh.yl_tally > stats.active_hh.yl_cap:
+				break
+			elif len(loots) > settings.yard_loot_cap:
 				break
 			
 	elif stats.active_hh.yard_loot:
@@ -392,8 +400,8 @@ def pick_by_mat(prole, settings, screen, stats, loots, brands):
 	"""pick by fav material"""
 	
 	roll =1
-	count=100
-	while True:
+	done = False
+	while not done:
 		pick = choice(prole.fav_mats)
 		pick_cat = ''
 		for cat in libs.mat_cats:
@@ -406,7 +414,6 @@ def pick_by_mat(prole, settings, screen, stats, loots, brands):
 		loot_inst = Loot(	settings, screen, stats.loot_val,init,
 							brands=brands)
 		loot_inst.construct()
-		legit = False
 		if loot_inst.raw == 'loot':
 			if pick_cat in loot_inst.parts[loot_inst.largest][4]:
 				loot_inst.parts[loot_inst.largest][6] = pick
@@ -418,7 +425,6 @@ def pick_by_mat(prole, settings, screen, stats, loots, brands):
 				loot_inst.roll_name()
 				loot_inst.roll_desc()
 				loot_inst.roll_parts_desc()
-				legit = True
 		if loot_inst.raw == 'part':
 			loot_inst.material = pick
 			loot_inst.mat_cat = pick_cat
@@ -427,53 +433,52 @@ def pick_by_mat(prole, settings, screen, stats, loots, brands):
 			loot_inst.roll_value()
 			loot_inst.roll_name()
 			loot_inst.roll_desc()
-			legit = True
-		temp_val = stats.active_hh.yl_tally+loot_inst.value
-		cap_buffer = stats.active_hh.yl_cap*1.2
-		if (temp_val < cap_buffer) and legit:
-			stats.active_hh.yl_tally += loot_inst.value
-			narrate_choice(roll, loot_inst, prole)
-			locate_loot(settings, screen, stats,loot_inst, loots)
-			break
-		count -= 1
-		if count < 1:
-			break	
+		done=fumble_in_yard(roll, prole, stats, settings, screen, 
+							loot_inst, loots)
 		
 def pick_by_brand(prole, settings, screen, stats, loots, brands):
 	"""pick by fav brand"""
 	
 	roll = 2
-	while True:
+	done = False
+	while not done:
 		init = gen_init
 		init[0] = 'loot'
 		#create a new loot inst by passing only this prole's brands
 		loot_inst = Loot(	settings, screen, stats.loot_val,init,
 							brands=prole.fav_brands)
 		loot_inst.construct()
-		LIV = stats.active_hh.yl_tally+loot_inst.value
-		HH_YLC = stats.active_hh.yl_cap*1.2
-		if (LIV) < (HH_YLC):
-			if loot_inst.brand in prole.fav_brands:
-				stats.active_hh.yl_tally += loot_inst.value
-				narrate_choice(roll, loot_inst, prole)
-				locate_loot(settings, screen, stats,loot_inst, loots)
-				break
-
+		done = fumble_in_yard(	roll, prole, stats, settings, screen, 
+								loot_inst, loots)
+		
 def pick_by_color(prole, settings, screen, stats, loots, brands):
 	"""pick by fav color"""
 	
 	roll = 3
-	while True:
+	done = False
+	while not done:
 		init = gen_init
 		init[18] = choice(prole.fav_colors)
 		init[0] = 'loot'
 		loot_inst = Loot(settings, screen, stats.loot_val,init,brands=brands)
 		loot_inst.construct()
-		if (stats.active_hh.yl_tally+loot_inst.value) < (stats.active_hh.yl_cap*1.2):
-			stats.active_hh.yl_tally += loot_inst.value
-			narrate_choice(roll, loot_inst, prole)
-			locate_loot(settings, screen, stats,loot_inst, loots)
-			break	
+		done = fumble_in_yard(	roll, prole, stats, settings, screen, 
+								loot_inst, loots)
+		
+def fumble_in_yard(	roll, prole, stats, settings, screen, loot_inst, 
+					loots):
+	"""fumble - maybe he catches it, maybe it falls.
+	this is how we determine which loots land in the yard!"""
+	
+	temp_val = stats.active_hh.yl_tally+loot_inst.value
+	cap_buffer = stats.active_hh.yl_cap*1.2
+	if (temp_val < cap_buffer):
+		stats.active_hh.yl_tally += loot_inst.value
+		#narrate_choice(roll, loot_inst, prole)
+		locate_loot(settings, screen, stats,loot_inst, loots)
+		return(True)
+	else:
+		return(False)
 
 def narrate_choice(roll, loot_inst, prole):
 	"""print a debug narration string to console"""
