@@ -328,148 +328,193 @@ def check_map_pip_buttons(	hoods, mouse_pos, stats, mp_buttons,
 				#update map pip to show mouse selection
 				
 	if not mp_buttons[0].rect.collidepoint(click_loc):
-		stats.map_pip = False
+		stats.map_pip = False #close map pip if click is outside pip
 		
 	elif mp_buttons[5].rect.collidepoint(click_loc):
-		lot_hit = True #prevent lot info from being erased in map pip
-		if stats.active_hh == stats.watched_hh:
-			return None
-			#ignore
-		
-		if not stats.active_hh:
-			#clear debug loot
-			for loot in loots:
-				del loot
-		
-		stats.previous_hh = stats.active_hh
-		stats.active_hh = stats.watched_hh
-		
-		for prole in stats.active_hh.proles:
-			prole.roll_favs(retailers)
-		#pop loots back into whh loot list
-		if stats.previous_hh:
-			while True:
-				try:
-					stats.previous_hh.yard_loot.append(loots.pop())
-					#print('A LOOT WAS APPENDED!')
-				except:
-					#print('COULD NOT APPEND LOOTS TO PREVIOUS_HH.YARD!')
-					break
-					
-		#check for existing yard loot
-		if not stats.active_hh.yard_loot:
-			cap = round((randint(10,50)/10000)*stats.active_hh.hh_value,2)
-			stats.active_hh.yl_cap = cap
-			#print('household vlaue is ' + str(stats.active_hh.hh_value))
-			#print(' cap has been set at $' + str(cap))
-			while True:
-				roll = randint(1,3)
-				roll = 1
-				#print('rolled a ' + str(roll))
-				prole = choice(stats.active_hh.proles)
-				if roll == 1:
-					#pick by fav material
-					count=100
-					while True:
-						pick = choice(prole.fav_mats)
-						pick_cat = ''
-						for cat in libs.mat_cats:
-							if pick in libs.std_w[cat][1]:
-								pick_cat = cat
-								#pick_cat now holds the category of the working material
-						init = gen_init
-						init[9] = pick
-						init[0] = 'loot'
-						loot_inst = Loot(settings, screen, stats.loot_val,init,brands=brands)
-						loot_inst.construct()
-						legit = False
-						if loot_inst.raw == 'loot':
-							if pick_cat in loot_inst.parts[loot_inst.largest][4]:
-								loot_inst.parts[loot_inst.largest][6] = pick
-								loot_inst.material = pick
-								loot_inst.mat_cat = pick_cat
-								loot_inst.source = pick_cat
-								loot_inst.roll_mfr()
-								loot_inst.roll_value()
-								loot_inst.roll_name()
-								loot_inst.roll_desc()
-								loot_inst.roll_parts_desc()
-								legit = True
-						if loot_inst.raw == 'part':
-							loot_inst.material = pick
-							loot_inst.mat_cat = pick_cat
-							loot_inst.roll_shape()
-							loot_inst.roll_industry()
-							loot_inst.roll_value()
-							loot_inst.roll_name()
-							loot_inst.roll_desc()
-							legit = True
-						temp_val = stats.active_hh.yl_tally+loot_inst.value
-						cap_buffer = stats.active_hh.yl_cap*1.2
-						if (temp_val < cap_buffer) and legit:
-							stats.active_hh.yl_tally += loot_inst.value
-							locate_loot(settings, screen, stats,loot_inst, loots)
-							#print('sent material: ' + pick[0])
-							#print('got something made from '+pick[0]+' by '+loot_inst.mfr.name)
-							#print('got '+loot_inst.name+'\n\n')
-							break
-						count -= 1
-						if count < 1:
-							break
-				if roll == 2:
-					#pick by fav brand
-					while True:
-						init = gen_init
-						init[0] = 'loot'
-						loot_inst = Loot(settings, screen, stats.loot_val,init,brands=prole.fav_brands)
-						loot_inst.construct()
-						if (stats.active_hh.yl_tally+loot_inst.value) < (stats.active_hh.yl_cap*1.2):
-							#print('value is kosher!')
-							if loot_inst.brand in prole.fav_brands:
-								stats.active_hh.yl_tally += loot_inst.value
-								locate_loot(settings, screen, stats,loot_inst, loots)
-								#print('got something from '+loot_inst.brand.name)
-								break
-						prole_brands = []
-						for i in prole.fav_brands:
-							prole_brands.append(i.name)
-						#print(loot_inst.brand.name + str(prole_brands))
-				if roll == 3:
-					#pick by fav color
-					while True:
-						init = gen_init
-						init[18] = choice(prole.fav_colors)
-						init[0] = 'loot'
-						loot_inst = Loot(settings, screen, stats.loot_val,init,brands=brands)
-						loot_inst.construct()
-						if (stats.active_hh.yl_tally+loot_inst.value) < (stats.active_hh.yl_cap*1.2):
-							stats.active_hh.yl_tally += loot_inst.value
-							locate_loot(settings, screen, stats,loot_inst, loots)
-							#print('got something '+init[18][0])
-							break
-				if stats.active_hh.yl_tally > stats.active_hh.yl_cap:
-					#print(str(round(stats.active_hh.yl_tally,2))+' dollars in the yard')
-					break
-		
-		elif stats.active_hh.yard_loot:
-			while True:
-				try:
-					loots.append(stats.active_hh.yard_loot.pop())
-				except:
-					break
-			
+		go_to_button(	hoods, mouse_pos, stats, mp_buttons, settings, screen, 
+						loots, brands, retailers, click_loc)
+
 	if not lot_hit:
-		stats.watched_hh = []
-		mp_buttons[2].msg=''
-		mp_buttons[2].prep_msg()
-		mp_buttons[3].msg=''
-		mp_buttons[3].prep_msg()
-		mp_buttons[4].msg=''
-		mp_buttons[4].prep_msg()
-		mp_buttons[5].msg=''
-		mp_buttons[5].prep_msg()
-		del mp_buttons[6:]
+		clear_map_pip(stats, mp_buttons)
+
+def go_to_button(	hoods, mouse_pos, stats, mp_buttons, settings, screen, 
+					loots, brands, retailers, click_loc):
+	lot_hit = True #prevent lot info from being erased in map pip
+	if stats.active_hh == stats.watched_hh:
+		return None
+		#ignore
+	
+	if not stats.active_hh:
+		#clear debug loot
+		for loot in loots:
+			del loot
+	
+	stats.previous_hh = stats.active_hh
+	stats.active_hh = stats.watched_hh
+	
+	for prole in stats.active_hh.proles:
+		prole.roll_favs(retailers)
+	#pop loots back into whh loot list
+	if stats.previous_hh:
+		while True:
+			try:
+				stats.previous_hh.yard_loot.append(loots.pop())
+			except:
+				break
+				
+	#check for existing yard loot
+	if not stats.active_hh.yard_loot:
+		cap = round((randint(10,50)/10000)*stats.active_hh.hh_value,2)
+		stats.active_hh.yl_cap = cap
+		while True:
+			roll = randint(1,3)
+			prole = choice(stats.active_hh.proles)
+			if roll == 1:
+				pick_by_mat(prole, settings, screen, stats, loots, brands)
+				
+			elif roll == 2:
+				pick_by_brand(prole, settings, screen, stats, loots, brands)
+				
+			elif roll == 3:
+				pick_by_color(prole, settings, screen, stats, loots, brands)
+						
+			if stats.active_hh.yl_tally > stats.active_hh.yl_cap:
+				break
 			
+	elif stats.active_hh.yard_loot:
+		while True:
+			try:
+				loots.append(stats.active_hh.yard_loot.pop())
+			except:
+				break
+
+def pick_by_mat(prole, settings, screen, stats, loots, brands):
+	"""pick by fav material"""
+	
+	roll =1
+	count=100
+	while True:
+		pick = choice(prole.fav_mats)
+		pick_cat = ''
+		for cat in libs.mat_cats:
+			if pick in libs.std_w[cat][1]:
+				pick_cat = cat
+				#pick_cat now holds the category of the working material
+		init = gen_init
+		init[9] = pick
+		init[0] = 'loot'
+		loot_inst = Loot(	settings, screen, stats.loot_val,init,
+							brands=brands)
+		loot_inst.construct()
+		legit = False
+		if loot_inst.raw == 'loot':
+			if pick_cat in loot_inst.parts[loot_inst.largest][4]:
+				loot_inst.parts[loot_inst.largest][6] = pick
+				loot_inst.material = pick
+				loot_inst.mat_cat = pick_cat
+				loot_inst.source = pick_cat
+				loot_inst.roll_mfr()
+				loot_inst.roll_value()
+				loot_inst.roll_name()
+				loot_inst.roll_desc()
+				loot_inst.roll_parts_desc()
+				legit = True
+		if loot_inst.raw == 'part':
+			loot_inst.material = pick
+			loot_inst.mat_cat = pick_cat
+			loot_inst.roll_shape()
+			loot_inst.roll_industry()
+			loot_inst.roll_value()
+			loot_inst.roll_name()
+			loot_inst.roll_desc()
+			legit = True
+		temp_val = stats.active_hh.yl_tally+loot_inst.value
+		cap_buffer = stats.active_hh.yl_cap*1.2
+		if (temp_val < cap_buffer) and legit:
+			stats.active_hh.yl_tally += loot_inst.value
+			narrate_choice(roll, loot_inst, prole)
+			locate_loot(settings, screen, stats,loot_inst, loots)
+			break
+		count -= 1
+		if count < 1:
+			break	
+		
+def pick_by_brand(prole, settings, screen, stats, loots, brands):
+	"""pick by fav brand"""
+	
+	roll = 2
+	while True:
+		init = gen_init
+		init[0] = 'loot'
+		#create a new loot inst by passing only this prole's brands
+		loot_inst = Loot(	settings, screen, stats.loot_val,init,
+							brands=prole.fav_brands)
+		loot_inst.construct()
+		LIV = stats.active_hh.yl_tally+loot_inst.value
+		HH_YLC = stats.active_hh.yl_cap*1.2
+		if (LIV) < (HH_YLC):
+			if loot_inst.brand in prole.fav_brands:
+				stats.active_hh.yl_tally += loot_inst.value
+				narrate_choice(roll, loot_inst, prole)
+				locate_loot(settings, screen, stats,loot_inst, loots)
+				break
+
+def pick_by_color(prole, settings, screen, stats, loots, brands):
+	"""pick by fav color"""
+	
+	roll = 3
+	while True:
+		init = gen_init
+		init[18] = choice(prole.fav_colors)
+		init[0] = 'loot'
+		loot_inst = Loot(settings, screen, stats.loot_val,init,brands=brands)
+		loot_inst.construct()
+		if (stats.active_hh.yl_tally+loot_inst.value) < (stats.active_hh.yl_cap*1.2):
+			stats.active_hh.yl_tally += loot_inst.value
+			narrate_choice(roll, loot_inst, prole)
+			locate_loot(settings, screen, stats,loot_inst, loots)
+			break	
+
+def narrate_choice(roll, loot_inst, prole):
+	"""print a debug narration string to console"""
+	
+	narrative = '\n'+str(roll)+': '+prole.fname+prole.lname
+	narrative += ' left a '+loot_inst.name+' from '+loot_inst.brand.name
+	narrative += ' in the yard.'
+	narrative += "\nIt was purchased for it's "
+	f_mats = []
+	f_brands = []
+	f_colors = []
+	for x in prole.fav_mats:
+		f_mats.append(x[0])
+	for x in prole.fav_brands:
+		f_brands.append(x.name)
+	for x in prole.fav_colors:
+		f_colors.append(x[0])
+	if roll == 1:
+		narrative += 'material.('+str(f_mats)+')'
+	elif roll == 2:
+		narrative += 'brand.('+str(f_brands)+')'
+	elif roll == 3:
+		narrative += 'color.('+str(f_colors)+')'
+	print(narrative)	
+			
+def clear_map_pip(stats, mp_buttons):
+	"""delete all mp_buttons beyond 6 (which held temp information
+	for the currently selected lot) and rewrite all buttons before 6 to
+	and empty string"""
+	
+	stats.watched_hh = []
+	mp_buttons[2].msg=''
+	mp_buttons[2].prep_msg()
+	mp_buttons[3].msg=''
+	mp_buttons[3].prep_msg()
+	mp_buttons[4].msg=''
+	mp_buttons[4].prep_msg()
+	mp_buttons[5].msg=''
+	mp_buttons[5].prep_msg()
+	del mp_buttons[6:]
+				
 def update_whh(settings, screen, stats, mp_buttons):
 	"""update the watched household buttons in the map pip"""
 	

@@ -148,7 +148,7 @@ class Loot(object):
 			if self.raw == 'loot':
 				self.clean_l_types()
 				#print('LOOT TYPES ARE CLEAN')
-		else:
+		elif not self.material:
 			#print('GETTING BRAND...')
 			self.roll_brand()
 			#print('BRAND DONE')
@@ -198,6 +198,7 @@ class Loot(object):
 			self.parts_desc,self.condition,self.mat_cat,self.color,
 			self.m_color,self.t_color,self.sprite,self.label,self.brand,
 			self.mfr]
+			
 	def DECLARE(self):
 		"""declare your contents...like...at...customs? it's debug"""
 		
@@ -243,30 +244,20 @@ class Loot(object):
 				
 	def roll_brand(self):
 		#roll retailer 
-		count = 100
 		while True:
 			self.brand = choice(self.brands)
 			if self.raw == 'loot':
 				if self.brand.ri == 'retail': #for retail brands...
-					if not self.l_type_num: #...and no loot type was picked
-						break
-					else:#..and a loot type is picked
-						if self.brand.ctg in self.loot_types[self.l_type_num][5]:
-							break
+					break
 							
 			elif self.raw == 'part' and self.mat_cat:
 				if self.brand.ri == 'industrial':
 					if self.mat_cat in self.brand.mat_cats:
 						break
-					#else: 
-						#print(self.brand.name + " doesn't work with " + str(self.mat_cat))
-			
+								
 			elif not self.mat_cat:
-				#print('picking at random.....' + self.brand.name + '!!!')
 				break
 				
-			count -= 1
-			#print(count)
 		self.label = self.brand.label
 		
 	def roll_l_type(self):
@@ -560,7 +551,6 @@ class Loot(object):
 					break	
 		else:
 			self.brand = self.mfr
-		#print('this is a part made by '+self.mfr.name)
 			
 	def roll_quality(self):
 		if not self.quality:
