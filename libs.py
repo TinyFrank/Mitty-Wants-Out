@@ -146,8 +146,8 @@ naturals = (				['Bone ',0.3,(234,228,168),1.9],
 							['Bone ',0.3,(234,228,168),1.9]							
 							)
 		
-minerals = (				['Charcoal ',0.2,(20,20,20),2.0],
-							['Charcoal ',0.2,(20,20,20),2.0])
+minerals = (				['Granite ',0.2,(115,113,121),2.75],
+							['Marble ',15,(20,20,20),2.8])
 
 soft_solids = (				['Cork ',3,(105,83,57),0.23],
 							['Wax ',1.8,(255,255,255),0.96])
@@ -157,6 +157,9 @@ pills = (					['Pain Killer ',50,(105,83,57),1.2],
 							['Antidepressant ',30,(255,255,255),1.2],
 							['Stimulant ',30,(255,255,255),1.2],
 							['Lessphine ',150,(255,255,255),1.2])
+
+solid_chems = (				['Charcoal ',0.2,(20,20,20),2.0],
+							['Charcoal ',0.2,(20,20,20),2.0])
 							
 		#list of available paint colours					
 colors = (					('red ',(200,30,30)), 				
@@ -307,12 +310,12 @@ loot_types ={				1:[
 							15:[
 							'Charcoal Barbecue ',
 							['bbq'],
-							[["legs ","rod ",3,2,['metal'],None,None],
+							[["lid ","sheet ",1,4,['metal'],None,None],
+							["legs ","rod ",3,2,['metal'],None,None],
 							["grill ","mesh ",1,3,['metal'],None,None],
-							["lid ","sheet ",1,4,['metal'],None,None],
 							["base ","sheet ",1,4,['metal'],None,None],
 							["screws ","chunk ",10,1,['metal'],None,None],
-							["contents ","Charcoal ",1,3,['mineral'],None,None]],
+							["contents ","Charcoal ",1,3,['solid chem'],None,None]],
 							15,['fabricators'],['patio']],
 							16:[
 							'Jerry Can ',
@@ -354,7 +357,7 @@ loot_types ={				1:[
 							'Bowl ',
 							['bowl'],
 							[["body ","chunk ",1,1,['metal','plastic','ceramic','wood','mineral','rubber'],None,None]],
-							.2,['plastics','fabricators','carpentry','glassworks'],['kitchenware','pet supplies']],
+							.2,['plastics','fabricators','carpentry','glassworks','masonry'],['kitchenware','pet supplies']],
 							22:[
 							'Classic Book ',
 							['classicbook'],
@@ -470,7 +473,7 @@ loot_types ={				1:[
 mat_cats = (			'metal','wood','plastic','rubber','ceramic',
 						'fibre','paper','fluid','drink','lqd food','pwdr food',
 						'soft food','natural','mineral','soft solid',
-						'pills')
+						'pills','solid chem')
 		
 		#list of standard weights for weigth baseline calculation
 std_w={					'metal':(8.05,metals,'metal'),
@@ -486,9 +489,10 @@ std_w={					'metal':(8.05,metals,'metal'),
 						'pwdr food':(.59,pwdr_foods,'pwdr food'),
 						'soft food':(.96,soft_foods,'soft food'),
 						'natural':(1,naturals,'natural'),
-						'mineral':(2,minerals,'mineral'),
+						'mineral':(2.75,minerals,'mineral'),
 						'soft solid':(0.8,soft_solids,'soft solid'),
-						'pills':(0.8,pills,'pills')}
+						'pills':(0.8,pills,'pills'),
+						'solid chem': (0.8,solid_chems,'solid chem')}
 		
 		#list of possible material shapes 
 shapes = {				'metal':(	'Threaded Rod','Bar','Tube','Wire',
@@ -515,6 +519,8 @@ shapes = {				'metal':(	'Threaded Rod','Bar','Tube','Wire',
 						'mineral':(	'Chunk','Powder','Pebble','Slab'),
 						'soft solid':(	'Scrap','Chunk'),
 						'pills':	(	'Capsules','Tablets','Pills'),
+						'solid chem':(	'Chunk', 'Powder', 'Pebble', 
+										'Slab')
 						}
 									
 		#dictionary of image sets for parts
@@ -567,5 +573,4 @@ part_sprites = {			'Rod':['rod'],
 		
 									
 		#list of materials which can be dyed
-dyed = ['plastic','rubber','fibre','paper','ceramic','pills']
-	
+dyed = ['plastic','rubber','fibre','paper','ceramic','pills','wood']

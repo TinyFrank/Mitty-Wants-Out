@@ -24,7 +24,8 @@ def place_loot(settings, screen, stats, loots, brands, retailers, mfrs):
 	#debug_init[23] = retailers[0]
 	#debug_init[24] = mfrs[0]
 	#instantiate one loot
-	loot_inst = Loot(settings, screen, stats.loot_val,gen_init,brands=brands) 
+	loot_inst = Loot(	settings, screen, stats.loot_val,gen_init,
+						brands=brands,mfrs=mfrs) 
 	#loot_inst = Loot(settings, screen, stats.loot_val,brands=brands) 
 	loot_inst.construct()
 	locate_loot(settings, screen, stats, loot_inst, loots)
@@ -86,6 +87,7 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 	"""Respond to keypresses"""
 	
 	if event.key == pygame.K_q:
+		#quit game
 		if not (stats.loot_pip or stats.inv_pip):
 			sys.exit()
 			
@@ -104,29 +106,34 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 			
 	elif event.key == pygame.K_k:
 		#debug - grow hood
-		hoods[0].grow_hood(100)
-		hoods[0].tiles = []
-		hoods[0].roll_rects()
-		if stats.watched_hh:
-			update_whh(settings, screen, stats, mp_buttons)
+		if hoods:
+			hoods[0].grow_hood(100)
+			hoods[0].tiles = []
+			hoods[0].roll_rects()
+			if stats.watched_hh:
+				update_whh(settings, screen, stats, mp_buttons)
 			
 	elif event.key == pygame.K_i:
+		#toggle inv pip
 		if not stats.inv_pip:
 			inv_pip(settings,screen,stats,ip_buttons)
 		else:
 			close_inv_pip(stats,settings,screen,ip_buttons)
 				
 	elif stats.inv_pip:
+		#check inventory hotkeys
 		check_inv_keys(	event, settings, screen, stats, loots, 
 							lp_buttons, ip_buttons,mp_buttons,hoods,
 							brands, retailers, mfrs)
 				
 	elif stats.loot_pip:
+		#check loot pip hotkeys
 		check_loot_keys(	event, settings, screen, stats, loots, 
 							lp_buttons, ip_buttons,mp_buttons,hoods,
 							brands, retailers, mfrs)
 
 	elif stats.map_pip:
+		#check map pip hotkeys
 		check_map_keys(	event, settings, screen, stats, loots, 
 							lp_buttons, ip_buttons,mp_buttons,hoods,
 							brands, retailers, mfrs)
@@ -243,7 +250,7 @@ def check_keyup_events(	event,settings, screen, stats,loots,
 
 def check_buttons(	settings, screen, stats, buttons, ig_buttons, 
 					lp_buttons, ip_buttons, mp_buttons, loots, retailers,
-					brands,	mouse_pos, player,hoods):
+					brands, mfrs, mouse_pos, player,hoods):
 	"""React to mouse clicks on buttons"""
 	
 	scx = settings.screen_width/2
@@ -258,14 +265,14 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 		#check for clicks in the loot pip
 		
 	elif stats.inv_pip and not stats.loot_pip:
-		check_inv_pip_buttons(	stats, loots, ip_buttons, screen, 
-								mouse_pos)
+		check_inv_pip_buttons(	stats, settings, loots, ip_buttons, 
+								screen, mouse_pos)
 		#check for clicks in the inv pip
 			
 	elif stats.map_pip:
 		check_map_pip_buttons(	hoods, mouse_pos, stats, mp_buttons, 
 								settings, screen, loots, brands, 
-								retailers)
+								retailers, mfrs)
 		#check for clicks in the map pip
 		
 	elif ig_buttons[4].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
@@ -298,14 +305,16 @@ def check_loot_pip_buttons(stats, loots, lp_buttons, mouse_pos):
 	else:
 		close_loot_pip(stats,lp_buttons)
 
-def check_inv_pip_buttons(stats, loots, ip_buttons, screen,  mouse_pos):
+def check_inv_pip_buttons(	stats, settings,  loots, ip_buttons, screen,  
+							mouse_pos):
 	"""react to mouse clicks inside the inventory pip"""
 	
 	if not ip_buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 		close_inv_pip(stats,settings,screen,ip_buttons)
 
 def check_map_pip_buttons(	hoods, mouse_pos, stats, mp_buttons, 
-							settings, screen, loots, brands, retailers):
+							settings, screen, loots, brands, retailers, 
+							mfrs):
 	"""react to mouse clicks inside the map pip"""
 	
 	lot_hit = False
@@ -332,13 +341,13 @@ def check_map_pip_buttons(	hoods, mouse_pos, stats, mp_buttons,
 		
 	elif mp_buttons[5].rect.collidepoint(click_loc):
 		go_to_button(	hoods, mouse_pos, stats, mp_buttons, settings, screen, 
-						loots, brands, retailers, click_loc)
+						loots, brands, retailers, mfrs, click_loc)
 
 	if not lot_hit:
 		clear_map_pip(stats, mp_buttons)
 
 def go_to_button(	hoods, mouse_pos, stats, mp_buttons, settings, screen, 
-					loots, brands, retailers, click_loc):
+					loots, brands, retailers, mfrs, click_loc):
 	"""go to the selected household. shifts loots around and creates 
 	them based on hh if hh has not yet been visited"""
 	
@@ -370,19 +379,21 @@ def go_to_button(	hoods, mouse_pos, stats, mp_buttons, settings, screen,
 		cap = round((randint(10,50)/10000)*stats.active_hh.hh_value,2)
 		stats.active_hh.yl_cap = cap
 		while True:
-			roll = randint(1,3)
+			#roll = randint(1,3)
+			roll = 2
 			prole = choice(stats.active_hh.proles)
 			if roll == 1:
-				print('trying to roll a 1')
 				pick_by_mat(prole, settings, screen, stats, loots, brands)
+				#print('pick by mat...')
 				
 			elif roll == 2:
-				pick_by_brand(prole, settings, screen, stats, loots, brands)
-				print('trying to roll a 2')
+				pick_by_brand(	prole, settings, screen, stats, loots, 
+								brands, mfrs)
+				#print('pick by brand...')
 				
 			elif roll == 3:
 				pick_by_color(prole, settings, screen, stats, loots, brands)
-				print('trying to roll a 3')
+				print('pick by color...')
 						
 			if stats.active_hh.yl_tally > stats.active_hh.yl_cap:
 				break
@@ -402,6 +413,7 @@ def pick_by_mat(prole, settings, screen, stats, loots, brands):
 	roll =1
 	done = False
 	while not done:
+		#decide which material is wanted (pick)
 		pick = choice(prole.fav_mats)
 		pick_cat = ''
 		for cat in libs.mat_cats:
@@ -414,29 +426,24 @@ def pick_by_mat(prole, settings, screen, stats, loots, brands):
 		loot_inst = Loot(	settings, screen, stats.loot_val,init,
 							brands=brands)
 		loot_inst.construct()
-		if loot_inst.raw == 'loot':
-			if pick_cat in loot_inst.parts[loot_inst.largest][4]:
-				loot_inst.parts[loot_inst.largest][6] = pick
-				loot_inst.material = pick
-				loot_inst.mat_cat = pick_cat
-				loot_inst.source = pick_cat
-				loot_inst.roll_mfr()
-				loot_inst.roll_value()
-				loot_inst.roll_name()
-				loot_inst.roll_desc()
-				loot_inst.roll_parts_desc()
-		if loot_inst.raw == 'part':
+		
+		if pick_cat in loot_inst.parts[loot_inst.largest][4]:
+			"""if the material categrory is viable for the largest part 
+			of this loot instance..."""
+			loot_inst.parts[loot_inst.largest][6] = pick
 			loot_inst.material = pick
 			loot_inst.mat_cat = pick_cat
-			loot_inst.roll_shape()
-			loot_inst.roll_industry()
+			loot_inst.source = pick_cat
+			loot_inst.roll_brand()
+			loot_inst.roll_mfr()
 			loot_inst.roll_value()
 			loot_inst.roll_name()
 			loot_inst.roll_desc()
-		done=fumble_in_yard(roll, prole, stats, settings, screen, 
+			loot_inst.roll_parts_desc()
+			done=fumble_in_yard(roll, prole, stats, settings, screen, 
 							loot_inst, loots)
-		
-def pick_by_brand(prole, settings, screen, stats, loots, brands):
+	
+def pick_by_brand(prole, settings, screen, stats, loots, brands, mfrs):
 	"""pick by fav brand"""
 	
 	roll = 2
@@ -446,10 +453,15 @@ def pick_by_brand(prole, settings, screen, stats, loots, brands):
 		init[0] = 'loot'
 		#create a new loot inst by passing only this prole's brands
 		loot_inst = Loot(	settings, screen, stats.loot_val,init,
-							brands=prole.fav_brands)
+							brands=prole.fav_brands,mfrs=mfrs)
 		loot_inst.construct()
 		done = fumble_in_yard(	roll, prole, stats, settings, screen, 
 								loot_inst, loots)
+		#print(str(loot_inst.l_type[0]) + ' from ' + str(loot_inst.brand.name))
+		#if loot_inst.brand in prole.fav_brands:
+			#print('this is one of ' + prole.fname + "'s favourite brands")
+		#else:
+			#print(str(prole.fname).upper() + "DOESN'T LIKE THIS BRAND!!!!")
 		
 def pick_by_color(prole, settings, screen, stats, loots, brands):
 	"""pick by fav color"""
@@ -653,7 +665,7 @@ def check_events(	settings, screen, stats, buttons, ig_buttons,
 			check_buttons(	settings, screen, stats, buttons, 
 							ig_buttons, lp_buttons, ip_buttons, 
 							mp_buttons, loots, retailers, brands,
-							mouse_pos, player, hoods)
+							mfrs, mouse_pos, player, hoods)
 				
 def update_screen(	settings, screen, stats, buttons, ig_buttons, 
 					lp_buttons, ip_buttons, mp_buttons, 

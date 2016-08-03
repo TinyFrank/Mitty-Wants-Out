@@ -8,10 +8,11 @@ import json
 from button import Button
 from settings import Settings
 import display
-import functions as gf
 from stats import Stats
 from player import Player
 from brands import Brand,ctg_retail,ctg_industrial
+import libs
+import functions as gf
 
 def run():
 	#Initialize game, settings and create a screen object
@@ -161,7 +162,7 @@ def run():
 	ip_buttons.append(ipdesc_button)
 	ip_buttons.append(ip_loot_window)
 	ip_buttons.append(ip_loot)
-		
+				
 	#Create a stats instance
 	stats = Stats(settings)
 	

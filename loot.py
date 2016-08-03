@@ -18,12 +18,13 @@ sources = [ ('petrochemical',['fluid','rubber']),
 			('fabrics',['fibre']),
 			('toolmaking',['plastic','metal']),
 			('garment',['fibre']),
-			('chemical',['fluid','mineral','rubber']),
+			('chemical',['fluid','mineral','rubber','solid chem']),
 			('distillery',['fluid','drink','pwdr food']),
 			('soapworks',['soft solid','natural']),
 			('semiconductor',['plastic','metal']),
-			('minerals',['mineral']),
-			('pharmaceutical',['pills'])]
+			('minerals',['solid chem']),
+			('pharmaceutical',['pills']),
+			('masonry',['mineral'])]
 
 lqds = ['fluid','drink','lqd food']
 
@@ -32,7 +33,7 @@ gen_init = 	[None,None,None,None,[],[],[],None,
 """can be initialized with a presets for 0,2,3,7,9,10"""
 class Loot(object):
 	def __init__(	self,settings,screen,loot_val,init_array=None,ref=None,
-					brands=[]):
+					brands=[],mfrs=[]):
 		
 		#initialization array for creating sprite copies
 		#self.init_array = init_array
@@ -113,6 +114,7 @@ class Loot(object):
 		self.settings = settings
 		self.screen = screen
 		self.brands = brands
+		self.mfrs = mfrs
 		self.spritepath = 'images/'
 		sys_r = random.SystemRandom()
 		
@@ -143,7 +145,7 @@ class Loot(object):
 	def construct(self):
 		#print('this is a '+self.raw)
 		if self.material:
-			#print('GETTINGS MAT_CAT')
+			#print('GETTING MAT_CAT')
 			self.get_mat_cat()
 			if self.raw == 'loot':
 				self.clean_l_types()
@@ -161,12 +163,16 @@ class Loot(object):
 		#print('WEIGHT DONE')
 		if self.raw == 'loot':
 			self.roll_parts()
+			self.roll_material()
+			self.get_mat_cat()
 			#print('PARTS DONE')
 			self.roll_condition()
 			#print('CONDITION DONE')
 			self.roll_mfr()
 			#print('MFR DONE')
-		self.roll_material()
+		else:
+			self.roll_material()
+			self.get_mat_cat()
 		if self.raw == 'part':
 			self.roll_brand()
 		#print('MATERIAL DONE')
@@ -247,9 +253,12 @@ class Loot(object):
 		while True:
 			self.brand = choice(self.brands)
 			if self.raw == 'loot':
-				if self.brand.ri == 'retail': #for retail brands...
-					break
-							
+				if self.brand.ri == 'retail':  #for retail brands...
+					if not self.mat_cat:
+						break
+					elif self.brand.ctg in self.l_type[5]:
+						break
+								
 			elif self.raw == 'part' and self.mat_cat:
 				if self.brand.ri == 'industrial':
 					if self.mat_cat in self.brand.mat_cats:
@@ -413,25 +422,29 @@ class Loot(object):
 					
 	def roll_mfr(self):
 		if not self.mfr:
-			count = 200
-			while True:
-				#pick a source industry entry at random
-				industry = choice(sources)
-				#if the loot material is made by this industry...
-				if self.source in industry[1]:
-					#...and the industry appears in the loot's mfr list
-					if industry[0] in self.l_type[4]:
-						#print('new industry for this ' +self.parts[self.largest][6][0] +self.l_type[0]+ 'is ' +industry[0])
-						break
-				count -= 1
-				if count < 1:
-					#print('could not find industry for '+self.parts[self.largest][6][0] +' '+self.l_type[0])
-					break
+			source_options = []
+			#make a list of viable mfr sources
+			for source in sources:
+				if source[0] in self.l_type[4]:
+					#print(str(source[0]) + ' company can produce a ' + str(self.l_type[0]))
+					if self.mat_cat in source[1]:
+						#print('		because this one is made from ' + str(self.mat_cat))
+						source_options.append(source[0])
+					#else:
+						#print('		HOWEVER this one is made from ' + str(self.mat_cat))
+			
+			mfr_options = []
+			#make a list of viable mfrs
+			for mfr in self.mfrs:	
+				if mfr.ctg in source_options:
+					#print(str(brand.ctg) + ' is in source_options')	
+					mfr_options.append(mfr)
+					
 			if len(self.brand.mfrs) > 0: #if some mfrs have been picked for this brand...
 				count = 100
 				while True:
 					self.mfr = choice(self.brand.mfrs)#make loot mfr one of the brand's mfrs
-					if self.mfr.ctg == industry[0]: #if the mfr matches the loot's industry, break
+					if self.mfr in mfr_options: #if the mfr matches the loot's industry, break
 						#print(self.mfr.name+' is suitable and already works for our brand!')
 						break
 					count -= 1
@@ -440,17 +453,10 @@ class Loot(object):
 						self.mfr = ''
 						break
 						#print('none of the brand mfrs matched the loot ctg')
+						
 			if not self.mfr:
-				count = 100
-				while True:
-					self.mfr = choice(self.brands)
-					if self.mfr.ctg == industry[0]:
-						self.brand.mfrs.append(self.mfr)
-						#print(self.mfr.name+' now works for '+self.brand.name)
-						break
-					count -= 1
-					if count < 1:
-						break
+				self.mfr = choice(mfr_options)
+				self.brand.mfrs.append(self.mfr)
 						
 	def roll_condition(self):
 		if not self.condition:
@@ -507,7 +513,11 @@ class Loot(object):
 			self.color = ['N/A',[0,0,0]]
 			if self.raw == 'loot':
 				self.m_color = self.material[2]
-				self.color = choice(self.brand.colors)
+				if self.mat_cat in libs.dyed:
+					self.color = choice(self.brand.colors)
+				else:
+					self.color[1] = self.material[2]
+					self.color[0] = self.material[0]
 			if self.raw == 'part':
 				self.color[1] = self.material[2]
 				self.color[0] = self.material[0]

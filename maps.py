@@ -1,6 +1,7 @@
 from random import choice, randint
 from button import Button
-from household import Household, Prole, lnames
+from household import Household, Prole
+from brands import lnames
 
 prefixes = ['San ','Old ','Great ','East ','West ','North ','South '
 			'Central ','Upper ','Lower ','Little ']

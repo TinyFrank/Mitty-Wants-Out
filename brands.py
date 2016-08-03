@@ -1,7 +1,19 @@
 from libs import *
-from household import fnames,mnames,lnames
 from random import choice
 from loot import sources as sources
+
+lnames = [ 	'Manning','Tsang','MacLeod','Flood','Elston','Rayner',
+			'Triantafilou','Cracknell','Shetler','Robertson','Smith',
+			'Johnson','Pilkington','Wynne','Sanders','Trump',"O'Neil",
+			'Flaherty','Harper','Trudeau']
+
+mnames = [	'Josh','Nick','Pete','Caleb','Phil','Garth','Matt','Micah',
+			'Don','Al','Paul','Dan','John','Steve','Chris','Ken','Frank',
+			'Berg']
+
+fnames = [	'Cherry','Tessa','Carron','Sharon','Mel','Hannah','Lila',
+			'Meghan','Becca','Sarah','Kate','Ali','Pat']
+			
 ctg_retail = [	'patio','entertainment','kitchenware','clothing',
 				'sanitary','toys','plumbing','hardware',
 				'souvenirs','foods','publishers','stationery',
@@ -11,7 +23,8 @@ ctg_retail = [	'patio','entertainment','kitchenware','clothing',
 ctg_industrial = ['petrochemical','plastics','fabricators',
 				'agriculture','carpentry','printers','glassworks','paper',
 				'fabrics','toolmaking','garment','chemical','distillery',
-				'soapworks','semiconductor','pharmaceutical','minerals']
+				'soapworks','semiconductor','pharmaceutical','minerals',
+				'masonry']
 				
 words1 = [	'First','Best','Solid','OK','High','Golden','Sunny','Jelly',
 			'Friendly','Happy','Fresh','Tall','Great','Awesome','Perfect',
@@ -53,7 +66,9 @@ words2 = [	'Friends','Friend','Neighbour','Brother','Sister','Family',
 			'Tower','Castle','Alley','Depot','Center','Market','Shoppe',
 			'Firkin','Club','Jelly','Specialists','Kaboom','Dollar','Penny',
 			'Nickel','Dime','Quarter','Discount','Dimes','Snipe','Ray','Chicken',
-			'Troll','Judas','Partner','Kirk','Cricket','Fun','Spot','Child']
+			'Troll','Judas','Partner','Kirk','Cricket','Fun','Spot','Child',
+			'Nugget','Nuggets','Partners','Thing','Dollar','Specialist',
+			'Azimuth']
 
 btype = [ ' Inc.',' Co.',' Ltd.',' LLC',' Outlet']
 

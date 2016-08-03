@@ -1,19 +1,8 @@
 import pygame
 import random
+from brands import fnames,mnames,lnames
 from random import randint,choice
 from libs import *
-
-lnames = [ 	'Manning','Tsang','MacLeod','Flood','Elston','Rayner',
-			'Triantafilou','Cracknell','Shetler','Robertson','Smith',
-			'Johnson','Pilkington','Wynne','Sanders','Trump',"O'Neil",
-			'Flaherty','Harper','Trudeau']
-
-mnames = [	'Josh','Nick','Pete','Caleb','Phil','Garth','Matt','Micah',
-			'Don','Al','Paul','Dan','John','Steve','Chris','Ken','Frank',
-			'Berg']
-
-fnames = [	'Cherry','Tessa','Carron','Sharon','Mel','Hannah','Lila',
-			'Meghan','Becca','Sarah','Kate','Ali','Pat']
 
 months = [	('January',31),
 			('February',29),
@@ -30,8 +19,14 @@ months = [	('January',31),
 			
 lqds = ['fluid','drink','lqd food']
 
-cntnts = ['fluid','drink','lqd food','pwdr food','soft food','soft solid','pills']
-
+cntnts = [	'fluid','drink','lqd food','pwdr food','soft food',
+				'soft solid','pills','solid chem']
+all_mats = []
+for mat_cat in mat_cats:
+	if mat_cat not in cntnts:
+		for mat in std_w[mat_cat][1]:
+			all_mats.append(mat)
+			
 class Household(object):
 	def __init__(	self,settings, screen, stats, lot_value=None, 
 					materials=None, colors=None, num_proles=None,
@@ -185,12 +180,13 @@ class Prole(object):
 			
 		mats = randint(1,3)
 		self.fav_mats = []
+		self.fav_mat_names = []
 		for i in range(mats):
-			temp_mat_cat = 'fluid'
-			while temp_mat_cat in cntnts:
-				temp_mat_cat = choice(mat_cats)
-			self.fav_mats.append(choice(std_w[temp_mat_cat][1]))
-		
+			pick = choice(all_mats)
+			self.fav_mats.append(pick)
+			self.fav_mat_names.append(pick[0])
+		#print('new fav mats are ' + str(self.fav_mat_names))
+			
 		#print(self.fname.upper() + ' ' + self.lname.upper())
 		#for color in self.fav_colors:
 			#print(color[0])
