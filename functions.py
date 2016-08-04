@@ -379,8 +379,8 @@ def go_to_button(	hoods, mouse_pos, stats, mp_buttons, settings, screen,
 		cap = round((randint(10,50)/10000)*stats.active_hh.hh_value,2)
 		stats.active_hh.yl_cap = cap
 		while True:
-			roll = randint(1,3)
-			#roll = 1
+			#roll = randint(1,3)
+			roll = 1
 			prole = choice(stats.active_hh.proles)
 			if roll == 1:
 				#print('pick by mat...')
@@ -413,9 +413,29 @@ def adjust_qc(	prole, loot_inst, gain):
 		"""adjust the quality and condition of a loot to coincide with
 		the specific prole who fumbled it. gain is a number, 1 or more, 
 		which determines how far the final q/c is from the prole's q/c"""
-		qc_offset = choice(range(-gain,gain+1))
 		
-
+		q_offset = choice(range(-gain,gain+1))
+		c_offset = choice(range(-gain,gain+1))
+		
+		loot_inst.quality_num = prole.quality + q_offset
+		if loot_inst.quality_num > len(libs.qualities):
+			loot_inst.quality_num = len(libs.qualities)
+		elif loot_inst.quality_num < 0:
+			loot_inst.quality_num = 0
+		loot_inst.quality = libs.qualities[loot_inst.quality_num-1]
+		
+		loot_inst.condition_num = prole.condition + c_offset
+		if loot_inst.condition_num > len(libs.conditions):
+			loot_inst.condition_num = len(libs.conditions)
+		elif loot_inst.condition_num < 0:
+			loot_inst.condition_num = 0
+		loot_inst.condition = libs.conditions[loot_inst.condition_num-1]
+		
+		loot_inst.roll_value()
+		loot_inst.roll_name()
+		loot_inst.roll_desc()
+		loot_inst.rebuild()
+		
 def pick_by_mat(	prole, settings, screen, stats, loots, brands, mfrs, 
 					active_hh):
 	"""pick by fav material"""
@@ -452,6 +472,11 @@ def pick_by_mat(	prole, settings, screen, stats, loots, brands, mfrs,
 			loot_inst.roll_parts_desc()
 			loot_inst.roll_image()
 			loot_inst.rebuild()
+			adjust_qc(	prole, loot_inst, 1)
+			print('active_hh = ' + str(active_hh.qualities) + ' & ' + str(active_hh.conditions))
+			print('active_hh = ' + str(prole.quality) + ' & ' + str(prole.condition))
+			print('active_hh = ' + str(loot_inst.quality_num) + ' & ' + str(loot_inst.condition_num))
+			print('\n')
 			done=fumble_in_yard(roll, prole, stats, settings, screen, 
 							loot_inst, loots)
 		init[9] = None
