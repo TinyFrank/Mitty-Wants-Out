@@ -759,9 +759,22 @@ def update_screen(	settings, screen, stats, buttons, ig_buttons,
 					loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i)
 					player.dest_ref = None
 					break	
-		for i in loots:
+					
+		fore_blits = []
+		rear_blits = []
+		for loot in loots:
+			if (loot.rect.y+loot.rect.height) >= (player.rect.y+player.rect.height):
+				fore_blits.append(loot)
+			else:
+				rear_blits.append(loot)
+		#for i in loots:
+			#i.blitme()
+		for i in rear_blits:
 			i.blitme()
 		player.blitme()
+		for i in fore_blits:
+			i.blitme()
+			
 		for i in ig_buttons:
 			i.draw_button()
 		if stats.loot_pip:

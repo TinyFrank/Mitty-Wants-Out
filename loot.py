@@ -736,10 +736,14 @@ class Loot(object):
 				self.label.append(choice(self.colors))
 						
 	def roll_image(self):
-		#always load LINE layer, convert 
-		self.image_line = pygame.image.load(self.spritepath+"L_" + str(self.sprite)+'.png')
-		self.image_line.convert_alpha()
 		
+		try:
+			#if there is a LINE layer, load and convert it
+			self.image_line = pygame.image.load(self.spritepath+"L_" + str(self.sprite)+'.png')
+			self.image_line.convert_alpha()
+		except:
+			pass
+			
 		#always load bottom MATERIAL layer, convert 
 		self.image_mat = pygame.image.load(self.spritepath+"M_" + str(self.sprite)+'.png')
 		self.image_mat.convert_alpha()
@@ -747,7 +751,7 @@ class Loot(object):
 		#number of colors/layers in the current working image	
 		self.layers = (len(self.image_mat.get_palette()))
 		
-		#iterate through mat layer to shade	
+		#iterate through MATERIAL layer to shade	
 		for i in range(0,self.layers-1):
 			#assign working color to x_color
 			self.x_color = self.image_mat.get_palette_at(i)
