@@ -149,23 +149,23 @@ class Loot(object):
 	def construct(self):
 		#print('this is a '+self.raw)
 		if self.material:
-			print('GETTING MAT_CAT')
+			#print('GETTING MAT_CAT')
 			self.get_mat_cat()
 			if self.raw == 'loot':
 				self.clean_l_types()
-				print('LOOT TYPES ARE CLEAN')
+				#print('LOOT TYPES ARE CLEAN')
 		elif not self.material:
 			#print('GETTING BRAND...')
 			self.roll_brand()
 			#print('BRAND DONE')
 		if self.raw == 'loot':
 			self.roll_l_type()
-			print('L_TYPE SELECTED')
+			#print('L_TYPE SELECTED')
 			if self.material:
 				self.roll_brand()
-				print('BRAND SELECTED')
-				print(len(self.brands))
-			print('LTYPE DONE')
+				#print('BRAND SELECTED')
+				#print(len(self.brands))
+			#print('LTYPE DONE')
 		self.roll_weight()
 		#print('WEIGHT DONE')
 		if self.raw == 'loot':
@@ -211,7 +211,8 @@ class Loot(object):
 			self.parts_desc,self.condition,self.mat_cat,self.color,
 			self.m_color,self.t_color,self.sprite,self.label,self.brand,
 			self.mfr]
-		print('\n')
+		self.rebuild()
+		#print('\n')
 		
 	def DECLARE(self):
 		"""declare your contents...like...at...customs? it's debug"""

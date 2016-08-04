@@ -383,17 +383,17 @@ def go_to_button(	hoods, mouse_pos, stats, mp_buttons, settings, screen,
 			#roll = 1
 			prole = choice(stats.active_hh.proles)
 			if roll == 1:
-				print('pick by mat...')
+				#print('pick by mat...')
 				pick_by_mat(	prole, settings, screen, stats, loots, 
 								brands, mfrs, stats.active_hh)
 				
 			elif roll == 2:
-				print('pick by brand...')
+				#print('pick by brand...')
 				pick_by_brand(	prole, settings, screen, stats, loots, 
 								brands, mfrs, stats.active_hh)
 				
 			elif roll == 3:
-				print('pick by color...')
+				#print('pick by color...')
 				pick_by_color(	prole, settings, screen, stats, loots, 
 								brands, mfrs, stats.active_hh)
 						
