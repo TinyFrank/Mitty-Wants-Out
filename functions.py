@@ -383,7 +383,8 @@ def go_to_button(	hoods, mouse_pos, stats, mp_buttons, settings, screen,
 			roll = 2
 			prole = choice(stats.active_hh.proles)
 			if roll == 1:
-				pick_by_mat(prole, settings, screen, stats, loots, brands)
+				pick_by_mat(	prole, settings, screen, stats, loots, 
+								brands, mfrs)
 				#print('pick by mat...')
 				
 			elif roll == 2:
@@ -392,8 +393,9 @@ def go_to_button(	hoods, mouse_pos, stats, mp_buttons, settings, screen,
 				#print('pick by brand...')
 				
 			elif roll == 3:
-				pick_by_color(prole, settings, screen, stats, loots, brands)
-				print('pick by color...')
+				pick_by_color(	prole, settings, screen, stats, loots, 
+								brands, mfrs)
+				#print('pick by color...')
 						
 			if stats.active_hh.yl_tally > stats.active_hh.yl_cap:
 				break
@@ -407,7 +409,7 @@ def go_to_button(	hoods, mouse_pos, stats, mp_buttons, settings, screen,
 			except:
 				break
 
-def pick_by_mat(prole, settings, screen, stats, loots, brands):
+def pick_by_mat(prole, settings, screen, stats, loots, brands, mfrs):
 	"""pick by fav material"""
 	
 	roll =1
@@ -424,7 +426,7 @@ def pick_by_mat(prole, settings, screen, stats, loots, brands):
 		init[9] = pick
 		init[0] = 'loot'
 		loot_inst = Loot(	settings, screen, stats.loot_val,init,
-							brands=brands)
+							brands=brands,mfrs=mfrs)
 		loot_inst.construct()
 		
 		if pick_cat in loot_inst.parts[loot_inst.largest][4]:
@@ -440,6 +442,8 @@ def pick_by_mat(prole, settings, screen, stats, loots, brands):
 			loot_inst.roll_name()
 			loot_inst.roll_desc()
 			loot_inst.roll_parts_desc()
+			loot_inst.roll_image()
+			loot_inst.rebuild()
 			done=fumble_in_yard(roll, prole, stats, settings, screen, 
 							loot_inst, loots)
 	
@@ -455,27 +459,37 @@ def pick_by_brand(prole, settings, screen, stats, loots, brands, mfrs):
 		loot_inst = Loot(	settings, screen, stats.loot_val,init,
 							brands=prole.fav_brands,mfrs=mfrs)
 		loot_inst.construct()
+		print(str(loot_inst.l_type[0]) + ' from ' + str(loot_inst.brand.name))
+		if loot_inst.brand in prole.fav_brands:
+			print('this is one of ' + prole.fname + "'s favourite brands")
+		else:
+			print(str(prole.fname).upper() + "DOESN'T LIKE THIS BRAND!!!!")
 		done = fumble_in_yard(	roll, prole, stats, settings, screen, 
 								loot_inst, loots)
-		#print(str(loot_inst.l_type[0]) + ' from ' + str(loot_inst.brand.name))
-		#if loot_inst.brand in prole.fav_brands:
-			#print('this is one of ' + prole.fname + "'s favourite brands")
-		#else:
-			#print(str(prole.fname).upper() + "DOESN'T LIKE THIS BRAND!!!!")
 		
-def pick_by_color(prole, settings, screen, stats, loots, brands):
+def pick_by_color(prole, settings, screen, stats, loots, brands, mfrs):
 	"""pick by fav color"""
 	
 	roll = 3
 	done = False
 	while not done:
 		init = gen_init
-		init[18] = choice(prole.fav_colors)
+		#init[18] = choice(prole.fav_colors)
 		init[0] = 'loot'
-		loot_inst = Loot(settings, screen, stats.loot_val,init,brands=brands)
+		loot_inst = Loot(	settings, screen, stats.loot_val,init,
+							brands=brands,mfrs=mfrs)
 		loot_inst.construct()
-		done = fumble_in_yard(	roll, prole, stats, settings, screen, 
-								loot_inst, loots)
+		if loot_inst.is_dyeable():
+			loot_inst.color = choice(prole.fav_colors)
+			loot_inst.roll_name()
+			loot_inst.roll_desc()
+			loot_inst.roll_image()
+			loot_inst.rebuild()
+			#for color in prole.fav_colors:
+				#print(color[0])
+			#print(loot_inst.color[0].upper()+'\n')
+			done = fumble_in_yard(	roll, prole, stats, settings, screen, 
+									loot_inst, loots)
 		
 def fumble_in_yard(	roll, prole, stats, settings, screen, loot_inst, 
 					loots):

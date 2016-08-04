@@ -513,7 +513,7 @@ class Loot(object):
 			self.color = ['N/A',[0,0,0]]
 			if self.raw == 'loot':
 				self.m_color = self.material[2]
-				if self.mat_cat in libs.dyed:
+				if self.is_dyeable():
 					self.color = choice(self.brand.colors)
 				else:
 					self.color[1] = self.material[2]
@@ -523,6 +523,12 @@ class Loot(object):
 				self.color[0] = self.material[0]
 				if self.mat_cat in self.dyed:
 					self.color = choice(self.brand.colors)
+	
+	def is_dyeable(self):
+		if self.mat_cat in libs.dyed:
+			return(True)
+		else:
+			return(False)
 					
 	def roll_shape(self):
 		if not self.shape:
