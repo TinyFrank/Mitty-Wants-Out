@@ -83,9 +83,14 @@ class Household(object):
 		self.wages = []
 		self.wages_n = 0
 		for i in range(self.num_adults):
+			#create a starting number between 1-100, squared
 			self.x_wages.append(randint(1,101)**2)	
+			#sum all the starting numbers
 			self.wages_n += self.x_wages[i]
 		for i in self.x_wages:
+			"""divide each of the wages by the sum to normalize them
+			each wage entry now represents that wage's fraction of the 
+			total household wage. ex. 0.1,0.2,0.7 make a sum of 1"""
 			self.wages.append(i/self.wages_n)
 		
 	def roll_proles(self):
@@ -97,7 +102,8 @@ class Household(object):
 			for i in range(self.num_adults):
 				x_age = randint(self.stats.work_age+1,85)
 				prole = Prole(	self.settings,self.screen,self.stats,
-								self.hh_value,lname=self.lname,
+								self.hh_value, self.qualities, 
+								self.conditions, lname=self.lname,
 								salary=round(self.hh_value*self.wages[i],2),
 								age=x_age)
 				self.proles.append(prole)
@@ -106,25 +112,39 @@ class Household(object):
 				for i in range(self.num_kids):
 					x_age = randint(0,self.stats.work_age+1)
 					prole = Prole(	self.settings,self.screen,self.stats,
-									self.hh_value,lname=self.lname,
+									self.hh_value,self.qualities,
+									self.conditions, lname=self.lname,
 									age=x_age)
 					self.proles.append(prole)
 			
 	def adjust_wages(self):
 		for i in range(self.num_adults):
 			self.proles[i].salary = int(self.hh_value*self.wages[i])
+	
+	def roll_qualities(self):
+		"""this number will represent the average quality of the 
+		household's possesions"""
+		self.qualities = choice(range(1,len(qualities)-1))
+		
+	def roll_conditions(self):
+		"""this number will represent the average conditions of the 
+		household's possesions"""
+		self.conditions = choice(range(1,len(conditions)-1))
 			
 	def construct(self):
 		self.roll_hh_value()
 		self.roll_lname()
 		self.roll_num_proles()
 		self.roll_wages()
+		self.roll_qualities()
+		self.roll_conditions()
 		self.roll_proles()				
 		
 class Prole(object):
 	def __init__(	self,settings, screen, stats, hh_value=None, 
-					materials=None, colors=None, lname=None, fname=None,
-					salary=None, age=None, sex=None, bday=None):
+					quality=None, condition=None, materials=None, 
+					colors=None, lname=None, fname=None,
+					salary=None, age=None, sex=None, bday=None, ):
 		self.settings = settings
 		self.screen = screen
 		self.stats = stats
@@ -137,13 +157,17 @@ class Prole(object):
 		self.age = age
 		self.sex = sex
 		self.bday = bday
+		self.quality = quality
+		self.condition = condition
 		
 		self.construct()
 		
 	def construct(self):
 		self.roll_sex()
 		self.roll_name()
-		self.roll_bday()	
+		self.roll_bday()
+		self.roll_quality()
+		self.roll_condition()	
 		
 	def roll_sex(self):
 		if not self.sex:
@@ -166,6 +190,24 @@ class Prole(object):
 					break
 				else:
 					self.bday -= months[i][1]
+		
+	def roll_quality(self):
+		self.q_offset = choice(	[-3,-2,-2,-2,-1,-1,-1,-1,-1,-1,0,0,0,0,0,
+								0,1,1,1,1,1,1,2,2,2,3])
+		self.quality = self.quality + self.q_offset
+		if self.quality < 0:
+			self.quality = 0
+		if self.quality > len(qualities):
+			self.quality = len(qualities)
+	
+	def roll_condition(self):
+		self.c_offset = choice(	[-3,-2,-2,-2,-1,-1,-1,-1,-1,-1,0,0,0,0,0,
+								0,1,1,1,1,1,1,2,2,2,3])
+		self.condition = self.condition + self.c_offset
+		if self.condition < 0:
+			self.condition = 0
+		if self.condition > len(conditions):
+			self.condition = len(conditions)
 		
 	def roll_favs(self,retailers):
 		clrs = randint(1,3)

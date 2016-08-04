@@ -28,8 +28,8 @@ sources = [ ('petrochemical',['fluid','rubber']),
 
 lqds = ['fluid','drink','lqd food']
 
-gen_init = 	[None,None,None,None,[],[],[],None,
-			None,[],[],[],'','',[],[],[],None,[],[],[],[],'',[],'','']
+gen_init = 	[	None,None,None,None,[],[],[],None,None,[],[],[],'','',
+				[],[],[],None,[],[],[],[],'',[],'','',None,None]
 """can be initialized with a presets for 0,2,3,7,9,10"""
 class Loot(object):
 	def __init__(	self,settings,screen,loot_val,init_array=None,ref=None,
@@ -65,6 +65,8 @@ class Loot(object):
 			self.label = init_array[22]#array - label color palette
 			self.brand = init_array[23]#string - brand name
 			self.mfr = init_array[24]#string - name of manufacturer
+			self.condition_num = init_array[25]#int - condition index
+			self.quality_num = init_array[26]#int - quality index
 		else:
 			self.raw = choice(('loot','part'))
 			self.l_type = None
@@ -91,6 +93,8 @@ class Loot(object):
 			self.label = []
 			self.brand = ''
 			self.mfr = ''
+			self.condition_num = None
+			self.quality_num = None
 					
 		#overwrite ref if one was provided
 		if ref:
@@ -145,20 +149,23 @@ class Loot(object):
 	def construct(self):
 		#print('this is a '+self.raw)
 		if self.material:
-			#print('GETTING MAT_CAT')
+			print('GETTING MAT_CAT')
 			self.get_mat_cat()
 			if self.raw == 'loot':
 				self.clean_l_types()
-				#print('LOOT TYPES ARE CLEAN')
+				print('LOOT TYPES ARE CLEAN')
 		elif not self.material:
 			#print('GETTING BRAND...')
 			self.roll_brand()
 			#print('BRAND DONE')
 		if self.raw == 'loot':
 			self.roll_l_type()
+			print('L_TYPE SELECTED')
 			if self.material:
 				self.roll_brand()
-			#print('LTYPE DONE')
+				print('BRAND SELECTED')
+				print(len(self.brands))
+			print('LTYPE DONE')
 		self.roll_weight()
 		#print('WEIGHT DONE')
 		if self.raw == 'loot':
@@ -204,7 +211,8 @@ class Loot(object):
 			self.parts_desc,self.condition,self.mat_cat,self.color,
 			self.m_color,self.t_color,self.sprite,self.label,self.brand,
 			self.mfr]
-			
+		print('\n')
+		
 	def DECLARE(self):
 		"""declare your contents...like...at...customs? it's debug"""
 		
@@ -222,7 +230,7 @@ class Loot(object):
 			self.quality,self.short_name,self.name,self.desc,
 			self.parts_desc,self.condition,self.mat_cat,self.color,
 			self.m_color,self.t_color,self.sprite,self.label,self.brand,
-			self.mfr]
+			self.mfr,self.condition_num,self.quality_num]
 	
 	def get_mat_cat(self):
 		#determine mat_cat of specified material
@@ -253,6 +261,8 @@ class Loot(object):
 		while True:
 			self.brand = choice(self.brands)
 			if self.raw == 'loot':
+				#print('getting BRAND for this LOOT')
+				#print(len(self.brands))
 				if self.brand.ri == 'retail':  #for retail brands...
 					if not self.mat_cat:
 						break
@@ -459,9 +469,12 @@ class Loot(object):
 				self.brand.mfrs.append(self.mfr)
 						
 	def roll_condition(self):
+		#select condition at random
+		if not self.condition_num:
+			self.condition_num = choice(range(0,len(self.conditions)))
+			#print(self.condition_num)
 		if not self.condition:
-			#select condition at random
-			self.condition = choice(self.conditions)
+			self.condition = self.conditions[self.condition_num]
 						
 	def roll_material(self):
 		if not self.material:
@@ -569,9 +582,12 @@ class Loot(object):
 			self.brand = self.mfr
 			
 	def roll_quality(self):
+		#select quality at random
+		if not self.quality_num:
+			self.quality_num = choice(range(0,len(self.qualities)))
+			#print(self.quality_num)
 		if not self.quality:
-			#select condition at random
-			self.quality = choice(self.brand.qtys)
+			self.quality = self.qualities[self.quality_num]
 								
 	def roll_value(self):
 		if not self.value:

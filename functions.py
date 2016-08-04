@@ -379,23 +379,23 @@ def go_to_button(	hoods, mouse_pos, stats, mp_buttons, settings, screen,
 		cap = round((randint(10,50)/10000)*stats.active_hh.hh_value,2)
 		stats.active_hh.yl_cap = cap
 		while True:
-			#roll = randint(1,3)
-			roll = 2
+			roll = randint(1,3)
+			#roll = 1
 			prole = choice(stats.active_hh.proles)
 			if roll == 1:
+				print('pick by mat...')
 				pick_by_mat(	prole, settings, screen, stats, loots, 
-								brands, mfrs)
-				#print('pick by mat...')
+								brands, mfrs, stats.active_hh)
 				
 			elif roll == 2:
+				print('pick by brand...')
 				pick_by_brand(	prole, settings, screen, stats, loots, 
-								brands, mfrs)
-				#print('pick by brand...')
+								brands, mfrs, stats.active_hh)
 				
 			elif roll == 3:
+				print('pick by color...')
 				pick_by_color(	prole, settings, screen, stats, loots, 
-								brands, mfrs)
-				#print('pick by color...')
+								brands, mfrs, stats.active_hh)
 						
 			if stats.active_hh.yl_tally > stats.active_hh.yl_cap:
 				break
@@ -409,7 +409,15 @@ def go_to_button(	hoods, mouse_pos, stats, mp_buttons, settings, screen,
 			except:
 				break
 
-def pick_by_mat(prole, settings, screen, stats, loots, brands, mfrs):
+def adjust_qc(	prole, loot_inst, gain):
+		"""adjust the quality and condition of a loot to coincide with
+		the specific prole who fumbled it. gain is a number, 1 or more, 
+		which determines how far the final q/c is from the prole's q/c"""
+		qc_offset = choice(range(-gain,gain+1))
+		
+
+def pick_by_mat(	prole, settings, screen, stats, loots, brands, mfrs, 
+					active_hh):
 	"""pick by fav material"""
 	
 	roll =1
@@ -446,8 +454,10 @@ def pick_by_mat(prole, settings, screen, stats, loots, brands, mfrs):
 			loot_inst.rebuild()
 			done=fumble_in_yard(roll, prole, stats, settings, screen, 
 							loot_inst, loots)
-	
-def pick_by_brand(prole, settings, screen, stats, loots, brands, mfrs):
+		init[9] = None
+		
+def pick_by_brand(	prole, settings, screen, stats, loots, brands, mfrs, 
+					active_hh):
 	"""pick by fav brand"""
 	
 	roll = 2
@@ -459,15 +469,16 @@ def pick_by_brand(prole, settings, screen, stats, loots, brands, mfrs):
 		loot_inst = Loot(	settings, screen, stats.loot_val,init,
 							brands=prole.fav_brands,mfrs=mfrs)
 		loot_inst.construct()
-		print(str(loot_inst.l_type[0]) + ' from ' + str(loot_inst.brand.name))
-		if loot_inst.brand in prole.fav_brands:
-			print('this is one of ' + prole.fname + "'s favourite brands")
-		else:
-			print(str(prole.fname).upper() + "DOESN'T LIKE THIS BRAND!!!!")
+		#print(str(loot_inst.l_type[0]) + ' from ' + str(loot_inst.brand.name))
+		#if loot_inst.brand in prole.fav_brands:
+			#print('this is one of ' + prole.fname + "'s favourite brands")
+		#else:
+			#print(str(prole.fname).upper() + "DOESN'T LIKE THIS BRAND!!!!")
 		done = fumble_in_yard(	roll, prole, stats, settings, screen, 
 								loot_inst, loots)
 		
-def pick_by_color(prole, settings, screen, stats, loots, brands, mfrs):
+def pick_by_color(	prole, settings, screen, stats, loots, brands, mfrs, 
+					active_hh):
 	"""pick by fav color"""
 	
 	roll = 3
