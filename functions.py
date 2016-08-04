@@ -11,7 +11,7 @@ from button import Button
 import math
 from maps import Hood
 
-def place_loot(settings, screen, stats, loots, brands, retailers, mfrs):
+def place_loot(	settings, screen, stats, loots, brands, retailers, mfrs):
 	"""create a new piece of loot"""
 	
 	debug_init = gen_init
@@ -30,7 +30,7 @@ def place_loot(settings, screen, stats, loots, brands, retailers, mfrs):
 	loot_inst.construct()
 	locate_loot(settings, screen, stats, loot_inst, loots)
 	
-def locate_loot(settings, screen, stats, loot_inst, loots):
+def locate_loot(	settings, screen, stats, loot_inst, loots):
 	"""find a location for a new loot inst that doesnt collide with others
 	already on screen"""
 	
@@ -63,7 +63,7 @@ def locate_loot(settings, screen, stats, loot_inst, loots):
 		
 		loots.sort(key=lambda loot: loot.rect.bottom)	
 
-def check_for_hits(loot_inst,loots):
+def check_for_hits(	loot_inst,loots):
 	"""check a loot_inst for collisions against other insts in a loots list"""
 	
 	hits = 0
@@ -72,7 +72,7 @@ def check_for_hits(loot_inst,loots):
 			hits=1
 	return(hits)
 			
-def take_loot(stats,loots,lp_buttons):
+def take_loot(	stats,loots,lp_buttons):
 	"""delete the original loot from the loots list and add a copied 
 	loot to mitty's inventory"""
 	
@@ -140,7 +140,7 @@ def check_keydown_events(	event, settings, screen, stats, loots,
 		
 	elif event.key == pygame.K_f:
 		#debug, create a (f)uck load of loot
-		for i in range(0,200):
+		for i in range(0,20):
 			place_loot(	settings, screen, stats, loots, brands, retailers,
 						mfrs)
 			
@@ -225,7 +225,7 @@ def check_map_keys(	event, settings, screen, stats, loots,
 		roll_hood(settings,screen,stats,mp_buttons,hoods)
 		stats.map_pip = True	
 
-def roll_hood(settings,screen,stats,mp_buttons,hoods):
+def roll_hood(	settings,screen,stats,mp_buttons,hoods):
 	"""roll a new hood"""
 	
 	d_hood = Hood(settings,screen,stats)
@@ -289,7 +289,7 @@ def check_buttons(	settings, screen, stats, buttons, ig_buttons,
 		elif player.dest_ref == None:
 			player.dest = mouse_pos
 	
-def check_main_menu_buttons(stats, buttons, mouse_pos):
+def check_main_menu_buttons(	stats, buttons, mouse_pos):
 	"""react to mouse clicks in the main menu"""
 	
 	if buttons[0].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
@@ -297,7 +297,7 @@ def check_main_menu_buttons(stats, buttons, mouse_pos):
 	elif  buttons[1].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
 		sys.exit()	
 
-def check_loot_pip_buttons(stats, loots, lp_buttons, mouse_pos):
+def check_loot_pip_buttons(	stats, loots, lp_buttons, mouse_pos):
 	"""react to mouse clicks inside loot pip"""
 	
 	if lp_buttons[2].rect.collidepoint(mouse_pos[0], mouse_pos[1]):
@@ -542,7 +542,7 @@ def fumble_in_yard(	roll, prole, stats, settings, screen, loot_inst,
 	else:
 		return(False)
 
-def narrate_choice(roll, loot_inst, prole):
+def narrate_choice(	roll, loot_inst, prole):
 	"""print a debug narration string to console"""
 	
 	narrative = '\n'+str(roll)+': '+prole.fname+prole.lname
@@ -566,7 +566,7 @@ def narrate_choice(roll, loot_inst, prole):
 		narrative += 'color.('+str(f_colors)+')'
 	print(narrative)	
 			
-def clear_map_pip(stats, mp_buttons):
+def clear_map_pip(	stats, mp_buttons):
 	"""delete all mp_buttons beyond 6 (which held temp information
 	for the currently selected lot) and rewrite all buttons before 6 to
 	and empty string"""
@@ -582,7 +582,7 @@ def clear_map_pip(stats, mp_buttons):
 	mp_buttons[5].prep_msg()
 	del mp_buttons[6:]
 				
-def update_whh(settings, screen, stats, mp_buttons):
+def update_whh(	settings, screen, stats, mp_buttons):
 	"""update the watched household buttons in the map pip"""
 	
 	del mp_buttons[6:]	
@@ -614,7 +614,7 @@ def update_whh(settings, screen, stats, mp_buttons):
 			x+240, y+i*25, 75,30,(0,0,0),None,15)
 		mp_buttons.append(text_line)
 			
-def loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i):	
+def loot_pip(	settings,screen,stats,lp_buttons,scx,scy,loot,i):	
 	stats.inv_pip = False
 	stats.map_pip = False
 	loot_inst = Loot(	settings, 
@@ -635,13 +635,13 @@ def loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i):
 	lp_buttons[6].rect.center = lp_buttons[4].rect.center 
 	stats.loot_pip = True	
 
-def close_loot_pip(stats,lp_buttons):
+def close_loot_pip(	stats,lp_buttons):
 	#delete alll buttons related to this loot
 	del lp_buttons[6:]
 	#turn off the loot pip
 	stats.loot_pip = False
 	
-def inv_pip(settings,screen,stats,ip_buttons):
+def inv_pip(	settings,screen,stats,ip_buttons):
 	stats.map_pip = False
 	stats.loot_pip = False
 	scx = settings.screen_width/2
@@ -684,7 +684,7 @@ def inv_pip(settings,screen,stats,ip_buttons):
 			pass
 	stats.inv_pip = True
 
-def close_inv_pip(stats,settings,screen,ip_buttons):
+def close_inv_pip(	stats,settings,screen,ip_buttons):
 	if stats.inv:
 		del ip_buttons[15:]
 	stats.inv_pip = False
@@ -716,6 +716,16 @@ def check_events(	settings, screen, stats, buttons, ig_buttons,
 							ig_buttons, lp_buttons, ip_buttons, 
 							mp_buttons, loots, retailers, brands,
 							mfrs, mouse_pos, player, hoods)
+
+def blit_depths(	player, loots):
+	"""blit mitty and other items at the correct depth"""
+	
+	blits = []
+	blits[1:1] = loots
+	blits.append(player)
+	blits.sort(key=lambda x: x.rect.y+x.rect.height)	
+	for i in blits:
+		i.blitme()	
 				
 def update_screen(	settings, screen, stats, buttons, ig_buttons, 
 					lp_buttons, ip_buttons, mp_buttons, 
@@ -748,7 +758,7 @@ def update_screen(	settings, screen, stats, buttons, ig_buttons,
 			i.draw_button()
 	#draw ingame menus while the game is active
 	if stats.game_active:
-		player.update()
+		player.update(loots)
 		for i,loot in enumerate(loots):
 			if loot.rect.colliderect(player.rect):
 				if i == player.dest_ref:
@@ -759,21 +769,8 @@ def update_screen(	settings, screen, stats, buttons, ig_buttons,
 					loot_pip(settings,screen,stats,lp_buttons,scx,scy,loot,i)
 					player.dest_ref = None
 					break	
-					
-		fore_blits = []
-		rear_blits = []
-		for loot in loots:
-			if (loot.rect.y+loot.rect.height) >= (player.rect.y+player.rect.height):
-				fore_blits.append(loot)
-			else:
-				rear_blits.append(loot)
-		#for i in loots:
-			#i.blitme()
-		for i in rear_blits:
-			i.blitme()
-		player.blitme()
-		for i in fore_blits:
-			i.blitme()
+			
+		blit_depths(player, loots)
 			
 		for i in ig_buttons:
 			i.draw_button()
