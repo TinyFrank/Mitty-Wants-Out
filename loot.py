@@ -308,6 +308,7 @@ class Loot(object):
 						
 		if not self.l_type: 
 			#assign that index's array to l_type
+			self.l_type_num = choice(range(1,len(self.loot_types)-1))
 			self.l_type = self.loot_types[self.l_type_num]
 		
 	def roll_weight(self):
@@ -331,6 +332,7 @@ class Loot(object):
 				self.weight *= setpoint
 			
 	def roll_parts(self):
+		print(self.l_type[0])
 		#check redundancy
 		if not self.parts:
 			#assign l_type parts array to self.parts
@@ -833,10 +835,13 @@ class Loot(object):
 		self.rect.normalize()
 		self.collide_rect = self.rect.copy()
 		self.screen_rect = self.screen.get_rect()
-		footprint = self.collide_rect.width/self.collide_rect.height
-		if footprint < 4:
-			self.collide_rect.height = self.collide_rect.width * (1/4)
+		if self.l_type[6] < 1:
+			self.collide_rect.height = self.collide_rect.width * self.l_type[6]
 			self.collide_rect.bottom = self.rect.bottom
+		#footprint = self.collide_rect.width/self.collide_rect.height
+		#if footprint < 4:
+			#self.collide_rect.height = self.collide_rect.width * (1/4)
+			#self.collide_rect.bottom = self.rect.bottom
 		self.collide_rect.normalize()
 		
 	def blit_alpha(self,target, source, location, opacity):
