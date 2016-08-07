@@ -7,6 +7,7 @@ from loot import *
 import pygame
 import copy
 import libs
+from iso import *
 from button import Button
 import math
 from maps import Hood
@@ -29,7 +30,7 @@ def place_loot(	settings, screen, stats, loots, brands, retailers, mfrs):
 	#loot_inst = Loot(settings, screen, stats.loot_val,brands=brands) 
 	loot_inst.construct()
 	locate_loot(settings, screen, stats, loot_inst, loots)
-	
+
 def locate_loot(	settings, screen, stats, loot_inst, loots):
 	"""find a location for a new loot inst that doesnt collide with others
 	already on screen"""
@@ -69,7 +70,8 @@ def check_for_hits(	loot_inst,loots):
 	hits = 0
 	for i in loots:
 		if i.collide_rect.colliderect(loot_inst.collide_rect):
-			hits=1
+			if iso_collide(i.collide_rect, loot_inst.collide_rect):
+				hits=1
 	return(hits)
 			
 def take_loot(	stats,loots,lp_buttons):
@@ -473,10 +475,10 @@ def pick_by_mat(	prole, settings, screen, stats, loots, brands, mfrs,
 			loot_inst.roll_image()
 			loot_inst.rebuild()
 			adjust_qc(	prole, loot_inst, 1)
-			print('active_hh = ' + str(active_hh.qualities) + ' & ' + str(active_hh.conditions))
-			print('active_hh = ' + str(prole.quality) + ' & ' + str(prole.condition))
-			print('active_hh = ' + str(loot_inst.quality_num) + ' & ' + str(loot_inst.condition_num))
-			print('\n')
+			#print('active_hh = ' + str(active_hh.qualities) + ' & ' + str(active_hh.conditions))
+			#print('active_hh = ' + str(prole.quality) + ' & ' + str(prole.condition))
+			#print('active_hh = ' + str(loot_inst.quality_num) + ' & ' + str(loot_inst.condition_num))
+			#print('\n')
 			done=fumble_in_yard(roll, prole, stats, settings, screen, 
 							loot_inst, loots)
 		init[9] = None

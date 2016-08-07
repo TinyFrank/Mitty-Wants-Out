@@ -606,6 +606,7 @@ class Loot(object):
 	
 	def roll_trim(self):
 		if self.trim:
+			#if you've already got trim...
 			if self.raw == "loot" and len(self.parts) > 1:
 				if self.parts[1][6] == self.trim: 
 					self.t_color = self.trim[2]
@@ -631,6 +632,7 @@ class Loot(object):
 				self.t_color_name = self.trim[0]
 				
 		elif not self.trim:
+			#if you haven't already got trim...
 			if self.raw == "loot" and len(self.parts) > 1:
 				#assign second part material as trim material	
 				self.trim = self.parts[1][6]
@@ -639,9 +641,13 @@ class Loot(object):
 				#if the material is dyed, select a dye color 
 				self.trim_cat = self.parts[1][4][0]
 				if self.trim_cat in self.dyed:
-					self.ct = randint(0,len(self.brand.colors)-1)
-					self.t_color =  self.colors[self.ct][1]					
-					self.t_color_name =  self.brand.colors[self.ct][0]
+					if len(self.brand.colors) > 1:
+						self.ct = randint(0,len(self.brand.colors)-1)
+						if self.brand.colors[self.ct][0] == self.color[0]:
+							pass
+						else:
+							self.t_color =  self.brand.colors[self.ct][1]					
+							self.t_color_name =  self.brand.colors[self.ct][0]
 					
 			elif self.raw == "loot" and len(self.parts) == 1:
 				#for parts and single part loots, pick randomly
@@ -828,8 +834,8 @@ class Loot(object):
 		self.collide_rect = self.rect.copy()
 		self.screen_rect = self.screen.get_rect()
 		footprint = self.collide_rect.width/self.collide_rect.height
-		if footprint < 2:
-			self.collide_rect.height = self.collide_rect.width * (1/2)
+		if footprint < 4:
+			self.collide_rect.height = self.collide_rect.width * (1/4)
 			self.collide_rect.bottom = self.rect.bottom
 		self.collide_rect.normalize()
 		

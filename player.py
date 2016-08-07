@@ -85,7 +85,7 @@ class Player(Sprite):
 				self.delta[0] = int((self.delta[0]/self.delta[2])*self.speed)
 				self.delta[1] = int((self.delta[1]/self.delta[2])*self.speed)
 				self.roll_rects()
-				print(self.collide_rect.x)
+				#print(self.collide_rect.x)
 				for i in loots:
 					if i.collide_rect.colliderect(self.collide_rect):
 						self.get_edges(i)
