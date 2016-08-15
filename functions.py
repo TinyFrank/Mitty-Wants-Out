@@ -18,7 +18,7 @@ def place_loot(	settings, screen, stats, loots, brands, retailers, mfrs):
 	debug_init = gen_init
 	debug_init[0]='loot'
 	#debug_init[2]= 'Bar'
-	#debug_init[3]=38
+	debug_init[3]=40
 	#debug_init[7]= 1.0
 	#debug_init[9]=['Gold ',80,(255,210,48),19.32]
 	#debug_init[10]=['Gold ',80,(255,210,48),19.32]

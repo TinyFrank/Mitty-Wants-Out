@@ -18,13 +18,14 @@ ctg_retail = [	'patio','entertainment','kitchenware','clothing',
 				'sanitary','toys','plumbing','hardware',
 				'souvenirs','foods','publishers','stationery',
 				'medical','automotive','camping','appliance',
-				'spirits','pet supplies','furniture','electronics']
+				'spirits','pet supplies','furniture','electronics',
+				'office supplies']
 
 ctg_industrial = ['petrochemical','plastics','fabricators',
 				'agriculture','carpentry','printers','glassworks','paper',
 				'fabrics','toolmaking','garment','chemical','distillery',
 				'soapworks','semiconductor','pharmaceutical','minerals',
-				'masonry']
+				'masonry','electronic','electrical','electromechanical']
 				
 words1 = [	'First','Best','Solid','OK','High','Golden','Sunny','Jelly',
 			'Friendly','Happy','Fresh','Tall','Great','Awesome','Perfect',

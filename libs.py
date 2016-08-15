@@ -143,8 +143,8 @@ soft_foods = (				['Margarine ',2,(255,255,150),0.96],
 							['Butter ',3,(255,255,120),0.96])
 								
 naturals = (				['Bone ',0.3,(234,228,168),1.9],
-							['Bone ',0.3,(234,228,168),1.9]							
-							)
+							['Ivory ',67,(234,228,220),1.9],
+							['Whalebone ',12,(234,228,200),1.7])
 		
 minerals = (				['Granite ',0.2,(115,113,121),2.75],
 							['Marble ',15,(20,20,20),2.8])
@@ -512,9 +512,36 @@ loot_types ={				1:[
 							["cable ","wire ",2,1,['metal'],None,None],
 							["screen ","chunk ",10,1,['plastic'],None,None]],
 							6,['semiconductor'],['electronics','appliance','entertainment'],
-							.4]
+							.4],
+							39:[
+							'Floppy Disk ',
+							['floppy'],
+							[["case ","sheet ",1,2,['plastic'],None,None],
+							["slider ","sheet ",1,1,['metal'],None,None],
+							["disk ","sheet ",1,1,['plastic'],None,None]],
+							.05,['semiconductor','electronic'],['office supplies','electronics','entertainment'],
+							.8],
+							40:[
+							'Computer Keyboard ',
+							['keyboard'],
+							[["case ","sheet ",1,8,['plastic','metal','wood','natural'],None,None],
+							["keys ","chunk ",[101,135,0],3,['metal','plastic','wood','natural'],None,None],
+							["internals ","chunk ",1,2,['plastic','metal'],None,None],
+							["cable ","wire ",1,1,['metal'],None,None]],
+							.9,['semiconductor','electronic'],['office supplies','electronics','entertainment'],
+							.2]
 							}
-	
+"""
+38(Index):[
+'Name ',
+['imagefilename'],
+[["first part name ","part type ",#qty,#contribution,['material','material'],None,None],
+["second part name ","part type ",[#minqty,#maxqty,#stepsize],#contribution,['material','material','material'],None,None],
+["contents name ","material type ",#qty,#contribution,['matcat','matcat'],None,None]]
+#defaultweight,['mfrcategory'],['retailcategory','retailcategory'],
+#footprintratio]	
+"""
+
 		#list of material categories
 mat_cats = (			'metal','wood','plastic','rubber','ceramic',
 						'fibre','paper','fluid','drink','lqd food','pwdr food',

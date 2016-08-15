@@ -1,7 +1,7 @@
 """
 Mitty Wants Out
 """
-import sys
+import sys 
 import pygame
 from pygame.sprite import Group
 import json

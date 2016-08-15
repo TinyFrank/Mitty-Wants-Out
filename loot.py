@@ -451,6 +451,10 @@ class Loot(object):
 						source_options.append(source[0])
 					else:
 						print('		HOWEVER this one is made from ' + str(self.mat_cat))
+			if not source_options: #if none of the sources/categories match, defer to the LT's category
+				for source in sources:
+					if source[0] in self.l_type[4]:
+						source_options.append(source[0])
 			print(source_options)
 			mfr_options = []
 			#make a list of viable mfrs
