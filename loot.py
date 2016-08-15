@@ -24,7 +24,10 @@ sources = [ ('petrochemical',['fluid','rubber']),
 			('semiconductor',['plastic','metal']),
 			('minerals',['solid chem']),
 			('pharmaceutical',['pills']),
-			('masonry',['mineral'])]
+			('masonry',['mineral']),
+			('electronic',['plastic','metal']),
+			('electrical',['plastic','metal']),
+			('electromechanical',['plastic','metal'])]
 
 lqds = ['fluid','drink','lqd food']
 
@@ -263,12 +266,14 @@ class Loot(object):
 		while True:
 			self.brand = choice(self.brands)
 			if self.raw == 'loot':
-				#print('getting BRAND for this LOOT')
-				#print(len(self.brands))
+				print('getting BRAND for this LOOT')
+				print(len(self.brands))
 				if self.brand.ri == 'retail':  #for retail brands...
 					if not self.mat_cat:
 						break
 					elif self.brand.ctg in self.l_type[5]:
+						print(self.brand.ctg)
+						print(self.l_type[5])
 						break
 								
 			elif self.raw == 'part' and self.mat_cat:
@@ -441,21 +446,21 @@ class Loot(object):
 	def roll_mfr(self):
 		if not self.mfr:
 			source_options = []
-			print(self.l_type[4])
+			#print(self.l_type[4])
 			#make a list of viable mfr sources
 			for source in sources:
 				if source[0] in self.l_type[4]:
-					print(str(source[0]) + ' company can produce a ' + str(self.l_type[0]))
+					#print(str(source[0]) + ' company can produce a ' + str(self.l_type[0]))
 					if self.mat_cat in source[1]:
-						print('		because this one is made from ' + str(self.mat_cat))
+						#print('		because this one is made from ' + str(self.mat_cat))
 						source_options.append(source[0])
-					else:
-						print('		HOWEVER this one is made from ' + str(self.mat_cat))
+					#else:
+						#print('		HOWEVER this one is made from ' + str(self.mat_cat))
 			if not source_options: #if none of the sources/categories match, defer to the LT's category
 				for source in sources:
 					if source[0] in self.l_type[4]:
 						source_options.append(source[0])
-			print(source_options)
+			#print(source_options)
 			mfr_options = []
 			#make a list of viable mfrs
 			for mfr in self.mfrs:	
@@ -498,7 +503,7 @@ class Loot(object):
 				elif self.parts[self.largest][0] == 'contents ':
 					self.material = self.parts[0][6]
 				self.m_color = self.material[2]
-				self.color = choice(self.brand.colors)
+				
 			if self.raw == 'part' and not self.mfr:
 				self.mat_cat = 'fluid'
 				if self.shape:
@@ -511,14 +516,7 @@ class Loot(object):
 						self.mat_cat = self.mat_cats[randint(0,len(self.mat_cats)-1)]
 					#material becomes any mat array from chosen category
 				self.material = choice(self.std_w[self.mat_cat][1])
-				self.color = ['N/A',[0,0,0,0]]
-				#main color becomes mat color
-				self.color[1] = self.material[2]
-				self.color[0] = self.material[0]
-				#if the material is dyed, select a dye color 
-				if self.mat_cat in self.dyed:
-					self.ct = randint(0,len(self.colors)-1)
-					self.color =  self.colors[self.ct]
+				
 			elif self.raw == 'part' and self.mfr:
 				for source in sources:
 					if source[0] == self.mfr.ctg:
@@ -535,6 +533,7 @@ class Loot(object):
 						self.mat_cat = cat
 					
 	def roll_color(self):
+		print(self.color)
 		if not self.color:
 			self.color = ['N/A',[0,0,0]]
 			if self.raw == 'loot':
@@ -552,7 +551,8 @@ class Loot(object):
 	
 	def is_dyeable(self):
 		if self.mat_cat in libs.dyed:
-			return(True)
+			if self.material[1] < 100:
+				return(True)
 		else:
 			return(False)
 					
