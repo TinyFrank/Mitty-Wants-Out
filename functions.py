@@ -18,7 +18,7 @@ def place_loot(	settings, screen, stats, loots, brands, retailers, mfrs):
 	debug_init = gen_init
 	debug_init[0]='loot'
 	#debug_init[2]= 'Bar'
-	#debug_init[3]=16
+	#debug_init[3]=38
 	#debug_init[7]= 1.0
 	#debug_init[9]=['Gold ',80,(255,210,48),19.32]
 	#debug_init[10]=['Gold ',80,(255,210,48),19.32]
@@ -27,7 +27,7 @@ def place_loot(	settings, screen, stats, loots, brands, retailers, mfrs):
 	#instantiate one loot
 	loot_inst = Loot(	settings, screen, stats.loot_val,gen_init,
 						brands=brands,mfrs=mfrs) 
-	#loot_inst = Loot(settings, screen, stats.loot_val,brands=brands) 
+	#loot_inst = Loot(settings, screen, stats.loot_val,brands=brands,mfrs=mfrs) 
 	loot_inst.construct()
 	locate_loot(settings, screen, stats, loot_inst, loots)
 
@@ -454,6 +454,7 @@ def pick_by_mat(	prole, settings, screen, stats, loots, brands, mfrs,
 				#pick_cat now holds the category of the working material
 		init = gen_init
 		init[9] = pick
+		print(pick)
 		init[0] = 'loot'
 		loot_inst = Loot(	settings, screen, stats.loot_val,init,
 							brands=brands,mfrs=mfrs)

@@ -152,8 +152,9 @@ class Loot(object):
 			#print('GETTING MAT_CAT')
 			self.get_mat_cat()
 			if self.raw == 'loot':
-				self.clean_l_types()
-				#print('LOOT TYPES ARE CLEAN')
+				if not self.l_type_num:
+					self.clean_l_types()
+					#print('LOOT TYPES ARE CLEAN')
 		elif not self.material:
 			#print('GETTING BRAND...')
 			self.roll_brand()
@@ -303,12 +304,17 @@ class Loot(object):
 					if self.l_type_num not in self.forbidden_lts:
 						break
 					count -=1
+					print(count)
 					if count <= 0:
 						break
 						
-		if not self.l_type: 
-			#assign that index's array to l_type
-			self.l_type_num = choice(range(1,len(self.loot_types)-1))
+			if not self.l_type: 
+				#assign that index's array to l_type
+				print('selected loot type randomly')
+				self.l_type_num = choice(range(1,len(self.loot_types)+1))
+				self.l_type = self.loot_types[self.l_type_num]
+		
+		else:
 			self.l_type = self.loot_types[self.l_type_num]
 		
 	def roll_weight(self):
@@ -332,7 +338,6 @@ class Loot(object):
 				self.weight *= setpoint
 			
 	def roll_parts(self):
-		print(self.l_type[0])
 		#check redundancy
 		if not self.parts:
 			#assign l_type parts array to self.parts
@@ -436,16 +441,17 @@ class Loot(object):
 	def roll_mfr(self):
 		if not self.mfr:
 			source_options = []
+			print(self.l_type[4])
 			#make a list of viable mfr sources
 			for source in sources:
 				if source[0] in self.l_type[4]:
-					#print(str(source[0]) + ' company can produce a ' + str(self.l_type[0]))
+					print(str(source[0]) + ' company can produce a ' + str(self.l_type[0]))
 					if self.mat_cat in source[1]:
-						#print('		because this one is made from ' + str(self.mat_cat))
+						print('		because this one is made from ' + str(self.mat_cat))
 						source_options.append(source[0])
-					#else:
-						#print('		HOWEVER this one is made from ' + str(self.mat_cat))
-			
+					else:
+						print('		HOWEVER this one is made from ' + str(self.mat_cat))
+			print(source_options)
 			mfr_options = []
 			#make a list of viable mfrs
 			for mfr in self.mfrs:	

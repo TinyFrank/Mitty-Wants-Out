@@ -502,7 +502,17 @@ loot_types ={				1:[
 							["stopper ","chunk ",1,1,['plastic','rubber','soft solid'],None,None],
 							["contents ","Wine ",1,80,['drink'],None,None]],
 							1.5,['glassworks','plastics'],['spirits','foods'],
-							.33]
+							.33],
+							38:[
+							'Digital Keyboard ',
+							['dkeyboard'],
+							[["body ","sheet ",1,6,['metal','plastic'],None,None],
+							["keys ","bar ",[65,88,0],2,['plastic','metal','natural'],None,None],
+							["internal frame ","chunk ",1,5,['metal','plastic'],None,None],
+							["cable ","wire ",2,1,['metal'],None,None],
+							["screen ","chunk ",10,1,['plastic'],None,None]],
+							6,['semiconductor'],['electronics','appliance','entertainment'],
+							.4]
 							}
 	
 		#list of material categories
